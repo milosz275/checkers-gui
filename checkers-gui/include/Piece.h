@@ -20,6 +20,8 @@ public:
 	Piece(char s, int x1, int y1);
 	int get_x(void) { return x; }
 	int get_y(void) { return y; }
+	int set_x(int x1) { return x = x1; }
+	int set_y(int y1) { return y = y1; }
 	char get_sign(void) { return sign; }
 
 	friend std::ostream& operator<<(std::ostream& os, const Piece* piece);

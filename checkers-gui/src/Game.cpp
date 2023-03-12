@@ -80,6 +80,7 @@ namespace Checkers
 	void Game::loop(void)
 	{
 		bool selected = false;
+		//rotate_board();
 		while (window.isOpen())
 		{
 			sf::sleep(sf::seconds(1.0f / 24));
@@ -91,12 +92,31 @@ namespace Checkers
 					window.close();
 				}
 
-				if (event.type == sf::Event::MouseButtonReleased)
+				if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
 				{
-					if (event.mouseButton.button == sf::Mouse::Left)
+					if (selected_piece != NULL)
 					{
-						selected = !selected;
+						int x = sf::Mouse::getPosition(window).x / square_size;
+						int y = sf::Mouse::getPosition(window).y / square_size;
+						/*if (is_rotated)
+						{
+							x = size - x - 1;
+							y = size - y - 1;
+						}*/
+						// change selected piece to fit into new spot
+						// todo: check coordinates
+
+						selected_piece->set_x(x);
+						selected_piece->set_y(y);
+						(*board)[x][y] = selected_piece;
+						//(*board)[selected_piece->get_x()][selected_piece->get_y()] = NULL;
+						selected_piece = NULL;
+						selected = false;
+						// rotate and if to evaluate opposite player
+						evaluate(&p_list_1);
 					}
+					else
+						selected = !selected;
 				}
 			}
 
@@ -108,11 +128,11 @@ namespace Checkers
 				selected_piece = NULL;
 				int x = sf::Mouse::getPosition(window).x / square_size;
 				int y = sf::Mouse::getPosition(window).y / square_size;
-				/*if (is_rotated)
+				if (is_rotated)
 				{
 					x = size - x - 1;
 					y = size - y - 1;
-				}*/
+				}
 				if ((*board)[x][y] != NULL)
 				{
 					std::cout << "x: " << x << "; y: " << y << "; piece: " << (*board)[x][y] << std::endl;
@@ -126,8 +146,11 @@ namespace Checkers
 			}
 			if (selected_piece != NULL)
 			{
-				/*if (!(selected_piece->get_av_list()->empty()))
-					highlight_selected(window, selected_piece->get_y(), selected_piece->get_x());*/
+				if (!(selected_piece->get_av_list()->empty()))
+				{
+					highlight_selected(window, selected_piece->get_x(), selected_piece->get_y());
+					for_each(selected_piece->get_av_list()->begin(), selected_piece->get_av_list()->end(), [this](AvailableMove* a) { highlight_available(window, a->get_x(), a->get_y()); });
+				}
 			}
 
 			for (int i = 0; i < size; ++i)
@@ -154,6 +177,7 @@ namespace Checkers
 			is_finished = player_1->move();
 			std::cout << board << std::endl;
 			rotate_board();
+			// evaluate player 2
 			if (is_finished) // break if finished
 				break;
 
@@ -162,6 +186,7 @@ namespace Checkers
 			is_finished = player_2->move();
 			std::cout << board << std::endl;
 			rotate_board();
+			// evaluate player 1
 
 			// tmp
 			player_1->print_player();
@@ -254,7 +279,6 @@ namespace Checkers
 
 	void Game::highlight_selected(sf::RenderWindow& window, int x, int y)
 	{
-		std::cout << "highlight" << std::endl;
 		sf::RectangleShape tile;
 		tile.setSize(sf::Vector2f(square_size, square_size));
 		tile.setFillColor(sf::Color(173, 134, 106, 255));
@@ -262,35 +286,27 @@ namespace Checkers
 		window.draw(tile);
 	}
 
+	void Game::highlight_available(sf::RenderWindow& window, int x, int y)
+	{
+		sf::RectangleShape tile;
+		tile.setSize(sf::Vector2f(square_size, square_size));
+		tile.setFillColor(sf::Color(103, 194, 106, 255));
+		tile.setPosition(sf::Vector2f(square_size * x, square_size * y));
+		window.draw(tile);
+	}
+
 
 	void Game::evaluate(std::list<Piece*>* list)
 	{
-		//for_each(list.begin(), list.end(), [this](Piece* p)
-		//	{
-		//		int x = p->get_x();
-		//		int y = p->get_y();
-		//		std::cout << "x: " << x << "; y: " << y << std::endl;
+		
 
-		//		if ((*board)[x][y] != NULL)
-		//			std::cout << (*board)[x][y] << std::endl;
-
-		//		// moves to right
-		//		if (x != size - 1 && y != size - 1)
-		//		{
-		//			std::cout << "tu jestem" << std::endl;
-		//			if ((*board)[x + 1][y + 1] == NULL)
-		//			{
-		//				std::cout << "available!" << std::endl;
-		//				//AvailableMove move(x + 1, y + 1);
-		//				(*p).get_av_list()->push_back(new AvailableMove(x + 1, y + 1));
-		//				//p->get_av_list()->push_back(move);
-		//			}
-
-		//		}
-		//		
-		//	});
 		for_each(list->begin(), list->end(), [this](Piece* p)
 			{
+				while (!(p->get_av_list()->empty()))
+				{
+					p->get_av_list()->pop_front();
+				}
+
 				int x = p->get_x();
 				int y = p->get_y();
 				std::cout << "x: " << x << "; y: " << y << std::endl;
