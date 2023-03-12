@@ -70,6 +70,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Users\mlsh\source\repos\checkers-gui\checkers-gui\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -110,7 +113,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\SFML-2.5.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics.lib;sfml-window.lib;sfml-system.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sfml-graphics.lib;sfml-window.lib;sfml-system.lib;sfml-audio.lib;sfml-network.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -130,7 +133,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\AvailableMove.cpp" />
+    <ClCompile Include="src\BasePlayer.cpp" />
+    <ClCompile Include="src\Bot.cpp" />
+    <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Piece.cpp" />
+    <ClCompile Include="src\Player.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\AvailableMove.h" />
+    <ClInclude Include="include\BasePlayer.h" />
+    <ClInclude Include="include\Bot.h" />
+    <ClInclude Include="include\Game.h" />
+    <ClInclude Include="include\Piece.h" />
+    <ClInclude Include="include\Player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
