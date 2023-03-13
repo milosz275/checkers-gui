@@ -3,7 +3,7 @@
 
 namespace Checkers
 {
-	Game::Game(int s) : is_finished(false), window(sf::VideoMode(square_size * size, square_size * size), "Checkers", sf::Style::Default, settings), selected_piece(NULL), is_rotated(false)
+	Game::Game(int s) : is_finished(false), window(sf::VideoMode(square_size * size, square_size * size), "Checkers", sf::Style::Default, settings), selected_piece(NULL), first_turn(true)
 	{
 		//board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, NULL));
 		board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, 0));
@@ -11,8 +11,8 @@ namespace Checkers
 		// todo: choice
 		std::string name_1 = "Some player 1";
 		std::string name_2 = "Some player 2";
-		player_1 = new Player('B', name_1);
-		player_2 = new Player('C', name_2);
+		player_1 = new Player('W', name_1);
+		player_2 = new Player('B', name_2);
 
 		// todo: change to algorithm
 		// board_1
@@ -46,9 +46,10 @@ namespace Checkers
 
 		settings.antialiasingLevel = 2.0;
 		
+		
 
 		// evaluate available moves
-		evaluate(&p_list_1);
+		evaluate_first();
 		//evaluate(p_list_2);
 	}
 
@@ -77,6 +78,8 @@ namespace Checkers
 		delete player_2;
 	}
 
+	void Game::switch_turn(void) { first_turn = !first_turn; }
+
 	void Game::loop(void)
 	{
 		bool selected = false;
@@ -98,22 +101,45 @@ namespace Checkers
 					{
 						int x = sf::Mouse::getPosition(window).x / square_size;
 						int y = sf::Mouse::getPosition(window).y / square_size;
-						/*if (is_rotated)
-						{
-							x = size - x - 1;
-							y = size - y - 1;
-						}*/
+						
 						// change selected piece to fit into new spot
 						// todo: check coordinates
 
-						selected_piece->set_x(x);
-						selected_piece->set_y(y);
-						(*board)[x][y] = selected_piece;
-						//(*board)[selected_piece->get_x()][selected_piece->get_y()] = NULL;
-						selected_piece = NULL;
-						selected = false;
-						// rotate and if to evaluate opposite player
-						evaluate(&p_list_1);
+						bool is_found = false;
+						for_each(selected_piece->get_av_list()->begin(), selected_piece->get_av_list()->end(), [&x, &y, &is_found](AvailableMove* a)
+						{
+							if (a->get_x() == x && a->get_y() == y)
+							{
+								std::cout << a->get_x() << " " << a->get_y() << std::endl;
+
+								is_found = true;
+							}
+						});
+						if (!is_found)
+							selected = false;
+						else
+						{
+							(*board)[selected_piece->get_x()][selected_piece->get_y()] = NULL;
+							selected_piece->set_x(x);
+							selected_piece->set_y(y);
+							(*board)[x][y] = selected_piece;
+							//(*board)[selected_piece->get_x()][selected_piece->get_y()] = NULL;
+							selected_piece = NULL;
+							selected = false;
+							switch_turn();
+
+							// rotate and if to evaluate opposite player
+							if (first_turn)
+							{
+								evaluate_first();
+								clear_list(&p_list_2);
+							}
+							else
+							{
+								evaluate_second();
+								clear_list(&p_list_1);
+							}
+						}
 					}
 					else
 						selected = !selected;
@@ -128,20 +154,20 @@ namespace Checkers
 				selected_piece = NULL;
 				int x = sf::Mouse::getPosition(window).x / square_size;
 				int y = sf::Mouse::getPosition(window).y / square_size;
-				if (is_rotated)
-				{
-					x = size - x - 1;
-					y = size - y - 1;
-				}
+				
 				if ((*board)[x][y] != NULL)
 				{
 					std::cout << "x: " << x << "; y: " << y << "; piece: " << (*board)[x][y] << std::endl;
-					for_each((*board)[x][y]->get_av_list()->begin(), (*board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
+					if (!(*board)[x][y]->get_av_list()->empty())
+						for_each((*board)[x][y]->get_av_list()->begin(), (*board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
 				}
 				else
 					std::cout << "x: " << x << "; y: " << y  << std::endl;
 				
-				selected_piece = (*board)[x][y];
+				if ((*board)[x][y] != NULL)
+					selected_piece = (*board)[x][y];
+				else
+					selected_piece = NULL;
 				selected = false;
 			}
 			if (selected_piece != NULL)
@@ -151,6 +177,8 @@ namespace Checkers
 					highlight_selected(window, selected_piece->get_x(), selected_piece->get_y());
 					for_each(selected_piece->get_av_list()->begin(), selected_piece->get_av_list()->end(), [this](AvailableMove* a) { highlight_available(window, a->get_x(), a->get_y()); });
 				}
+				else
+					selected_piece = NULL;
 			}
 
 			for (int i = 0; i < size; ++i)
@@ -176,7 +204,7 @@ namespace Checkers
 
 			is_finished = player_1->move();
 			std::cout << board << std::endl;
-			rotate_board();
+			
 			// evaluate player 2
 			if (is_finished) // break if finished
 				break;
@@ -185,7 +213,7 @@ namespace Checkers
 			//system("cls");
 			is_finished = player_2->move();
 			std::cout << board << std::endl;
-			rotate_board();
+			
 			// evaluate player 1
 
 			// tmp
@@ -221,7 +249,7 @@ namespace Checkers
 
 	std::vector<std::vector<Piece*>>* Game::get_board(void) { return board; }
 
-	void Game::rotate_board(void)
+	/*void Game::rotate_board(void)
 	{
 		is_rotated = !is_rotated;
 		for (int i = 0; i < size; ++i)
@@ -240,7 +268,7 @@ namespace Checkers
 				}
 			}
 		}
-	}
+	}*/
 
 	void Game::print_results(void)
 	{
@@ -296,19 +324,14 @@ namespace Checkers
 	}
 
 
-	void Game::evaluate(std::list<Piece*>* list)
+	void Game::evaluate_first(void)
 	{
-		
-
-		for_each(list->begin(), list->end(), [this](Piece* p)
+		for_each(p_list_1.begin(), p_list_1.end(), [this](Piece* p)
 			{
-				while (!(p->get_av_list()->empty()))
-				{
-					p->get_av_list()->pop_front();
-				}
-
 				int x = p->get_x();
 				int y = p->get_y();
+
+				std::cout << "evaluating" << std::endl;
 				std::cout << "x: " << x << "; y: " << y << std::endl;
 
 				if ((*board)[x][y] != NULL)
@@ -342,7 +365,57 @@ namespace Checkers
 
 
 	}
-	
+
+	void Game::evaluate_second(void)
+	{
+		for_each(p_list_2.begin(), p_list_2.end(), [this](Piece* p)
+			{
+				int x = p->get_x();
+				int y = p->get_y();
+
+				std::cout << "evaluating" << std::endl;
+				std::cout << "x: " << x << "; y: " << y << std::endl;
+
+				if ((*board)[x][y] != NULL)
+					std::cout << (*board)[x][y] << std::endl;
+
+				// moves to right
+				if (x != size - 1 && y != size - 1)
+				{
+					if ((*board)[x + 1][y + 1] == NULL)
+					{
+						std::cout << "available move to the right!" << std::endl;
+						//AvailableMove move(x + 1, y + 1);
+						(*p).get_av_list()->push_back(new AvailableMove(x + 1, y + 1));
+						//p->get_av_list()->push_back(move);
+					}
+				}
+
+				// moves to left
+				if (x != 0 && y != size - 1)
+				{
+					if ((*board)[x - 1][y + 1] == NULL)
+					{
+						std::cout << "available move to the left!" << std::endl;
+						//AvailableMove move(x + 1, y + 1);
+						(*p).get_av_list()->push_back(new AvailableMove(x - 1, y + 1));
+						//p->get_av_list()->push_back(move);
+					}
+				}
+
+			});
+	}
+
+	void Game::clear_list(std::list<Piece*>* list)
+	{
+		for_each(list->begin(), list->end(), [this](Piece* p)
+			{
+				while (!(p->get_av_list()->empty()))
+				{
+					p->get_av_list()->pop_front();
+				}
+			});
+	}
 }
 
 

@@ -26,7 +26,8 @@ namespace Checkers
 		//board
 		std::vector<std::vector<Piece*>>* board;
 		// flag relating to board being rotated == turn of the second player (upper)
-		bool is_rotated;
+		//bool is_rotated;
+		bool first_turn;
 		// player 1
 		BasePlayer* player_1;
 		// player 2
@@ -61,7 +62,8 @@ namespace Checkers
 
 		~Game();
 		// rotates the vector of vectors board, sets the is rotated flag to opposite
-		void rotate_board(void);
+		//void rotate_board(void);
+		void switch_turn(void);
 
 		std::vector<std::vector<Piece*>>* get_board(void);
 
@@ -78,7 +80,11 @@ namespace Checkers
 		void highlight_available(sf::RenderWindow& window, int x, int y);
 
 
-		void evaluate(std::list<Piece*>* list);
+		void evaluate_first(void);
+
+		void evaluate_second(void);
+
+		void clear_list(std::list<Piece*>* list);
 		
 	};
 

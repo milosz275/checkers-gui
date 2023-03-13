@@ -18,11 +18,11 @@ class Piece
 	std::list<AvailableMove*>* av_list;
 public:
 	Piece(char s, int x1, int y1);
-	int get_x(void) { return x; }
-	int get_y(void) { return y; }
-	int set_x(int x1) { return x = x1; }
-	int set_y(int y1) { return y = y1; }
-	char get_sign(void) { return sign; }
+	int get_x(void);
+	int get_y(void);
+	int set_x(int x1);
+	int set_y(int y1);
+	char get_sign(void);
 
 	friend std::ostream& operator<<(std::ostream& os, const Piece* piece);
 	std::list<AvailableMove*>* get_av_list(void);
