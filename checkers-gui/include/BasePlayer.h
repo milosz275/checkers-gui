@@ -21,6 +21,9 @@ public:
 	bool check_if_possible_move(int x_p, int y_p, int x, int y);
 	virtual bool move(void) = 0;
 	void add_piece(void);
+	int get_pieces(void);
+	int get_captured_pieces(void);
+	void capture(void);
 	void print_player(void);
 	BasePlayer(char s, std::string n);
 	~BasePlayer();

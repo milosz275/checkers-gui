@@ -15,7 +15,6 @@ namespace Checkers
 		player_2 = new Player('B', name_2);
 
 		// todo: change to algorithm
-		// board_1
 		// rows of the second player (upper)
 		for (int i = 0; i < 3; ++i)
 		{
@@ -43,14 +42,11 @@ namespace Checkers
 			}
 		}
 
-
+		// set the antialiasing
 		settings.antialiasingLevel = 2.0;
-		
-		
 
-		// evaluate available moves
+		// evaluate available moves for the first player
 		evaluate_first();
-		//evaluate(p_list_2);
 	}
 
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<Piece*>>* board)
@@ -84,51 +80,52 @@ namespace Checkers
 	{
 		bool selected = false;
 		//rotate_board();
+
+		// main loop
 		while (window.isOpen())
 		{
+			// 24 fps
 			sf::sleep(sf::seconds(1.0f / 24));
 
 			while (window.pollEvent(event))
 			{
 				if (event.type == sf::Event::Closed)
-				{
 					window.close();
-				}
 
 				if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
 				{
-					if (selected_piece != NULL)
+					if (selected_piece != NULL) // choice after highlighting
 					{
 						int x = sf::Mouse::getPosition(window).x / square_size;
 						int y = sf::Mouse::getPosition(window).y / square_size;
 						
-						// change selected piece to fit into new spot
-						// todo: check coordinates
-
+						// find corresponding piece
 						bool is_found = false;
 						for_each(selected_piece->get_av_list()->begin(), selected_piece->get_av_list()->end(), [&x, &y, &is_found](AvailableMove* a)
 						{
 							if (a->get_x() == x && a->get_y() == y)
 							{
 								std::cout << a->get_x() << " " << a->get_y() << std::endl;
-
 								is_found = true;
 							}
 						});
 						if (!is_found)
+						{
 							selected = false;
+							selected_piece = NULL;
+						}
 						else
 						{
+							// move the piece
 							(*board)[selected_piece->get_x()][selected_piece->get_y()] = NULL;
 							selected_piece->set_x(x);
 							selected_piece->set_y(y);
 							(*board)[x][y] = selected_piece;
-							//(*board)[selected_piece->get_x()][selected_piece->get_y()] = NULL;
 							selected_piece = NULL;
 							selected = false;
 							switch_turn();
 
-							// rotate and if to evaluate opposite player
+							// evaluate opposite player
 							if (first_turn)
 							{
 								evaluate_first();
@@ -149,27 +146,37 @@ namespace Checkers
 			window.clear();
 			draw(window);
 
+			// first choice, nothing is already highlighted
 			if (selected)
 			{
 				selected_piece = NULL;
+
 				int x = sf::Mouse::getPosition(window).x / square_size;
 				int y = sf::Mouse::getPosition(window).y / square_size;
 				
+				// if the correspoding field contains a piece
 				if ((*board)[x][y] != NULL)
 				{
 					std::cout << "x: " << x << "; y: " << y << "; piece: " << (*board)[x][y] << std::endl;
 					if (!(*board)[x][y]->get_av_list()->empty())
 						for_each((*board)[x][y]->get_av_list()->begin(), (*board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
+					selected_piece = (*board)[x][y];
 				}
 				else
-					std::cout << "x: " << x << "; y: " << y  << std::endl;
+				{
+					std::cout << "x: " << x << "; y: " << y << std::endl;
+					selected_piece = NULL;
+				}
 				
-				if ((*board)[x][y] != NULL)
+				/*if ((*board)[x][y] != NULL)
 					selected_piece = (*board)[x][y];
 				else
-					selected_piece = NULL;
+					selected_piece = NULL;*/
+
 				selected = false;
 			}
+
+			// highlight selected piece and its corresponding moves, when moves exist
 			if (selected_piece != NULL)
 			{
 				if (!(selected_piece->get_av_list()->empty()))
