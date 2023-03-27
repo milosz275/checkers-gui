@@ -46,7 +46,15 @@ namespace Checkers
 		settings.antialiasingLevel = 2.0;
 
 		// evaluate available moves for the first player
-		evaluate_first();
+		evaluate(p_list_1, board);
+
+
+		std::cout << "List of pieces of first player" << std::endl;
+		print_pieces(&p_list_1);
+
+		std::cout << "List of pieces of second player" << std::endl;
+		print_pieces(&p_list_2);
+
 	}
 
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<Piece*>>* board)
@@ -84,8 +92,8 @@ namespace Checkers
 		// main loop
 		while (window.isOpen())
 		{
-			// 24 fps
-			sf::sleep(sf::seconds(1.0f / 24));
+			// 10 fps
+			sf::sleep(sf::seconds(1.0f / 10));
 
 			while (window.pollEvent(event))
 			{
@@ -101,13 +109,18 @@ namespace Checkers
 						
 						// find corresponding piece
 						bool is_found = false;
-						for_each(selected_piece->get_av_list()->begin(), selected_piece->get_av_list()->end(), [&x, &y, &is_found](AvailableMove* a)
+						AvailableMove* found_move = NULL;
+
+						all_of(selected_piece->get_av_list()->begin(), selected_piece->get_av_list()->end(), [&x, &y, &is_found, &found_move](AvailableMove* a)
 						{
 							if (a->get_x() == x && a->get_y() == y)
 							{
 								std::cout << a->get_x() << " " << a->get_y() << std::endl;
+								found_move = a;
 								is_found = true;
+								return false; // break
 							}
+							return true; // continue
 						});
 						if (!is_found)
 						{
@@ -116,26 +129,76 @@ namespace Checkers
 						}
 						else
 						{
-							// move the piece
+							// if available move is a capture
+							//if (found_move->is_capture())
+							//{
+							//	// coords to delete
+							//	int x_d = 0;
+							//	int y_d = 0;
+							//}
+							
+							if (found_move->is_capture())
+							{
+								AvailableCapture* found_capture = dynamic_cast<AvailableCapture*>(found_move);
+								std::cout << "CONTROL" << std::endl;
+								std::cout << "Coords to delete" << found_capture->get_x_d() << " " << found_capture->get_y_d() << std::endl;
+								int x_d = found_capture->get_x_d();
+								int y_d = found_capture->get_y_d();
+								Piece* piece_to_delete = (*board)[x_d][y_d];
+								//delete piece_to_delete;
+								
+								//delete from list
+								(*board)[x_d][y_d] = NULL;
+								
+								if (first_turn)
+								{
+									player_2->capture();
+									delete_from_list(&p_list_2, piece_to_delete);
+									/*if (player_2->get_captured_pieces)
+									{
+										print_results();
+										return;
+									}*/
+								}
+								else
+								{
+
+								}
+							}
+							// todo: change to dynamic cast
+							/*if (typeid(found_move).name() == "AvailableCapture")
+							{
+								std::cout << "good code" << std::endl;
+							}*/
+
+							// move the piece (CAPTURE)
 							(*board)[selected_piece->get_x()][selected_piece->get_y()] = NULL;
 							selected_piece->set_x(x);
 							selected_piece->set_y(y);
 							(*board)[x][y] = selected_piece;
 							selected_piece = NULL;
 							selected = false;
+							
+							std::cout << "List of pieces of first player" << std::endl;
+							print_pieces(&p_list_1);
+							std::cout << "List of pieces of second player" << std::endl;
+							print_pieces(&p_list_2);
+
 							switch_turn();
 
 							// evaluate opposite player
 							if (first_turn)
 							{
-								evaluate_first();
+								evaluate(p_list_1, board);
 								clear_list(&p_list_2);
 							}
 							else
 							{
-								evaluate_second();
+								evaluate_inv(p_list_2, board);
 								clear_list(&p_list_1);
 							}
+
+
 						}
 					}
 					else
@@ -197,61 +260,58 @@ namespace Checkers
 				}
 			}
 
-			
-
-
 			window.display();
 		}
 
 
-		while (!is_finished)
-		{
-			// move of the first player
-			//system("cls");
+		//while (!is_finished)
+		//{
+		//	// move of the first player
+		//	//system("cls");
 
-			is_finished = player_1->move();
-			std::cout << board << std::endl;
-			
-			// evaluate player 2
-			if (is_finished) // break if finished
-				break;
+		//	is_finished = player_1->move();
+		//	std::cout << board << std::endl;
+		//	
+		//	// evaluate player 2
+		//	if (is_finished) // break if finished
+		//		break;
 
-			// move of the second player
-			//system("cls");
-			is_finished = player_2->move();
-			std::cout << board << std::endl;
-			
-			// evaluate player 1
+		//	// move of the second player
+		//	//system("cls");
+		//	is_finished = player_2->move();
+		//	std::cout << board << std::endl;
+		//	
+		//	// evaluate player 1
 
-			// tmp
-			player_1->print_player();
-			player_2->print_player();
+		//	// tmp
+		//	player_1->print_player();
+		//	player_2->print_player();
 
-			is_finished = true;
-		}
-		//print_results();
+		//	is_finished = true;
+		//}
+		////print_results();
 
-		std::cout << board << std::endl;
+		//std::cout << board << std::endl;
 
-		player_1->print_player();
-		player_2->print_player();
+		//player_1->print_player();
+		//player_2->print_player();
 
-		while (!p_list_1.empty())
-		{
-			std::cout << "sign: " << p_list_1.front()->get_sign() << "; x: " << p_list_1.front()->get_x() << "; y: " << p_list_1.front()->get_y() << std::endl;
-			while (!(p_list_1.front()->get_av_list()->empty()))
-			{
-				std::cout << "available move - x: " << p_list_1.front()->get_av_list()->front()->get_x() << "; y: " << p_list_1.front()->get_av_list()->front()->get_y() << std::endl;
-				p_list_1.front()->get_av_list()->pop_front();
-			}
-			p_list_1.pop_front();
-		}
+		//while (!p_list_1.empty())
+		//{
+		//	std::cout << "sign: " << p_list_1.front()->get_sign() << "; x: " << p_list_1.front()->get_x() << "; y: " << p_list_1.front()->get_y() << std::endl;
+		//	while (!(p_list_1.front()->get_av_list()->empty()))
+		//	{
+		//		std::cout << "available move - x: " << p_list_1.front()->get_av_list()->front()->get_x() << "; y: " << p_list_1.front()->get_av_list()->front()->get_y() << std::endl;
+		//		p_list_1.front()->get_av_list()->pop_front();
+		//	}
+		//	p_list_1.pop_front();
+		//}
 
-		while (!p_list_2.empty())
-		{
-			std::cout << "sign: " << p_list_2.front()->get_sign() << "; x: " << p_list_2.front()->get_x() << "; y: " << p_list_2.front()->get_y() << std::endl;
-			p_list_2.pop_front();
-		}
+		//while (!p_list_2.empty())
+		//{
+		//	std::cout << "sign: " << p_list_2.front()->get_sign() << "; x: " << p_list_2.front()->get_x() << "; y: " << p_list_2.front()->get_y() << std::endl;
+		//	p_list_2.pop_front();
+		//}
 	}
 
 	std::vector<std::vector<Piece*>>* Game::get_board(void) { return board; }
@@ -277,7 +337,7 @@ namespace Checkers
 		}
 	}*/
 
-	void Game::print_results(void)
+	void Game::print_results(std::ostream& os)
 	{
 		if (!first_won && !second_won)
 			std::cout << "Game wasn't finished" << std::endl;
@@ -331,9 +391,9 @@ namespace Checkers
 	}
 
 
-	void Game::evaluate_first(void)
+	void Game::evaluate(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p)
 	{
-		for_each(p_list_1.begin(), p_list_1.end(), [this](Piece* p)
+		for_each(list.begin(), list.end(), [this, &board_p](Piece* p)
 			{
 				int x = p->get_x();
 				int y = p->get_y();
@@ -341,30 +401,128 @@ namespace Checkers
 				std::cout << "evaluating" << std::endl;
 				std::cout << "x: " << x << "; y: " << y << std::endl;
 
-				if ((*board)[x][y] != NULL)
-					std::cout << (*board)[x][y] << std::endl;
+				if ((*board_p)[x][y] != NULL)
+					std::cout << (*board_p)[x][y] << std::endl;
 
-				// moves to right
-				if (x != size - 1 && y != 0)
+				// captures
+				bool possible_capture = false;
+				bool possible_capture_top_left = false;
+				bool possible_capture_top_right = false;
+				bool possible_capture_bottow_left = false;
+				bool possible_capture_bottom_right = false;
+
+				// check possible captures in every direction
+				// choose move with the most captures
+				// add to possible moves
+
+				// maybe move to right: captures, normal
+
+				// x ascending to the right  !
+				// y ascendint to the bottom !
+
+				// capture top right
+				if (x + 2 <= size - 1 && y - 2 >= 0 && (*board_p)[x + 1][y - 1] != NULL && (*board_p)[x + 1][y - 1]->get_sign() == player_2->get_sign() && (*board_p)[x + 2][y - 2] == NULL)
 				{
-					if ((*board)[x + 1][y - 1] == NULL)
-					{
-						std::cout << "available move to the right!" << std::endl;
-						//AvailableMove move(x + 1, y + 1);
-						(*p).get_av_list()->push_back(new AvailableMove(x + 1, y - 1));
-						//p->get_av_list()->push_back(move);
-					}
+					possible_capture = true;
+					possible_capture_top_right = true;
+					//(*p).get_av_list()->push_back(new AvailableMove(x + 2, y - 2));
+					(*p).get_av_list()->push_back(new AvailableCapture(x + 2, y - 2, x + 1, y - 1));
 				}
 
-				// moves to left
-				if (x != 0 && y != 0)
+				// capture top left
+				if (x - 2 >= 0 && y - 2 >= 0 && (*board_p)[x - 1][y - 1] != NULL && (*board_p)[x - 1][y - 1]->get_sign() == player_2->get_sign() && (*board_p)[x - 2][y - 2] == NULL)
 				{
-					if ((*board)[x - 1][y - 1] == NULL)
+					possible_capture = true;
+					possible_capture_top_left = true;
+					//(*p).get_av_list()->push_back(new AvailableMove(x + 2, y - 2));
+					(*p).get_av_list()->push_back(new AvailableCapture(x - 2, y - 2, x - 1, y - 1));
+				}
+
+				// capture bottom right
+				if (x + 2 <= size - 1 && y + 2 <= size - 1 && (*board_p)[x + 1][y + 1] != NULL && (*board_p)[x + 1][y + 1]->get_sign() == player_2->get_sign() && (*board_p)[x + 2][y + 2] == NULL)
+				{
+					possible_capture = true;
+					possible_capture_bottom_right = true;
+					//(*p).get_av_list()->push_back(new AvailableMove(x + 2, y - 2));
+					(*p).get_av_list()->push_back(new AvailableCapture(x + 2, y + 2, x + 1, y + 1));
+				}
+
+				// capture bottom left
+				if (x - 2 >= 0 && y + 2 <= size - 1 && (*board_p)[x - 1][y + 1] != NULL && (*board_p)[x - 1][y + 1]->get_sign() == player_2->get_sign() && (*board_p)[x - 2][y + 2] == NULL)
+				{
+					possible_capture = true;
+					possible_capture_bottow_left = true;
+					//(*p).get_av_list()->push_back(new AvailableMove(x + 2, y - 2));
+					(*p).get_av_list()->push_back(new AvailableCapture(x - 2, y + 2, x - 1, y + 1));
+				}
+
+
+				if (possible_capture)
+				{
+					// evaluate copy of the board recursively in every direction and find highest number of captures to add to base moves list
+					int capture_id = 0; // 1 - top right, 2 - top left, 3 - bottom right, 4 - bottom left
+					int capture_counter_top_left = 0;
+					int capture_counter_top_right = 0;
+					int capture_counter_bottow_left = 0;
+					int capture_counter_bottom_right = 0;
+					if (possible_capture_top_right)
 					{
-						std::cout << "available move to the left!" << std::endl;
-						//AvailableMove move(x + 1, y + 1);
-						(*p).get_av_list()->push_back(new AvailableMove(x - 1, y - 1));
-						//p->get_av_list()->push_back(move);
+						std::vector<std::vector<Piece*>> copy_of_board = *board;
+
+						Piece* moving_piece = (copy_of_board)[x][y];
+						(copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
+						moving_piece->set_x(x);
+						moving_piece->set_y(y);
+						(copy_of_board)[x][y] = moving_piece;
+						moving_piece = NULL;
+
+						// now, copy of board contains board with moved piece
+						//evaluate()
+
+						// evaluate return true if possible capture
+						//recursively while evaluate true counter++
+					}
+					if (possible_capture_top_left)
+					{
+						std::vector<std::vector<Piece*>> copy_of_board = *board;
+					}
+					if (possible_capture_bottom_right)
+					{
+						std::vector<std::vector<Piece*>> copy_of_board = *board;
+					}
+					if (possible_capture_bottow_left)
+					{
+						std::vector<std::vector<Piece*>> copy_of_board = *board;
+					}
+
+					//find max counter
+
+					// if counter == max push back available capture
+				}
+				else
+				{
+					// moves to right
+					if (x != size - 1 && y != 0)
+					{
+						if ((*board_p)[x + 1][y - 1] == NULL)
+						{
+							std::cout << "available move to the right!" << std::endl;
+							//AvailableMove move(x + 1, y + 1);
+							(*p).get_av_list()->push_back(new AvailableMove(x + 1, y - 1));
+							//p->get_av_list()->push_back(move);
+						}
+					}
+
+					// moves to left
+					if (x != 0 && y != 0)
+					{
+						if ((*board_p)[x - 1][y - 1] == NULL)
+						{
+							std::cout << "available move to the left!" << std::endl;
+							//AvailableMove move(x + 1, y + 1);
+							(*p).get_av_list()->push_back(new AvailableMove(x - 1, y - 1));
+							//p->get_av_list()->push_back(move);
+						}
 					}
 				}
 
@@ -373,9 +531,9 @@ namespace Checkers
 
 	}
 
-	void Game::evaluate_second(void)
+	void Game::evaluate_inv(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p)
 	{
-		for_each(p_list_2.begin(), p_list_2.end(), [this](Piece* p)
+		for_each(list.begin(), list.end(), [this, &board_p](Piece* p)
 			{
 				int x = p->get_x();
 				int y = p->get_y();
@@ -383,45 +541,59 @@ namespace Checkers
 				std::cout << "evaluating" << std::endl;
 				std::cout << "x: " << x << "; y: " << y << std::endl;
 
-				if ((*board)[x][y] != NULL)
-					std::cout << (*board)[x][y] << std::endl;
+				if ((*board_p)[x][y] != NULL)
+					std::cout << (*board_p)[x][y] << std::endl;
 
-				// moves to right
-				if (x != size - 1 && y != size - 1)
+				// captures
+				bool possible_capture = false;
+
+				// capture
+
+				if (!possible_capture)
 				{
-					if ((*board)[x + 1][y + 1] == NULL)
+					// if any piece is on last row, change to king
+
+
+					// moves to right
+					if (x != size - 1 && y != size - 1)
 					{
-						std::cout << "available move to the right!" << std::endl;
-						//AvailableMove move(x + 1, y + 1);
-						(*p).get_av_list()->push_back(new AvailableMove(x + 1, y + 1));
-						//p->get_av_list()->push_back(move);
+						if ((*board_p)[x + 1][y + 1] == NULL)
+						{
+							std::cout << "available move to the right!" << std::endl;
+							(*p).get_av_list()->push_back(new AvailableMove(x + 1, y + 1));
+						}
+					}
+
+					// moves to left
+					if (x != 0 && y != size - 1)
+					{
+						if ((*board_p)[x - 1][y + 1] == NULL)
+						{
+							std::cout << "available move to the left!" << std::endl;
+							(*p).get_av_list()->push_back(new AvailableMove(x - 1, y + 1));
+						}
 					}
 				}
-
-				// moves to left
-				if (x != 0 && y != size - 1)
-				{
-					if ((*board)[x - 1][y + 1] == NULL)
-					{
-						std::cout << "available move to the left!" << std::endl;
-						//AvailableMove move(x + 1, y + 1);
-						(*p).get_av_list()->push_back(new AvailableMove(x - 1, y + 1));
-						//p->get_av_list()->push_back(move);
-					}
-				}
-
 			});
 	}
+	void Game::clear_list(std::list<Piece*>* list) { for_each(list->begin(), list->end(), [this](Piece* p) { while (!(p->get_av_list()->empty())) { p->get_av_list()->pop_front(); } }); }
+	
+	void Game::print_pieces(std::list<Piece*>* list, std::ostream& os) { std::for_each(list->begin(), list->end(), [i = 1, this, &os](Piece* p) mutable { os << i++ << "; sign: " << p << "; x: " << p->get_x() << "; y: " << p->get_y() << std::endl; }); }
 
-	void Game::clear_list(std::list<Piece*>* list)
+	void Game::delete_from_list(std::list<Piece*>* list, Piece* piece_to_delete)
 	{
-		for_each(list->begin(), list->end(), [this](Piece* p)
-			{
-				while (!(p->get_av_list()->empty()))
-				{
-					p->get_av_list()->pop_front();
-				}
-			});
+		//all_of(list->begin(), list->end(), [&piece_to_delete](Piece* p)
+		//	{
+		//		if (p->get_x() == piece_to_delete->get_x() && p->get_y() == piece_to_delete->get_y())
+		//		{
+		//			std::cout << a->get_x() << " " << a->get_y() << std::endl;
+		//			found_move = a;
+		//			is_found = true;
+		//			return false; // break
+		//		}
+		//		return true; // continue
+		//	});
+		list->remove(piece_to_delete);
 	}
 }
 

@@ -23,10 +23,9 @@ namespace Checkers
 
 	class Game
 	{
-		//board
+		// main game board
 		std::vector<std::vector<Piece*>>* board;
-		// flag relating to board being rotated == turn of the second player (upper)
-		//bool is_rotated;
+		// flag indicating turn of the first player
 		bool first_turn;
 		// player 1
 		BasePlayer* player_1;
@@ -42,52 +41,55 @@ namespace Checkers
 		bool first_won;
 		// flag indicating that second player won
 		bool second_won;
-		//
+		// pointer to selected piece on the board
+		Piece* selected_piece;
 
 		// square/tile size
 		float square_size = 75.0;
 
+		// sfml fields
 		sf::ContextSettings settings;
 		sf::RenderWindow window;
 		sf::Event event;
 
-
-		Piece* selected_piece;
-
 	public:
 		// board size
 		static const int size = 10;
-
+		// create the game with s size of the board
 		Game(int s);
-
+		// deletes the game
 		~Game();
 		// rotates the vector of vectors board, sets the is rotated flag to opposite
 		//void rotate_board(void);
 		void switch_turn(void);
-
+		// returns main game board
 		std::vector<std::vector<Piece*>>* get_board(void);
-
+		// executes the game
 		void loop(void);
+		// prints result to given stream
+		void print_results(std::ostream& os = std::cout);
 
-		void print_results(void);
+		void print_pieces(std::list<Piece*>* list, std::ostream& os = std::cout);
 
-
-
+		// draws main game board in the given window
 		void draw(sf::RenderWindow& window);
-
+		// highlights selected piece of given coords (brown)
 		void highlight_selected(sf::RenderWindow& window, int x, int y);
-
+		// higlight selected piece of given coords (green)
 		void highlight_available(sf::RenderWindow& window, int x, int y);
 
-
-		void evaluate_first(void);
-
-		void evaluate_second(void);
-
+		// evaluate possible moves of a player starting on the bottom of the board (first)
+		void evaluate(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p);
+		// evaluate possible moves of a player starting on the top of the board (second)
+		void evaluate_inv(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p);
+		// clears available moves list for every piece in pieces list (gets through lists in list)
 		void clear_list(std::list<Piece*>* list);
+
+
+		void delete_from_list(std::list<Piece*>* list, Piece* piece_to_delete);
 		
 	};
-
+	// returns board to the stream
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<Piece*>>* board);
 }
 
