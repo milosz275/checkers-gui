@@ -79,9 +79,9 @@ namespace Checkers
 		void highlight_available(sf::RenderWindow& window, int x, int y);
 
 		// evaluate possible moves of a player starting on the bottom of the board (first)
-		void evaluate(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p);
+		void evaluate(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p, int* counter);
 		// evaluate possible moves of a player starting on the top of the board (second)
-		void evaluate_inv(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p);
+		void evaluate_inv(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p, int* counter);
 		// clears available moves list for every piece in pieces list (gets through lists in list)
 		void clear_list(std::list<Piece*>* list);
 
