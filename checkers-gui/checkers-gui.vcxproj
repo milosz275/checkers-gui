@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\AvailableCapture.cpp" />
     <ClCompile Include="src\AvailableMove.cpp" />
     <ClCompile Include="src\BasePlayer.cpp" />
     <ClCompile Include="src\Bot.cpp" />
@@ -142,6 +143,7 @@
     <ClCompile Include="src\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\AvailableCapture.h" />
     <ClInclude Include="include\AvailableMove.h" />
     <ClInclude Include="include\BasePlayer.h" />
     <ClInclude Include="include\Bot.h" />

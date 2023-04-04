@@ -9,6 +9,7 @@
 #include "Player.h"
 #include "Bot.h"
 #include "Piece.h"
+#include "AvailableCapture.h"
 
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
@@ -19,6 +20,10 @@
 
 namespace Checkers
 {
+	// xnor gate
+	bool xnor(bool A, bool B);
+
+	// map containing letters and their corresponding integers
 	static std::map<char, int> coords{ {'a', 1}, {'b', 2}, {'c', 3}, {'d', 4}, {'e', 5}, {'f', 6}, {'g', 7}, {'h', 8}, {'i', 9}, {'j', 10} };
 
 	class Game
@@ -43,6 +48,8 @@ namespace Checkers
 		bool second_won;
 		// pointer to selected piece on the board
 		Piece* selected_piece;
+		// flag indicating if there is one or more captures, not allowing other moves
+		bool available_capture;
 
 		// square/tile size
 		float square_size = 75.0;
@@ -79,15 +86,15 @@ namespace Checkers
 		void highlight_available(sf::RenderWindow& window, int x, int y);
 
 		// evaluate possible moves of a player starting on the bottom of the board (first)
-		void evaluate(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p, int* counter);
+		bool evaluate(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p, int* counter);
 		// evaluate possible moves of a player starting on the top of the board (second)
-		void evaluate_inv(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p, int* counter);
+		bool evaluate_inv(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p, int* counter);
 		// clears available moves list for every piece in pieces list (gets through lists in list)
 		void clear_list(std::list<Piece*>* list);
 
-
+		// deletes given piece from given list
 		void delete_from_list(std::list<Piece*>* list, Piece* piece_to_delete);
-		
+
 	};
 	// returns board to the stream
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<Piece*>>* board);

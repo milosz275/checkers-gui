@@ -7,6 +7,7 @@ class Bot : public BasePlayer
 {
 
 public:
+	//
 	Bot();
 	~Bot();
 };
