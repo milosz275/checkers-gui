@@ -110,6 +110,11 @@ namespace Checkers
 
 				if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
 				{
+					if (!available_capture) // check for new kings made
+					{
+
+					}
+
 					if (selected_piece != NULL) // choice after highlighting
 					{
 						int x = sf::Mouse::getPosition(window).x / square_size;
@@ -160,23 +165,24 @@ namespace Checkers
 									player_2->capture();
 									delete_from_list(&p_list_2, piece_to_delete);
 									player_1->set_combo(true);
-									std::cout << "combo gracza 1" << std::endl;
+									std::cout << "player's 1 combo" << std::endl;
 								}
 								else
 								{
 									player_1->capture();
 									delete_from_list(&p_list_1, piece_to_delete);
 									player_2->set_combo(true);
-									std::cout << "combo gracza 2" << std::endl;
+									std::cout << "player's 2 combo" << std::endl;
 								}
 							}
 							else
 							{
 								player_1->set_combo(false);
 								player_2->set_combo(false);
-								std::cout << "combo usuniete" << std::endl;
+								std::cout << "combo deleted" << std::endl;
 							}
-							// move the piece (CAPTURE)
+
+							// move the piece (piece, which is moving -> both capture and normal move)
 							(*board)[selected_piece->get_x()][selected_piece->get_y()] = NULL;
 							selected_piece->set_x(x);
 							selected_piece->set_y(y);
@@ -189,7 +195,7 @@ namespace Checkers
 							std::cout << "List of pieces of second player" << std::endl;
 							print_pieces(&p_list_2);
 
-							// add end of game
+							// add end of game *
 							if (!player_1->get_combo() && !player_2->get_combo())
 								switch_turn();
 							else
@@ -197,7 +203,7 @@ namespace Checkers
 								clear_list(&p_list_1);
 								clear_list(&p_list_2);
 							}
-							// add end of game
+							// add end of game *
 
 							// evaluate opposite player
 							int dummy = 0;

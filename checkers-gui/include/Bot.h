@@ -3,13 +3,16 @@
 
 #include "BasePlayer.h"
 
-class Bot : public BasePlayer
+namespace Checkers
 {
+	class Bot : public BasePlayer
+	{
 
-public:
-	//
-	Bot();
-	~Bot();
-};
+	public:
+		//
+		Bot();
+		~Bot();
+	};
+}
 
 #endif

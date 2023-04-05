@@ -20,9 +20,6 @@
 
 namespace Checkers
 {
-	// xnor gate
-	bool xnor(bool A, bool B);
-
 	// map containing letters and their corresponding integers
 	static std::map<char, int> coords{ {'a', 1}, {'b', 2}, {'c', 3}, {'d', 4}, {'e', 5}, {'f', 6}, {'g', 7}, {'h', 8}, {'i', 9}, {'j', 10} };
 
@@ -68,6 +65,7 @@ namespace Checkers
 		~Game();
 		// rotates the vector of vectors board, sets the is rotated flag to opposite
 		//void rotate_board(void);
+		// switches first_turn flag, indicating that it is move of the first player
 		void switch_turn(void);
 		// returns main game board
 		std::vector<std::vector<Piece*>>* get_board(void);
@@ -85,9 +83,9 @@ namespace Checkers
 		// higlight selected piece of given coords (green)
 		void highlight_available(sf::RenderWindow& window, int x, int y);
 
-		// evaluate possible moves of a player starting on the bottom of the board (first)
+		// evaluate possible moves of a player starting on the bottom of the board (first), returns true if there is at least on possible capture
 		bool evaluate(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p, int* counter);
-		// evaluate possible moves of a player starting on the top of the board (second)
+		// evaluate possible moves of a player starting on the top of the board (second) - change to one function with proper parameters
 		bool evaluate_inv(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p, int* counter);
 		// clears available moves list for every piece in pieces list (gets through lists in list)
 		void clear_list(std::list<Piece*>* list);
