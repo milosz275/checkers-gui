@@ -36,36 +36,23 @@ namespace Checkers
     {
         float radius = 30;
 
-
+        sf::CircleShape shape(radius);
         if (!is_captured)
         {
-            sf::CircleShape shape(radius);
             if (sign == 'W')
-            {
-                if (is_king)
-                    shape.setFillColor(sf::Color(247, 246, 246, 255));
-                else
-                    shape.setFillColor(sf::Color(217, 216, 216, 255));
-
-            }
-            else if (sign == 'B')
-            {
-                if (is_king)
-                    shape.setFillColor(sf::Color(56, 53, 52, 255));
-                else
-                    shape.setFillColor(sf::Color(26, 23, 22, 255));
-            }
-            else // for example "x" for dead, but in multicapture pieces
-            {
-                if (is_king)
-                    shape.setFillColor(sf::Color(99, 99, 99, 255));
-                else
-                    shape.setFillColor(sf::Color(59, 59, 59, 255));
-            }
-            shape.setPosition(sf::Vector2f(x * 75 + (75 - radius * 2) / 2, y * 75 + (75 - 2 * radius) / 2));
-            window.draw(shape);
-
+                shape.setFillColor(sf::Color(217, 216, 216, 255));
+            else // 'B'
+                shape.setFillColor(sf::Color(26, 23, 22, 255));
         }
+        else // during multicapture
+        {
+            if (sign == 'W')
+                shape.setFillColor(sf::Color(197, 196, 196, 255));
+            else // 'B'
+                shape.setFillColor(sf::Color(59, 59, 59, 255));
+        }
+        shape.setPosition(sf::Vector2f(x * 75 + (75 - radius * 2) / 2, y * 75 + (75 - 2 * radius) / 2));
+        window.draw(shape);
     }
 
     std::list<AvailableMove*>* Piece::get_av_list(void)

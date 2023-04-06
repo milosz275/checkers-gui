@@ -159,8 +159,7 @@ namespace Checkers
 								std::cout << "CONTROL" << std::endl;
 								std::cout << "Coords to delete" << x_d << " " << y_d << std::endl;
 								
-								// push to the "to delete list" (delete later)
-								to_delete_list.push_back(new Piece('x', x_d, y_d));
+								
 								(*board)[x_d][y_d]->set_captured();
 								
 								
@@ -168,6 +167,9 @@ namespace Checkers
 								{
 									player_2->capture();
 									
+									// push to the "to delete list" (delete later)
+									to_delete_list.push_back(new Piece('B', x_d, y_d));
+
 									player_1->set_combo(true);
 									std::cout << "player's 1 combo" << std::endl;
 								}
@@ -175,6 +177,9 @@ namespace Checkers
 								{
 									player_1->capture();
 									
+									// push to the "to delete list" (delete later)
+									to_delete_list.push_back(new Piece('W', x_d, y_d));
+
 									player_2->set_combo(true);
 									std::cout << "player's 2 combo" << std::endl;
 								}
@@ -226,6 +231,7 @@ namespace Checkers
 									clear_to_delete_list(&to_delete_list, &p_list_2);
 
 									clear_list(&p_list_1);
+									//clear_list(&p_list_2);
 									player_1->set_combo(false);
 									switch_turn();
 									available_capture = evaluate_inv(p_list_2, board, &dummy);
@@ -246,6 +252,7 @@ namespace Checkers
 									// delete opponent's pieces of multi capture, clear failed list of possible moves, cancel combo, evaluate again
 									clear_to_delete_list(&to_delete_list, &p_list_1);
 
+									//clear_list(&p_list_1);
 									clear_list(&p_list_2);
 									player_2->set_combo(false);
 									switch_turn();
@@ -298,7 +305,7 @@ namespace Checkers
 									});
 								for_each((*board)[x][y]->get_av_list()->begin(), (*board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
 							}
-							if ((found_capture && available_capture) || (!found_capture && !available_capture))
+							//if ((found_capture && available_capture) || (!found_capture && !available_capture))
 								selected_piece = (*board)[x][y];
 						}
 						else
@@ -324,7 +331,7 @@ namespace Checkers
 									});
 								for_each((*board)[x][y]->get_av_list()->begin(), (*board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
 							}
-							if ((found_capture && available_capture) || (!found_capture && !available_capture))
+							//if ((found_capture && available_capture) || (!found_capture && !available_capture))
 								selected_piece = (*board)[x][y];
 						}
 						else
@@ -401,8 +408,8 @@ namespace Checkers
 					if ((*board)[i][j] != NULL)
 						(*board)[i][j]->draw(window);
 
-			// print pieces in multicapture
-			for_each(to_delete_list.begin(), to_delete_list.end(), [this](Piece* p) { p->draw(window); });
+			//// print pieces in multicapture
+			//for_each(to_delete_list.begin(), to_delete_list.end(), [this](Piece* p) { p->draw(window); });
 
 			window.display();
 		}
@@ -887,7 +894,7 @@ namespace Checkers
 				int x = p->get_x();
 				int y = p->get_y();
 
-				std::cout << "evaluating" << std::endl;
+				std::cout << "evaluating inverted" << std::endl;
 				std::cout << "x: " << x << "; y: " << y << std::endl;
 
 				if ((*board_p)[x][y] != NULL)
@@ -972,7 +979,7 @@ namespace Checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 							int moves = 1;
-							evaluate(copy_of_list, copy_of_board, &moves);
+							evaluate_inv(copy_of_list, copy_of_board, &moves);
 							capture_counter[0] = moves;
 							std::cout << "moves counter (top right): " << moves << std::endl;
 						}
@@ -981,7 +988,7 @@ namespace Checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
 							(*counter)++;
-							evaluate(copy_of_list, copy_of_board, counter);
+							evaluate_inv(copy_of_list, copy_of_board, counter);
 						}
 					}
 
@@ -1027,7 +1034,7 @@ namespace Checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 							int moves = 1;
-							evaluate(copy_of_list, copy_of_board, &moves);
+							evaluate_inv(copy_of_list, copy_of_board, &moves);
 							capture_counter[1] = moves;
 							std::cout << "moves counter (top left): " << moves << std::endl;
 						}
@@ -1036,7 +1043,7 @@ namespace Checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
 							(*counter)++;
-							evaluate(copy_of_list, copy_of_board, counter);
+							evaluate_inv(copy_of_list, copy_of_board, counter);
 						}
 					}
 
@@ -1082,7 +1089,7 @@ namespace Checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 							int moves = 1;
-							evaluate(copy_of_list, copy_of_board, &moves);
+							evaluate_inv(copy_of_list, copy_of_board, &moves);
 							capture_counter[2] = moves;
 							std::cout << "moves counter (bottom right): " << moves << std::endl;
 						}
@@ -1091,7 +1098,7 @@ namespace Checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
 							(*counter)++;
-							evaluate(copy_of_list, copy_of_board, counter);
+							evaluate_inv(copy_of_list, copy_of_board, counter);
 						}
 					}
 
@@ -1137,7 +1144,7 @@ namespace Checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 							int moves = 1;
-							evaluate(copy_of_list, copy_of_board, &moves);
+							evaluate_inv(copy_of_list, copy_of_board, &moves);
 							capture_counter[3] = moves;
 							std::cout << "moves counter (bottom left): " << moves << std::endl;
 						}
@@ -1146,7 +1153,7 @@ namespace Checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
 							(*counter)++;
-							evaluate(copy_of_list, copy_of_board, counter);
+							evaluate_inv(copy_of_list, copy_of_board, counter);
 						}
 					} // all recursive function made
 
