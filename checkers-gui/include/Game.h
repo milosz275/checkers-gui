@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <map>
+
 #include "BasePlayer.h"
 #include "Player.h"
 #include "Bot.h"
@@ -37,6 +38,8 @@ namespace Checkers
 		std::list<Piece*> p_list_1;
 		// piece list of player 2
 		std::list<Piece*> p_list_2;
+		// list of pieces to delete after multicapture (combo)
+		std::list<Piece*> to_delete_list;
 		// flag indicating finished game
 		bool is_finished;
 		// flag indicating that first player won
@@ -89,7 +92,8 @@ namespace Checkers
 		bool evaluate_inv(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p, int* counter);
 		// clears available moves list for every piece in pieces list (gets through lists in list)
 		void clear_list(std::list<Piece*>* list);
-
+		// 
+		void clear_to_delete_list(std::list<Piece*>* del_list, std::list<Piece*>* src_list);
 		// deletes given piece from given list
 		void delete_from_list(std::list<Piece*>* list, Piece* piece_to_delete);
 

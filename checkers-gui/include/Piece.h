@@ -39,6 +39,10 @@ namespace Checkers
 		int set_y(int y1);
 		// returns sign of the piece
 		char get_sign(void);
+		// sets flag indicating if the piece is captured and returns set value
+		bool set_captured(bool t = true);
+		// returns true, if piece is already captured, false respectively
+		bool get_is_captured(void);
 		// lets to print the piece in given stream
 		friend std::ostream& operator<<(std::ostream& os, const Piece* piece);
 		// returns the list of all evaluated moves

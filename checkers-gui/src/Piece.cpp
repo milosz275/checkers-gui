@@ -8,6 +8,8 @@ namespace Checkers
         //av_list->push_back(AvailableMove(1, 1));
     }
 
+    Piece::~Piece() {}
+
     int Piece::get_x(void) { return x; }
 
     int Piece::get_y(void) { return y; }
@@ -17,6 +19,10 @@ namespace Checkers
     int Piece::set_y(int y1) { return y = y1; }
 
     char Piece::get_sign(void) { return sign; }
+
+    bool Piece::set_captured(bool t) { return is_captured = t; }
+
+    bool Piece::get_is_captured(void) { return is_captured; }
 
     std::ostream& operator<<(std::ostream& os, const Piece* piece)
     {
@@ -49,7 +55,7 @@ namespace Checkers
                 else
                     shape.setFillColor(sf::Color(26, 23, 22, 255));
             }
-            else
+            else // for example "x" for dead, but in multicapture pieces
             {
                 if (is_king)
                     shape.setFillColor(sf::Color(99, 99, 99, 255));
