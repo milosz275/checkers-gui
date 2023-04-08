@@ -10,7 +10,6 @@ namespace Checkers
 	{
 
 	public:
-		bool move(void);
 		// creates the player of given sign and name
 		Player(char s, std::string n);
 		// deletes the player

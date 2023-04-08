@@ -24,12 +24,6 @@ namespace Checkers
 		char get_sign(void);
 		// returns player nickname
 		std::string get_name(void);
-		// checks if the piece at given coordinates can move
-		bool check_if_possible_move(int x_p, int y_p);
-		// checks if the given coordinates are allowed to go: x_p, y_p: coordinates of the piece; x,y: coordinates of target place
-		bool check_if_possible_move(int x_p, int y_p, int x, int y);
-		// to delete
-		virtual bool move(void) = 0;
 		// increases piece count by x
 		void add_piece(int x = 1);
 		// returns living pieces 

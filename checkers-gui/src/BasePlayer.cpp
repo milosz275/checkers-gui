@@ -2,7 +2,7 @@
 
 namespace Checkers
 {
-	BasePlayer::BasePlayer(char s, std::string n) : sign(s), name(n), pieces(0), captured_pieces(0) {}
+	BasePlayer::BasePlayer(char s, std::string n) : sign(s), name(n), pieces(0), captured_pieces(0), combo(false) {}
 
 	BasePlayer::~BasePlayer() {}
 
@@ -13,13 +13,6 @@ namespace Checkers
 	bool BasePlayer::get_combo(void) { return combo; }
 
 	bool BasePlayer::set_combo(bool c) { return combo = c; }
-
-	bool BasePlayer::check_if_possible_move(int x_p, int y_p, int x, int y)
-	{
-
-
-		return false;
-	}
 
 	void BasePlayer::add_piece(int x) { pieces += x; }
 

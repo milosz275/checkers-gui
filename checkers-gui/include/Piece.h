@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <list>
+#include "Game.h"
 #include "AvailableMove.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>

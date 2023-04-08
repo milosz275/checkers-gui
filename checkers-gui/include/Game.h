@@ -18,11 +18,18 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Network.hpp>
 
+class Piece;
 
 namespace Checkers
 {
 	// map containing letters and their corresponding integers
 	static std::map<char, int> coords{ {'a', 1}, {'b', 2}, {'c', 3}, {'d', 4}, {'e', 5}, {'f', 6}, {'g', 7}, {'h', 8}, {'i', 9}, {'j', 10} };
+	// board size
+	static const int size = 10;
+	// square/tile size
+	static const float square_size = 75.0;
+	// radius of one piece
+	const float radius = square_size / 2.5;
 
 	class Game
 	{
@@ -50,9 +57,7 @@ namespace Checkers
 		Piece* selected_piece;
 		// flag indicating if there is one or more captures, not allowing other moves
 		bool available_capture;
-
-		// square/tile size
-		float square_size = 75.0;
+		
 
 		// sfml fields
 		sf::ContextSettings settings;
@@ -60,8 +65,7 @@ namespace Checkers
 		sf::Event event;
 
 	public:
-		// board size
-		static const int size = 10;
+		
 		// create the game with s size of the board
 		Game(int s);
 		// deletes the game

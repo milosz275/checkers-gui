@@ -2,7 +2,7 @@
 
 namespace Checkers
 {
-	Bot::Bot() : BasePlayer('X', "Bocik") {}
+	Bot::Bot(char sign) : BasePlayer(sign, "Bot") {}
 
 	Bot::~Bot() {}
 }

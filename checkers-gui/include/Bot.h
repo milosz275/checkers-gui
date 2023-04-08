@@ -10,7 +10,8 @@ namespace Checkers
 
 	public:
 		//
-		Bot();
+		Bot(char sign);
+		//
 		~Bot();
 	};
 }

@@ -9,7 +9,7 @@
 
 namespace Checkers
 {
-	Game::Game(int s) : is_finished(false), window(sf::VideoMode(square_size * size, square_size * size), "Checkers", sf::Style::Default, settings), selected_piece(NULL), first_turn(true)
+	Game::Game(int s) : is_finished(false), window(sf::VideoMode(square_size * size, square_size * size), "Checkers", sf::Style::Default, settings), selected_piece(NULL), first_turn(true), available_capture(false)
 	{
 		board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, 0));
 		
@@ -52,6 +52,7 @@ namespace Checkers
 
 		// evaluate available moves for the first player
 		int dummy = 0;
+		//available_capture = evaluate(p_list_1, board, &dummy);
 		available_capture = evaluate(p_list_1, board, &dummy);
 
 		std::cout << "List of pieces of first player" << std::endl;
@@ -66,14 +67,14 @@ namespace Checkers
 		os << "\t  ";
 		/*for (char a = 'a'; a < 'a' + Game::size; ++a) // colums as letters
 			os << a << "   ";*/
-		for (int i = 0; i < Game::size; ++i)
+		for (int i = 0; i < size; ++i)
 			os << i << "   ";
 		os << std::endl << std::endl << std::endl;
-		for (int i = 0; i < Game::size; ++i)
+		for (int i = 0; i < size; ++i)
 		{
 			//os << Game::size - i << "\t| ";
 			os << i << "\t| ";
-			for (int j = 0; j < Game::size; ++j)
+			for (int j = 0; j < size; ++j)
 			{
 				os << (*board)[j][i] << " | ";
 			}
@@ -109,13 +110,14 @@ namespace Checkers
 
 				if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
 				{
-					if (!available_capture) // check for new kings made
-					{
+					//if (!available_capture) // check for new kings made
+					//{
 
-					}
+					//}
 
 					if (selected_piece != NULL) // choice after highlighting
 					{
+						// getting coords of the click after highlighting selected piece
 						int x = sf::Mouse::getPosition(window).x / square_size;
 						int y = sf::Mouse::getPosition(window).y / square_size;
 						
@@ -125,6 +127,7 @@ namespace Checkers
 
 						all_of(selected_piece->get_av_list()->begin(), selected_piece->get_av_list()->end(), [&x, &y, &is_found, &found_move](AvailableMove* a)
 						{
+							// check if selected coords match any of possible moves
 							if (a->get_x() == x && a->get_y() == y)
 							{
 								std::cout << a->get_x() << " " << a->get_y() << std::endl;
@@ -134,12 +137,12 @@ namespace Checkers
 							}
 							return true; // continue
 						});
-						if (!is_found)
+						if (!is_found) // deselection when wrong coords given
 						{
 							selected = false;
 							selected_piece = NULL;
 						}
-						else
+						else // making a move
 						{
 							// if available move is a capture
 							//if (found_move->is_capture())
@@ -159,16 +162,20 @@ namespace Checkers
 								std::cout << "CONTROL" << std::endl;
 								std::cout << "Coords to delete" << x_d << " " << y_d << std::endl;
 								
-								
+								// now it is not needed
 								(*board)[x_d][y_d]->set_captured();
-								
+
+								// temporary: delete to debug
+								Piece* piece_to_delete = (*board)[x_d][y_d];
+								(*board)[x_d][y_d] = NULL;
 								
 								if (first_turn)
 								{
 									player_2->capture();
+									delete_from_list(&p_list_2, piece_to_delete);
 									
-									// push to the "to delete list" (delete later)
-									to_delete_list.push_back(new Piece('B', x_d, y_d));
+									// push to the "to delete list" (delete later) --- or maybe just to display it during multicapture
+									to_delete_list.push_back(new Piece('b', x_d, y_d));
 
 									player_1->set_combo(true);
 									std::cout << "player's 1 combo" << std::endl;
@@ -176,18 +183,23 @@ namespace Checkers
 								else
 								{
 									player_1->capture();
+									delete_from_list(&p_list_1, piece_to_delete);
 									
 									// push to the "to delete list" (delete later)
-									to_delete_list.push_back(new Piece('W', x_d, y_d));
+									to_delete_list.push_back(new Piece('w', x_d, y_d));
 
 									player_2->set_combo(true);
 									std::cout << "player's 2 combo" << std::endl;
 								}
 							}
-							//else // section to delete
+							//else // quitting the combo
 							//{
 							//	player_1->set_combo(false);
 							//	player_2->set_combo(false);
+
+							//	clear_to_delete_list(&to_delete_list, &p_list_1);
+							//	clear_to_delete_list(&to_delete_list, &p_list_2);
+
 							//	std::cout << "combo deleted" << std::endl;
 							//}
 
@@ -206,7 +218,7 @@ namespace Checkers
 
 							// add end of game *
 
-							// switch turn, if no combo
+							//// switch turn, if no combo
 							if (!player_1->get_combo() && !player_2->get_combo())
 								switch_turn();
 							else // section to test (fixes stuff)
@@ -214,10 +226,9 @@ namespace Checkers
 								clear_list(&p_list_1);
 								clear_list(&p_list_2);
 							}
-
 							// add end of game *
 
-							// evaluate opposite player
+							// evaluate current player
 							int dummy = 0;
 							if (first_turn)
 							{
@@ -228,17 +239,18 @@ namespace Checkers
 								if (player_1->get_combo() && !available_capture)
 								{
 									// delete opponent's pieces of multi capture, clear failed list of possible moves, cancel combo, evaluate again
+									clear_to_delete_list(&to_delete_list, &p_list_1);
 									clear_to_delete_list(&to_delete_list, &p_list_2);
 
 									clear_list(&p_list_1);
-									//clear_list(&p_list_2);
+									clear_list(&p_list_2);
 									player_1->set_combo(false);
+									player_2->set_combo(false);
 									switch_turn();
 									available_capture = evaluate_inv(p_list_2, board, &dummy);
 								}
 								else
 									clear_list(&p_list_2);
-
 								// check for empty evaluation?
 							}
 							else // second turn
@@ -251,9 +263,11 @@ namespace Checkers
 								{
 									// delete opponent's pieces of multi capture, clear failed list of possible moves, cancel combo, evaluate again
 									clear_to_delete_list(&to_delete_list, &p_list_1);
+									clear_to_delete_list(&to_delete_list, &p_list_2);
 
-									//clear_list(&p_list_1);
+									clear_list(&p_list_1);
 									clear_list(&p_list_2);
+									player_1->set_combo(false);
 									player_2->set_combo(false);
 									switch_turn();
 									available_capture = evaluate(p_list_1, board, &dummy);
@@ -305,7 +319,7 @@ namespace Checkers
 									});
 								for_each((*board)[x][y]->get_av_list()->begin(), (*board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
 							}
-							//if ((found_capture && available_capture) || (!found_capture && !available_capture))
+							//if ((found_capture && available_capture) || (!found_capture && !available_capture)) // this lets making only capture moves !!!
 								selected_piece = (*board)[x][y];
 						}
 						else
@@ -331,7 +345,7 @@ namespace Checkers
 									});
 								for_each((*board)[x][y]->get_av_list()->begin(), (*board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
 							}
-							//if ((found_capture && available_capture) || (!found_capture && !available_capture))
+							//if ((found_capture && available_capture) || (!found_capture && !available_capture)) // this lets making only capture moves !!!
 								selected_piece = (*board)[x][y];
 						}
 						else
@@ -408,8 +422,8 @@ namespace Checkers
 					if ((*board)[i][j] != NULL)
 						(*board)[i][j]->draw(window);
 
-			//// print pieces in multicapture
-			//for_each(to_delete_list.begin(), to_delete_list.end(), [this](Piece* p) { p->draw(window); });
+			// print pieces in multicapture
+			for_each(to_delete_list.begin(), to_delete_list.end(), [this](Piece* p) { p->draw(window); });
 
 			window.display();
 		}
