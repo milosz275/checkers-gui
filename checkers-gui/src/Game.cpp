@@ -5,7 +5,7 @@
 // * enable hit series
 // add check if king to evaluation
 //		if the counter won't work: get value from argument and copy to local variable, then pass it to resursive function call
-// remake code into more functions
+// remake code into more functions, current player and opponent pointers
 
 namespace Checkers
 {
@@ -319,7 +319,7 @@ namespace Checkers
 									});
 								for_each((*board)[x][y]->get_av_list()->begin(), (*board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
 							}
-							//if ((found_capture && available_capture) || (!found_capture && !available_capture)) // this lets making only capture moves !!!
+							if ((found_capture && available_capture) || (!found_capture && !available_capture)) // this lets making only capture moves, comment out to enable testing
 								selected_piece = (*board)[x][y];
 						}
 						else
@@ -345,7 +345,7 @@ namespace Checkers
 									});
 								for_each((*board)[x][y]->get_av_list()->begin(), (*board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
 							}
-							//if ((found_capture && available_capture) || (!found_capture && !available_capture)) // this lets making only capture moves !!!
+							if ((found_capture && available_capture) || (!found_capture && !available_capture)) // this lets making only capture moves, comment out to enable testing
 								selected_piece = (*board)[x][y];
 						}
 						else
@@ -359,50 +359,6 @@ namespace Checkers
 				}
 				selected = false;
 			}
-
-			//// cancel selection if the capture is possible and not selected - this block is replaced in evaluation
-			//if (available_capture)
-			//{
-			//	bool found_capture = false;
-			//	if (first_turn)
-			//	{
-			//		all_of(p_list_1.begin(), p_list_1.end(), [&found_capture](Piece* p)
-			//			{
-			//				bool tmp = true;
-			//				all_of(p->get_av_list()->begin(), p->get_av_list()->end(), [&tmp, &found_capture](AvailableMove* a)
-			//					{
-			//						if (a->is_capture())
-			//						{
-			//							tmp = false;
-			//							found_capture = true;
-			//							return false;
-			//						}
-			//						return true;
-			//					});
-			//				return tmp;
-			//			});
-			//	}
-			//	else
-			//	{
-			//		all_of(p_list_2.begin(), p_list_2.end(), [&found_capture](Piece* p)
-			//			{
-			//				bool tmp = true;
-			//				all_of(p->get_av_list()->begin(), p->get_av_list()->end(), [&tmp, &found_capture](AvailableMove* a)
-			//					{
-			//						if (a->is_capture())
-			//						{
-			//							tmp = false;
-			//							found_capture = true;
-			//							return false;
-			//						}
-			//						return true;
-			//					});
-			//				return tmp;
-			//			});
-			//	}
-			//	if (!found_capture)
-			//		selected_piece = NULL;
-			//}
 
 			// highlight selected piece and its corresponding moves, when moves exist
 			if (selected_piece != NULL)
@@ -427,56 +383,6 @@ namespace Checkers
 
 			window.display();
 		}
-
-
-		//while (!is_finished)
-		//{
-		//	// move of the first player
-		//	//system("cls");
-
-		//	is_finished = player_1->move();
-		//	std::cout << board << std::endl;
-		//	
-		//	// evaluate player 2
-		//	if (is_finished) // break if finished
-		//		break;
-
-		//	// move of the second player
-		//	//system("cls");
-		//	is_finished = player_2->move();
-		//	std::cout << board << std::endl;
-		//	
-		//	// evaluate player 1
-
-		//	// tmp
-		//	player_1->print_player();
-		//	player_2->print_player();
-
-		//	is_finished = true;
-		//}
-		////print_results();
-
-		//std::cout << board << std::endl;
-
-		//player_1->print_player();
-		//player_2->print_player();
-
-		//while (!p_list_1.empty())
-		//{
-		//	std::cout << "sign: " << p_list_1.front()->get_sign() << "; x: " << p_list_1.front()->get_x() << "; y: " << p_list_1.front()->get_y() << std::endl;
-		//	while (!(p_list_1.front()->get_av_list()->empty()))
-		//	{
-		//		std::cout << "available move - x: " << p_list_1.front()->get_av_list()->front()->get_x() << "; y: " << p_list_1.front()->get_av_list()->front()->get_y() << std::endl;
-		//		p_list_1.front()->get_av_list()->pop_front();
-		//	}
-		//	p_list_1.pop_front();
-		//}
-
-		//while (!p_list_2.empty())
-		//{
-		//	std::cout << "sign: " << p_list_2.front()->get_sign() << "; x: " << p_list_2.front()->get_x() << "; y: " << p_list_2.front()->get_y() << std::endl;
-		//	p_list_2.pop_front();
-		//}
 	}
 
 	std::vector<std::vector<Piece*>>* Game::get_board(void) { return board; }
@@ -1248,54 +1154,6 @@ namespace Checkers
 		return available_capture;
 	}
 
-	//// its outdated
-	//bool Game::evaluate_inv(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p, int* counter)
-	//{
-	//	for_each(list.begin(), list.end(), [this, &board_p](Piece* p)
-	//		{
-	//			int x = p->get_x();
-	//			int y = p->get_y();
-
-	//			std::cout << "evaluating" << std::endl;
-	//			std::cout << "x: " << x << "; y: " << y << std::endl;
-
-	//			if ((*board_p)[x][y] != NULL)
-	//				std::cout << (*board_p)[x][y] << std::endl;
-
-	//			// captures
-	//			bool possible_capture = false;
-
-	//			// capture
-
-	//			if (!possible_capture)
-	//			{
-	//				// if any piece is on last row, change to king
-
-	//				// moves to right
-	//				if (x != size - 1 && y != size - 1)
-	//				{
-	//					if ((*board_p)[x + 1][y + 1] == NULL)
-	//					{
-	//						std::cout << "available move to the right!" << std::endl;
-	//						(*p).get_av_list()->push_back(new AvailableMove(x + 1, y + 1));
-	//					}
-	//				}
-
-	//				// moves to left
-	//				if (x != 0 && y != size - 1)
-	//				{
-	//					if ((*board_p)[x - 1][y + 1] == NULL)
-	//					{
-	//						std::cout << "available move to the left!" << std::endl;
-	//						(*p).get_av_list()->push_back(new AvailableMove(x - 1, y + 1));
-	//					}
-	//				}
-	//			}0,,,
-	//		});
-	//	return false;
-	//}
-	//void Game::clear_list(std::list<Piece*>* list) { for_each(list->begin(), list->end(), [this](Piece* p) { while (!(p->get_av_list()->empty())) { p->get_av_list()->pop_front(); } }); }
-
 	void Game::clear_list(std::list<Piece*>* list) { for_each(list->begin(), list->end(), [this](Piece* p) { p->get_av_list()->clear(); }); }
 	
 	void Game::print_pieces(std::list<Piece*>* list, std::ostream& os) { std::for_each(list->begin(), list->end(), [i = 1, this, &os](Piece* p) mutable { os << i++ << "; sign: " << p << "; x: " << p->get_x() << "; y: " << p->get_y() << std::endl; }); }
@@ -1321,50 +1179,3 @@ namespace Checkers
 		}
 	}
 }
-
-
-
-/*
-#include <iostream>
-#include <vector>
-#include <list>
-#include <algorithm>
-
-using namespace std;
-
-class Piece
-{
-	int x;
-public:
-	int get_x(void) { return x; }
-	int set_x(int a) { return x = a; }
-	Piece() : x(5) {}
-	Piece(int a) : x(a) {}
-	friend ostream& operator<<(ostream& os, const Piece& p);
-};
-ostream& operator<<(ostream& os, const Piece& p) { return os << p.x; }
-
-int main(int argc, char* argv[])
-{
-	vector<vector<Piece*>>* board;
-	board = new vector<vector<Piece*>>(10, vector<Piece*>(10, NULL));
-
-
-	(*board)[1][1] = new Piece(4);
-	(*board)[2][2] = new Piece(6);
-	list<Piece*> lista;
-	lista.push_back((*board)[1][1]);
-	lista.back()->set_x(7);
-
-
-	for_each(board->begin(), board->end(), [](vector<Piece*> v) { for_each(v.begin(), v.end(), [](Piece* p)
-		{
-			if (p == NULL)
-				std::cout << "0; ";
-			else
-				std::cout << *p << "; ";
-		}); std::cout << endl; });
-
-	return 0;
-}
-*/
