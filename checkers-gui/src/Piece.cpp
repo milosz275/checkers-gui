@@ -2,39 +2,39 @@
 
 namespace Checkers
 {
-    Piece::Piece(char s, int x1, int y1) : sign(s), x(x1), y(y1), is_captured(false), is_king(false), av_list(new std::list<AvailableMove*>) {}
+    Piece::Piece(char sign, int x, int y) : m_sign(sign), m_x(x), m_y(y), m_is_captured(false), m_is_king(false), m_av_list(new std::list<AvailableMove*>) {}
 
     Piece::~Piece() {}
 
-    int Piece::get_x(void) { return x; }
+    int Piece::get_x(void) { return m_x; }
 
-    int Piece::get_y(void) { return y; }
+    int Piece::get_y(void) { return m_y; }
 
-    int Piece::set_x(int x1) { return x = x1; }
+    int Piece::set_x(int x) { return m_x = x; }
 
-    int Piece::set_y(int y1) { return y = y1; }
+    int Piece::set_y(int y) { return m_y = y; }
 
-    char Piece::get_sign(void) { return sign; }
+    char Piece::get_sign(void) { return m_sign; }
 
-    bool Piece::set_captured(bool t) { return is_captured = t; }
+    bool Piece::set_captured(bool captured) { return m_is_captured = captured; }
 
-    bool Piece::get_is_captured(void) { return is_captured; }
+    bool Piece::get_is_captured(void) { return m_is_captured; }
 
-    std::list<AvailableMove*>* Piece::get_av_list(void) { return av_list; }
+    std::list<AvailableMove*>* Piece::get_av_list(void) { return m_av_list; }
 
     std::ostream& operator<<(std::ostream& os, const Piece* piece)
     {
         if (piece == NULL)
             return os << " ";
         else
-            return os << piece->sign;
+            return os << piece->m_sign;
     }
 
     void Piece::draw(sf::RenderWindow& window)
     {
         sf::CircleShape shape(radius);
 
-        switch (sign)
+        switch (m_sign)
         {
         case 'W':
             shape.setFillColor(sf::Color(217, 216, 216, 255));
@@ -52,7 +52,7 @@ namespace Checkers
             throw std::runtime_error("Wrong piece sign");
         }
 
-        shape.setPosition(sf::Vector2f(x * square_size + (square_size - radius * 2) / 2, y * square_size + (square_size - 2 * radius) / 2));
+        shape.setPosition(sf::Vector2f(m_x * square_size + (square_size - radius * 2) / 2, m_y * square_size + (square_size - 2 * radius) / 2));
         window.draw(shape);
     }
 }

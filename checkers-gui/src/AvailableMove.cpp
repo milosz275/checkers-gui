@@ -2,13 +2,13 @@
 
 namespace Checkers
 {
-	AvailableMove::AvailableMove(int x1, int y1, bool capt) : x(x1), y(y1), capture(capt) {}
+	AvailableMove::AvailableMove(int x, int y, bool capture) : m_x(x), m_y(y), m_capture(capture) {}
 
 	AvailableMove::~AvailableMove() {}
 
-	int AvailableMove::get_x(void) { return x; }
+	int AvailableMove::get_x(void) { return m_x; }
 
-	int AvailableMove::get_y(void) { return y; }
+	int AvailableMove::get_y(void) { return m_y; }
 
-	bool AvailableMove::is_capture(void) { return capture; }
+	bool AvailableMove::is_capture(void) { return m_capture; }
 }

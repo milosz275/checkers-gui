@@ -6,18 +6,20 @@
 // add check if king to evaluation
 //		if the counter won't work: get value from argument and copy to local variable, then pass it to resursive function call
 // remake code into more functions, current player and opponent pointers
+// fix the namescheme
 
 namespace Checkers
 {
-	Game::Game(int s) : is_finished(false), window(sf::VideoMode(square_size * size, square_size * size), "Checkers", sf::Style::Default, settings), selected_piece(NULL), first_turn(true), available_capture(false)
+	Game::Game(int s) : m_is_finished(false), window(sf::VideoMode(square_size * size, square_size * size), "Checkers", sf::Style::Default, settings),
+		m_selected_piece(NULL), m_first_turn(true), m_available_capture(false)
 	{
-		board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, 0));
+		m_board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, 0));
 		
 		// todo: choice
 		std::string name_1 = "Some player 1";
 		std::string name_2 = "Some player 2";
-		player_1 = new Player('W', name_1);
-		player_2 = new Player('B', name_2);
+		m_player_1 = new Player('W', name_1);
+		m_player_2 = new Player('B', name_2);
 
 		// todo: change to algorithm
 		// rows of the second player (upper)
@@ -27,9 +29,9 @@ namespace Checkers
 			{
 				if ((i + j) % 2 != 0)
 				{
-					(*board)[j][i] = new Piece(player_2->get_sign(), j, i);
-					p_list_2.push_back((*board)[j][i]);
-					player_2->add_piece();
+					(*m_board)[j][i] = new Piece(m_player_2->get_sign(), j, i);
+					m_p_list_2.push_back((*m_board)[j][i]);
+					m_player_2->add_piece();
 				}
 			}
 		}
@@ -40,9 +42,9 @@ namespace Checkers
 			{
 				if ((i + j) % 2 != 0)
 				{
-					(*board)[j][i] = new Piece(player_1->get_sign(), j, i);
-					p_list_1.push_back((*board)[j][i]);
-					player_1->add_piece();
+					(*m_board)[j][i] = new Piece(m_player_1->get_sign(), j, i);
+					m_p_list_1.push_back((*m_board)[j][i]);
+					m_player_1->add_piece();
 				}
 			}
 		}
@@ -53,13 +55,13 @@ namespace Checkers
 		// evaluate available moves for the first player
 		int dummy = 0;
 		//available_capture = evaluate(p_list_1, board, &dummy);
-		available_capture = evaluate(p_list_1, board, &dummy);
+		m_available_capture = evaluate(m_p_list_1, m_board, &dummy);
 
 		std::cout << "List of pieces of first player" << std::endl;
-		print_pieces(&p_list_1);
+		print_pieces(&m_p_list_1);
 
 		std::cout << "List of pieces of second player" << std::endl;
-		print_pieces(&p_list_2);
+		print_pieces(&m_p_list_2);
 	}
 
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<Piece*>>* board)
@@ -85,12 +87,12 @@ namespace Checkers
 
 	Game::~Game()
 	{
-		delete board;
-		delete player_1;
-		delete player_2;
+		delete m_board;
+		delete m_player_1;
+		delete m_player_2;
 	}
 
-	void Game::switch_turn(void) { first_turn = !first_turn; }
+	void Game::switch_turn(void) { m_first_turn = !m_first_turn; }
 
 	void Game::loop(void)
 	{
@@ -100,8 +102,8 @@ namespace Checkers
 		// main loop
 		while (window.isOpen())
 		{
-			// 10 fps
-			sf::sleep(sf::seconds(1.0f / 20));
+			// 10 fps - set to time
+			sf::sleep(sf::seconds(1.0f / 10));
 
 			while (window.pollEvent(event))
 			{
@@ -115,7 +117,7 @@ namespace Checkers
 
 					//}
 
-					if (selected_piece != NULL) // choice after highlighting
+					if (m_selected_piece != NULL) // choice after highlighting
 					{
 						// getting coords of the click after highlighting selected piece
 						int x = sf::Mouse::getPosition(window).x / square_size;
@@ -125,7 +127,7 @@ namespace Checkers
 						bool is_found = false;
 						AvailableMove* found_move = NULL;
 
-						all_of(selected_piece->get_av_list()->begin(), selected_piece->get_av_list()->end(), [&x, &y, &is_found, &found_move](AvailableMove* a)
+						all_of(m_selected_piece->get_av_list()->begin(), m_selected_piece->get_av_list()->end(), [&x, &y, &is_found, &found_move](AvailableMove* a)
 						{
 							// check if selected coords match any of possible moves
 							if (a->get_x() == x && a->get_y() == y)
@@ -140,7 +142,7 @@ namespace Checkers
 						if (!is_found) // deselection when wrong coords given
 						{
 							selected = false;
-							selected_piece = NULL;
+							m_selected_piece = NULL;
 						}
 						else // making a move
 						{
@@ -163,32 +165,32 @@ namespace Checkers
 								std::cout << "Coords to delete" << x_d << " " << y_d << std::endl;
 								
 								// now it is not needed
-								(*board)[x_d][y_d]->set_captured();
+								(*m_board)[x_d][y_d]->set_captured();
 
 								// temporary: delete to debug
-								Piece* piece_to_delete = (*board)[x_d][y_d];
-								(*board)[x_d][y_d] = NULL;
+								Piece* piece_to_delete = (*m_board)[x_d][y_d];
+								(*m_board)[x_d][y_d] = NULL;
 								
-								if (first_turn)
+								if (m_first_turn)
 								{
-									player_2->capture();
-									delete_from_list(&p_list_2, piece_to_delete);
+									m_player_2->capture();
+									delete_from_list(&m_p_list_2, piece_to_delete);
 									
 									// push to the "to delete list" (delete later) --- or maybe just to display it during multicapture
-									to_delete_list.push_back(new Piece('b', x_d, y_d));
+									m_to_delete_list.push_back(new Piece('b', x_d, y_d));
 
-									player_1->set_combo(true);
+									m_player_1->set_combo(true);
 									std::cout << "player's 1 combo" << std::endl;
 								}
 								else
 								{
-									player_1->capture();
-									delete_from_list(&p_list_1, piece_to_delete);
+									m_player_1->capture();
+									delete_from_list(&m_p_list_1, piece_to_delete);
 									
 									// push to the "to delete list" (delete later)
-									to_delete_list.push_back(new Piece('w', x_d, y_d));
+									m_to_delete_list.push_back(new Piece('w', x_d, y_d));
 
-									player_2->set_combo(true);
+									m_player_2->set_combo(true);
 									std::cout << "player's 2 combo" << std::endl;
 								}
 							}
@@ -204,76 +206,76 @@ namespace Checkers
 							//}
 
 							// move the piece (piece, which is moving -> both capture and normal move)
-							(*board)[selected_piece->get_x()][selected_piece->get_y()] = NULL;
-							selected_piece->set_x(x);
-							selected_piece->set_y(y);
-							(*board)[x][y] = selected_piece;
-							selected_piece = NULL;
+							(*m_board)[m_selected_piece->get_x()][m_selected_piece->get_y()] = NULL;
+							m_selected_piece->set_x(x);
+							m_selected_piece->set_y(y);
+							(*m_board)[x][y] = m_selected_piece;
+							m_selected_piece = NULL;
 							selected = false;
 							
 							std::cout << "List of pieces of first player" << std::endl;
-							print_pieces(&p_list_1);
+							print_pieces(&m_p_list_1);
 							std::cout << "List of pieces of second player" << std::endl;
-							print_pieces(&p_list_2);
+							print_pieces(&m_p_list_2);
 
 							// add end of game *
 
 							//// switch turn, if no combo
-							if (!player_1->get_combo() && !player_2->get_combo())
+							if (!m_player_1->get_combo() && !m_player_2->get_combo())
 								switch_turn();
 							else // section to test (fixes stuff)
 							{
-								clear_list(&p_list_1);
-								clear_list(&p_list_2);
+								clear_list(&m_p_list_1);
+								clear_list(&m_p_list_2);
 							}
 							// add end of game *
 
 							// evaluate current player
 							int dummy = 0;
-							if (first_turn)
+							if (m_first_turn)
 							{
 								// evaluate next move
-								available_capture = evaluate(p_list_1, board, &dummy);
+								m_available_capture = evaluate(m_p_list_1, m_board, &dummy);
 
 								// exit the combo, if no more captures
-								if (player_1->get_combo() && !available_capture)
+								if (m_player_1->get_combo() && !m_available_capture)
 								{
 									// delete opponent's pieces of multi capture, clear failed list of possible moves, cancel combo, evaluate again
-									clear_to_delete_list(&to_delete_list, &p_list_1);
-									clear_to_delete_list(&to_delete_list, &p_list_2);
+									clear_to_delete_list(&m_to_delete_list, &m_p_list_1);
+									clear_to_delete_list(&m_to_delete_list, &m_p_list_2);
 
-									clear_list(&p_list_1);
-									clear_list(&p_list_2);
-									player_1->set_combo(false);
-									player_2->set_combo(false);
+									clear_list(&m_p_list_1);
+									clear_list(&m_p_list_2);
+									m_player_1->set_combo(false);
+									m_player_2->set_combo(false);
 									switch_turn();
-									available_capture = evaluate_inv(p_list_2, board, &dummy);
+									m_available_capture = evaluate_inv(m_p_list_2, m_board, &dummy);
 								}
 								else
-									clear_list(&p_list_2);
+									clear_list(&m_p_list_2);
 								// check for empty evaluation?
 							}
 							else // second turn
 							{
 								// evaluate next move
-								available_capture = evaluate_inv(p_list_2, board, &dummy);
+								m_available_capture = evaluate_inv(m_p_list_2, m_board, &dummy);
 
 								// exit the combo, if no more captures
-								if (player_2->get_combo() && !available_capture)
+								if (m_player_2->get_combo() && !m_available_capture)
 								{
 									// delete opponent's pieces of multi capture, clear failed list of possible moves, cancel combo, evaluate again
-									clear_to_delete_list(&to_delete_list, &p_list_1);
-									clear_to_delete_list(&to_delete_list, &p_list_2);
+									clear_to_delete_list(&m_to_delete_list, &m_p_list_1);
+									clear_to_delete_list(&m_to_delete_list, &m_p_list_2);
 
-									clear_list(&p_list_1);
-									clear_list(&p_list_2);
-									player_1->set_combo(false);
-									player_2->set_combo(false);
+									clear_list(&m_p_list_1);
+									clear_list(&m_p_list_2);
+									m_player_1->set_combo(false);
+									m_player_2->set_combo(false);
 									switch_turn();
-									available_capture = evaluate(p_list_1, board, &dummy);
+									m_available_capture = evaluate(m_p_list_1, m_board, &dummy);
 								}
 								else
-									clear_list(&p_list_1);
+									clear_list(&m_p_list_1);
 							}
 						}
 					}
@@ -288,27 +290,27 @@ namespace Checkers
 			// first choice, nothing is already highlighted
 			if (selected)
 			{
-				selected_piece = NULL;
+				m_selected_piece = NULL;
 
 				int x = sf::Mouse::getPosition(window).x / square_size;
 				int y = sf::Mouse::getPosition(window).y / square_size;
 
 				// if the correspoding field contains a piece
-				if ((*board)[x][y] != NULL)
+				if ((*m_board)[x][y] != NULL)
 				{
-					std::cout << "x: " << x << "; y: " << y << "; piece: " << (*board)[x][y] << std::endl;
+					std::cout << "x: " << x << "; y: " << y << "; piece: " << (*m_board)[x][y] << std::endl;
 
 					// check if player owns this piece
-					if (first_turn)
+					if (m_first_turn)
 					{
-						if ((*board)[x][y]->get_sign() == player_1->get_sign())
+						if ((*m_board)[x][y]->get_sign() == m_player_1->get_sign())
 						{
 							std::cout << ":)" << std::endl;
 							bool found_capture = false;
-							if (!(*board)[x][y]->get_av_list()->empty())
+							if (!(*m_board)[x][y]->get_av_list()->empty())
 							{
 								// find at least one move that is a capture
-								all_of((*board)[x][y]->get_av_list()->begin(), (*board)[x][y]->get_av_list()->end(), [&found_capture](AvailableMove* a)
+								all_of((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [&found_capture](AvailableMove* a)
 									{
 										if (a->is_capture())
 										{
@@ -317,24 +319,24 @@ namespace Checkers
 										}
 										return true;
 									});
-								for_each((*board)[x][y]->get_av_list()->begin(), (*board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
+								for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
 							}
-							if ((found_capture && available_capture) || (!found_capture && !available_capture)) // this lets making only capture moves, comment out to enable testing
-								selected_piece = (*board)[x][y];
+							if ((found_capture && m_available_capture) || (!found_capture && !m_available_capture)) // this lets making only capture moves, comment out to enable testing - replace to xnor
+								m_selected_piece = (*m_board)[x][y];
 						}
 						else
 							std::cout << ":(" << std::endl;
 					}
 					else
 					{
-						if ((*board)[x][y]->get_sign() == player_2->get_sign())
+						if ((*m_board)[x][y]->get_sign() == m_player_2->get_sign())
 						{
 							std::cout << ":)" << std::endl;
 							bool found_capture = false;
-							if (!(*board)[x][y]->get_av_list()->empty())
+							if (!(*m_board)[x][y]->get_av_list()->empty())
 							{
 								// find at least one move that is a capture
-								all_of((*board)[x][y]->get_av_list()->begin(), (*board)[x][y]->get_av_list()->end(), [&found_capture](AvailableMove* a)
+								all_of((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [&found_capture](AvailableMove* a)
 									{
 										if (a->is_capture())
 										{
@@ -343,10 +345,10 @@ namespace Checkers
 										}
 										return true;
 									});
-								for_each((*board)[x][y]->get_av_list()->begin(), (*board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
+								for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
 							}
-							if ((found_capture && available_capture) || (!found_capture && !available_capture)) // this lets making only capture moves, comment out to enable testing
-								selected_piece = (*board)[x][y];
+							if ((found_capture && m_available_capture) || (!found_capture && !m_available_capture)) // this lets making only capture moves, comment out to enable testing
+								m_selected_piece = (*m_board)[x][y];
 						}
 						else
 							std::cout << ":(" << std::endl;
@@ -355,37 +357,37 @@ namespace Checkers
 				else
 				{
 					std::cout << "x: " << x << "; y: " << y << std::endl;
-					selected_piece = NULL;
+					m_selected_piece = NULL;
 				}
 				selected = false;
 			}
 
 			// highlight selected piece and its corresponding moves, when moves exist
-			if (selected_piece != NULL)
+			if (m_selected_piece != NULL)
 			{
-				if (!(selected_piece->get_av_list()->empty()))
+				if (!(m_selected_piece->get_av_list()->empty()))
 				{
-					highlight_selected(window, selected_piece->get_x(), selected_piece->get_y());
-					for_each(selected_piece->get_av_list()->begin(), selected_piece->get_av_list()->end(), [this](AvailableMove* a) { highlight_available(window, a->get_x(), a->get_y()); });
+					highlight_selected(window, m_selected_piece->get_x(), m_selected_piece->get_y());
+					for_each(m_selected_piece->get_av_list()->begin(), m_selected_piece->get_av_list()->end(), [this](AvailableMove* a) { highlight_available(window, a->get_x(), a->get_y()); });
 				}
 				else
-					selected_piece = NULL;
+					m_selected_piece = NULL;
 			}
 
 			// print alive pieces
 			for (int i = 0; i < size; ++i)
 				for (int j = 0; j < size; ++j)
-					if ((*board)[i][j] != NULL)
-						(*board)[i][j]->draw(window);
+					if ((*m_board)[i][j] != NULL)
+						(*m_board)[i][j]->draw(window);
 
 			// print pieces in multicapture
-			for_each(to_delete_list.begin(), to_delete_list.end(), [this](Piece* p) { p->draw(window); });
+			for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [this](Piece* p) { p->draw(window); });
 
 			window.display();
 		}
 	}
 
-	std::vector<std::vector<Piece*>>* Game::get_board(void) { return board; }
+	std::vector<std::vector<Piece*>>* Game::get_board(void) { return m_board; }
 
 	/*void Game::rotate_board(void)
 	{
@@ -410,14 +412,14 @@ namespace Checkers
 
 	void Game::print_results(std::ostream& os)
 	{
-		if (!first_won && !second_won)
+		if (!m_first_won && !m_second_won)
 			std::cout << "Game wasn't finished" << std::endl;
-		else if (first_won && second_won)
+		else if (m_first_won && m_second_won)
 			std::cout << "Draw" << std::endl;
-		else if (first_won)
-			std::cout << "Player: \"" << player_1->get_name() << "\" won!" << std::endl;
+		else if (m_first_won)
+			std::cout << "Player: \"" << m_player_1->get_name() << "\" won!" << std::endl;
 		else
-			std::cout << "Player: \"" << player_2->get_name() << "\" won!" << std::endl;
+			std::cout << "Player: \"" << m_player_2->get_name() << "\" won!" << std::endl;
 	}
 
 
@@ -486,19 +488,19 @@ namespace Checkers
 				// y ascendint to the bottom !
 
 				// capture top right (0)
-				if (x + 2 <= size - 1 && y - 2 >= 0 && (*board_p)[x + 1][y - 1] != NULL && (*board_p)[x + 1][y - 1]->get_sign() == player_2->get_sign() && !((*board_p)[x + 1][y - 1]->get_is_captured()) && (*board_p)[x + 2][y - 2] == NULL)
+				if (x + 2 <= size - 1 && y - 2 >= 0 && (*board_p)[x + 1][y - 1] != NULL && (*board_p)[x + 1][y - 1]->get_sign() == m_player_2->get_sign() && !((*board_p)[x + 1][y - 1]->get_is_captured()) && (*board_p)[x + 2][y - 2] == NULL)
 					possible_capture_top_right = true;
 
 				// capture top left (1)
-				if (x - 2 >= 0 && y - 2 >= 0 && (*board_p)[x - 1][y - 1] != NULL && (*board_p)[x - 1][y - 1]->get_sign() == player_2->get_sign() && !((*board_p)[x - 1][y - 1]->get_is_captured()) && (*board_p)[x - 2][y - 2] == NULL)
+				if (x - 2 >= 0 && y - 2 >= 0 && (*board_p)[x - 1][y - 1] != NULL && (*board_p)[x - 1][y - 1]->get_sign() == m_player_2->get_sign() && !((*board_p)[x - 1][y - 1]->get_is_captured()) && (*board_p)[x - 2][y - 2] == NULL)
 					possible_capture_top_left = true;
 
 				// capture bottom right (2)
-				if (x + 2 <= size - 1 && y + 2 <= size - 1 && (*board_p)[x + 1][y + 1] != NULL && (*board_p)[x + 1][y + 1]->get_sign() == player_2->get_sign() && !((*board_p)[x + 1][y + 1]->get_is_captured()) && (*board_p)[x + 2][y + 2] == NULL)
+				if (x + 2 <= size - 1 && y + 2 <= size - 1 && (*board_p)[x + 1][y + 1] != NULL && (*board_p)[x + 1][y + 1]->get_sign() == m_player_2->get_sign() && !((*board_p)[x + 1][y + 1]->get_is_captured()) && (*board_p)[x + 2][y + 2] == NULL)
 					possible_capture_bottom_right = true;
 
 				// capture bottom left (3)
-				if (x - 2 >= 0 && y + 2 <= size - 1 && (*board_p)[x - 1][y + 1] != NULL && (*board_p)[x - 1][y + 1]->get_sign() == player_2->get_sign() && !((*board_p)[x - 1][y + 1]->get_is_captured()) && (*board_p)[x - 2][y + 2] == NULL)
+				if (x - 2 >= 0 && y + 2 <= size - 1 && (*board_p)[x - 1][y + 1] != NULL && (*board_p)[x - 1][y + 1]->get_sign() == m_player_2->get_sign() && !((*board_p)[x - 1][y + 1]->get_is_captured()) && (*board_p)[x - 2][y + 2] == NULL)
 					possible_capture_bottow_left = true;
 
 
@@ -521,8 +523,8 @@ namespace Checkers
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
-									if ((*board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
+									if ((*m_board)[i][j] != NULL)
+										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 							
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -576,8 +578,8 @@ namespace Checkers
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
-									if ((*board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
+									if ((*m_board)[i][j] != NULL)
+										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -631,8 +633,8 @@ namespace Checkers
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
-									if ((*board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
+									if ((*m_board)[i][j] != NULL)
+										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -686,8 +688,8 @@ namespace Checkers
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
-									if ((*board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
+									if ((*m_board)[i][j] != NULL)
+										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -834,19 +836,19 @@ namespace Checkers
 				// y ascendint to the bottom !
 
 				// capture top right (0)
-				if (x + 2 <= size - 1 && y - 2 >= 0 && (*board_p)[x + 1][y - 1] != NULL && (*board_p)[x + 1][y - 1]->get_sign() == player_1->get_sign() && !((*board_p)[x + 1][y - 1]->get_is_captured()) && (*board_p)[x + 2][y - 2] == NULL)
+				if (x + 2 <= size - 1 && y - 2 >= 0 && (*board_p)[x + 1][y - 1] != NULL && (*board_p)[x + 1][y - 1]->get_sign() == m_player_1->get_sign() && !((*board_p)[x + 1][y - 1]->get_is_captured()) && (*board_p)[x + 2][y - 2] == NULL)
 					possible_capture_top_right = true;
 
 				// capture top left (1)
-				if (x - 2 >= 0 && y - 2 >= 0 && (*board_p)[x - 1][y - 1] != NULL && (*board_p)[x - 1][y - 1]->get_sign() == player_1->get_sign() && !((*board_p)[x - 1][y - 1]->get_is_captured()) && (*board_p)[x - 2][y - 2] == NULL)
+				if (x - 2 >= 0 && y - 2 >= 0 && (*board_p)[x - 1][y - 1] != NULL && (*board_p)[x - 1][y - 1]->get_sign() == m_player_1->get_sign() && !((*board_p)[x - 1][y - 1]->get_is_captured()) && (*board_p)[x - 2][y - 2] == NULL)
 					possible_capture_top_left = true;
 
 				// capture bottom right (2)
-				if (x + 2 <= size - 1 && y + 2 <= size - 1 && (*board_p)[x + 1][y + 1] != NULL && (*board_p)[x + 1][y + 1]->get_sign() == player_1->get_sign() && !((*board_p)[x + 1][y + 1]->get_is_captured()) && (*board_p)[x + 2][y + 2] == NULL)
+				if (x + 2 <= size - 1 && y + 2 <= size - 1 && (*board_p)[x + 1][y + 1] != NULL && (*board_p)[x + 1][y + 1]->get_sign() == m_player_1->get_sign() && !((*board_p)[x + 1][y + 1]->get_is_captured()) && (*board_p)[x + 2][y + 2] == NULL)
 					possible_capture_bottom_right = true;
 
 				// capture bottom left (3)
-				if (x - 2 >= 0 && y + 2 <= size - 1 && (*board_p)[x - 1][y + 1] != NULL && (*board_p)[x - 1][y + 1]->get_sign() == player_1->get_sign() && !((*board_p)[x - 1][y + 1]->get_is_captured()) && (*board_p)[x - 2][y + 2] == NULL)
+				if (x - 2 >= 0 && y + 2 <= size - 1 && (*board_p)[x - 1][y + 1] != NULL && (*board_p)[x - 1][y + 1]->get_sign() == m_player_1->get_sign() && !((*board_p)[x - 1][y + 1]->get_is_captured()) && (*board_p)[x - 2][y + 2] == NULL)
 					possible_capture_bottow_left = true;
 
 
@@ -869,8 +871,8 @@ namespace Checkers
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
-									if ((*board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
+									if ((*m_board)[i][j] != NULL)
+										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -924,8 +926,8 @@ namespace Checkers
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
-									if ((*board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
+									if ((*m_board)[i][j] != NULL)
+										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -979,8 +981,8 @@ namespace Checkers
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
-									if ((*board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
+									if ((*m_board)[i][j] != NULL)
+										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -1034,8 +1036,8 @@ namespace Checkers
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
-									if ((*board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
+									if ((*m_board)[i][j] != NULL)
+										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -1169,8 +1171,8 @@ namespace Checkers
 
 			int x_d = tmp->get_x();
 			int y_d = tmp->get_y();
-			Piece* piece_to_delete = (*board)[x_d][y_d];
-			(*board)[x_d][y_d] = NULL;
+			Piece* piece_to_delete = (*m_board)[x_d][y_d];
+			(*m_board)[x_d][y_d] = NULL;
 
 			delete_from_list(src_list, piece_to_delete);
 

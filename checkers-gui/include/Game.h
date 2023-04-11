@@ -34,29 +34,29 @@ namespace Checkers
 	class Game
 	{
 		// main game board
-		std::vector<std::vector<Piece*>>* board;
+		std::vector<std::vector<Piece*>>* m_board;
 		// flag indicating turn of the first player
-		bool first_turn;
+		bool m_first_turn;
 		// player 1
-		BasePlayer* player_1;
+		BasePlayer* m_player_1;
 		// player 2
-		BasePlayer* player_2;
+		BasePlayer* m_player_2;
 		// piece list of player 1
-		std::list<Piece*> p_list_1;
+		std::list<Piece*> m_p_list_1;
 		// piece list of player 2
-		std::list<Piece*> p_list_2;
+		std::list<Piece*> m_p_list_2;
 		// list of pieces to delete after multicapture (combo)
-		std::list<Piece*> to_delete_list;
+		std::list<Piece*> m_to_delete_list;
 		// flag indicating finished game
-		bool is_finished;
+		bool m_is_finished;
 		// flag indicating that first player won
-		bool first_won;
+		bool m_first_won;
 		// flag indicating that second player won
-		bool second_won;
+		bool m_second_won;
 		// pointer to selected piece on the board
-		Piece* selected_piece;
+		Piece* m_selected_piece;
 		// flag indicating if there is one or more captures, not allowing other moves
-		bool available_capture;
+		bool m_available_capture;
 		
 
 		// sfml fields

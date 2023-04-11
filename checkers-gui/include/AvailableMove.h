@@ -8,14 +8,14 @@ namespace Checkers
 	class AvailableMove
 	{
 		// x coordinate of available move
-		int x;
+		int m_x;
 		// y coordinate of available move
-		int y;
+		int m_y;
 		// flag indicating if the move will be a capture -> please use AvailableCapture if so;
-		bool capture;
+		bool m_capture;
 	public:
 		// creates available move
-		AvailableMove(int x1, int y1, bool capt = false);
+		AvailableMove(int x, int y, bool capture = false);
 		// deletes the move
 		virtual ~AvailableMove();
 		// returns x coordinate of available move

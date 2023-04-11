@@ -2,25 +2,25 @@
 
 namespace Checkers
 {
-	BasePlayer::BasePlayer(char s, std::string n) : sign(s), name(n), pieces(0), captured_pieces(0), combo(false) {}
+	BasePlayer::BasePlayer(char sign, std::string name) : m_sign(sign), m_name(name), m_pieces(0), m_captured_pieces(0), m_combo(false) {}
 
 	BasePlayer::~BasePlayer() {}
 
-	char BasePlayer::get_sign(void) { return sign; }
+	char BasePlayer::get_sign(void) { return m_sign; }
 
-	std::string BasePlayer::get_name(void) { return name; }
+	std::string BasePlayer::get_name(void) { return m_name; }
 
-	bool BasePlayer::get_combo(void) { return combo; }
+	bool BasePlayer::get_combo(void) { return m_combo; }
 
-	bool BasePlayer::set_combo(bool c) { return combo = c; }
+	bool BasePlayer::set_combo(bool combo) { return m_combo = combo; }
 
-	void BasePlayer::add_piece(int x) { pieces += x; }
+	void BasePlayer::add_piece(int count) { m_pieces += count; }
 
-	int BasePlayer::get_pieces(void) { return pieces; }
+	int BasePlayer::get_pieces(void) { return m_pieces; }
 
-	int BasePlayer::get_captured_pieces(void) { return captured_pieces; }
+	int BasePlayer::get_captured_pieces(void) { return m_captured_pieces; }
 
-	void BasePlayer::capture(void) { pieces--; captured_pieces++; }
+	void BasePlayer::capture(void) { m_pieces--; m_captured_pieces++; }
 
-	void BasePlayer::print_player(void) { std::cout << name << "; sign: " << sign << "; pieces: " << pieces << "; captured pieces: " << captured_pieces << std::endl; }
+	void BasePlayer::print_player(void) { std::cout << m_name << "; sign: " << m_sign << "; pieces: " << m_pieces << "; captured pieces: " << m_captured_pieces << std::endl; }
 }
