@@ -22,10 +22,10 @@ class Piece;
 
 namespace Checkers
 {
-	// map containing letters and their corresponding integers
-	static std::map<char, int> coords{ {'a', 1}, {'b', 2}, {'c', 3}, {'d', 4}, {'e', 5}, {'f', 6}, {'g', 7}, {'h', 8}, {'i', 9}, {'j', 10} };
 	// board size
 	static const int size = 10;
+	// map containing letters and their corresponding integers
+	static std::map<char, int> coords{ {'a', 1}, {'b', 2}, {'c', 3}, {'d', 4}, {'e', 5}, {'f', 6}, {'g', 7}, {'h', 8}, {'i', 9}, {'j', 10} };
 	// square/tile size
 	static const float square_size = 75.0;
 	// radius of one piece
@@ -35,6 +35,8 @@ namespace Checkers
 	{
 		// main game board
 		std::vector<std::vector<Piece*>>* m_board;
+		// 
+		const int m_size = size;
 		// flag indicating turn of the first player
 		bool m_first_turn;
 		// player 1
@@ -57,17 +59,23 @@ namespace Checkers
 		Piece* m_selected_piece;
 		// flag indicating if there is one or more captures, not allowing other moves
 		bool m_available_capture;
-		
-
-		// sfml fields
-		sf::ContextSettings settings;
-		sf::RenderWindow window;
-		sf::Event event;
+		//
+		const int m_fps;
+		//
+		float m_frame_duration = 1.0f / m_fps;
+		// 
+		sf::Clock m_clock;
+		// 
+		sf::ContextSettings m_settings;
+		//
+		sf::RenderWindow m_window;
+		//
+		sf::Event m_event;
 
 	public:
 		
-		// create the game with s size of the board
-		Game(int s);
+		// create the game of given size and target frames per second
+		Game(int fps = 24);
 		// deletes the game
 		~Game();
 		// rotates the vector of vectors board, sets the is rotated flag to opposite
@@ -101,6 +109,7 @@ namespace Checkers
 		// deletes given piece from given list
 		void delete_from_list(std::list<Piece*>* list, Piece* piece_to_delete);
 
+		friend std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<Piece*>>* board);
 	};
 	// returns board to the stream
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<Piece*>>* board);

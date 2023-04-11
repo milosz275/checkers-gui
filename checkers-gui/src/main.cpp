@@ -5,8 +5,8 @@ int main(int argc, char* argv[])
 {
 	try
 	{
-		Checkers::Game ch_g(10);
-		ch_g.loop();
+		Checkers::Game checkers;
+		checkers.loop();
 	}
 	catch (std::exception& e)
 	{

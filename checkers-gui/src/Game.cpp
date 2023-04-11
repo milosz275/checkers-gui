@@ -6,12 +6,14 @@
 // add check if king to evaluation
 //		if the counter won't work: get value from argument and copy to local variable, then pass it to resursive function call
 // remake code into more functions, current player and opponent pointers
-// fix the namescheme
+// * fix the namescheme
+// add menu
 
 namespace Checkers
 {
-	Game::Game(int s) : m_is_finished(false), window(sf::VideoMode(square_size * size, square_size * size), "Checkers", sf::Style::Default, settings),
-		m_selected_piece(NULL), m_first_turn(true), m_available_capture(false)
+	Game::Game(int fps) : m_is_finished(false), m_fps(fps),
+		m_window(sf::VideoMode(square_size * size, square_size * size), "Checkers", sf::Style::Default, m_settings),
+		m_selected_piece(NULL), m_first_turn(true), m_available_capture(false), m_clock(), m_event(), m_settings()
 	{
 		m_board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, 0));
 		
@@ -50,7 +52,7 @@ namespace Checkers
 		}
 
 		// set the antialiasing
-		settings.antialiasingLevel = 2.0;
+		m_settings.antialiasingLevel = 2.0;
 
 		// evaluate available moves for the first player
 		int dummy = 0;
@@ -69,10 +71,10 @@ namespace Checkers
 		os << "\t  ";
 		/*for (char a = 'a'; a < 'a' + Game::size; ++a) // colums as letters
 			os << a << "   ";*/
-		for (int i = 0; i < size; ++i)
+		for (int i = 0; i < Checkers::size; ++i)
 			os << i << "   ";
 		os << std::endl << std::endl << std::endl;
-		for (int i = 0; i < size; ++i)
+		for (int i = 0; i < Checkers::size; ++i)
 		{
 			//os << Game::size - i << "\t| ";
 			os << i << "\t| ";
@@ -98,19 +100,17 @@ namespace Checkers
 	{
 		bool selected = false;
 		//rotate_board();
+		m_clock.restart();
 
 		// main loop
-		while (window.isOpen())
+		while (m_window.isOpen())
 		{
-			// 10 fps - set to time
-			sf::sleep(sf::seconds(1.0f / 10));
-
-			while (window.pollEvent(event))
+			while (m_window.pollEvent(m_event))
 			{
-				if (event.type == sf::Event::Closed)
-					window.close();
+				if (m_event.type == sf::Event::Closed)
+					m_window.close();
 
-				if (event.type == sf::Event::MouseButtonReleased && event.mouseButton.button == sf::Mouse::Left)
+				if (m_event.type == sf::Event::MouseButtonReleased && m_event.mouseButton.button == sf::Mouse::Left)
 				{
 					//if (!available_capture) // check for new kings made
 					//{
@@ -120,8 +120,8 @@ namespace Checkers
 					if (m_selected_piece != NULL) // choice after highlighting
 					{
 						// getting coords of the click after highlighting selected piece
-						int x = sf::Mouse::getPosition(window).x / square_size;
-						int y = sf::Mouse::getPosition(window).y / square_size;
+						int x = sf::Mouse::getPosition(m_window).x / square_size;
+						int y = sf::Mouse::getPosition(m_window).y / square_size;
 						
 						// find corresponding piece
 						bool is_found = false;
@@ -284,16 +284,16 @@ namespace Checkers
 				}
 			}
 
-			window.clear();
-			draw(window);
+			m_window.clear();
+			draw(m_window);
 
 			// first choice, nothing is already highlighted
 			if (selected)
 			{
 				m_selected_piece = NULL;
 
-				int x = sf::Mouse::getPosition(window).x / square_size;
-				int y = sf::Mouse::getPosition(window).y / square_size;
+				int x = sf::Mouse::getPosition(m_window).x / square_size;
+				int y = sf::Mouse::getPosition(m_window).y / square_size;
 
 				// if the correspoding field contains a piece
 				if ((*m_board)[x][y] != NULL)
@@ -367,8 +367,8 @@ namespace Checkers
 			{
 				if (!(m_selected_piece->get_av_list()->empty()))
 				{
-					highlight_selected(window, m_selected_piece->get_x(), m_selected_piece->get_y());
-					for_each(m_selected_piece->get_av_list()->begin(), m_selected_piece->get_av_list()->end(), [this](AvailableMove* a) { highlight_available(window, a->get_x(), a->get_y()); });
+					highlight_selected(m_window, m_selected_piece->get_x(), m_selected_piece->get_y());
+					for_each(m_selected_piece->get_av_list()->begin(), m_selected_piece->get_av_list()->end(), [this](AvailableMove* a) { highlight_available(m_window, a->get_x(), a->get_y()); });
 				}
 				else
 					m_selected_piece = NULL;
@@ -378,13 +378,17 @@ namespace Checkers
 			for (int i = 0; i < size; ++i)
 				for (int j = 0; j < size; ++j)
 					if ((*m_board)[i][j] != NULL)
-						(*m_board)[i][j]->draw(window);
+						(*m_board)[i][j]->draw(m_window);
 
 			// print pieces in multicapture
-			for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [this](Piece* p) { p->draw(window); });
+			for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [this](Piece* p) { p->draw(m_window); });
 
-			window.display();
+			m_window.display();
 		}
+		sf::Time elapsed_time = m_clock.restart();
+
+		if (elapsed_time.asSeconds() < m_frame_duration)
+			sf::sleep(sf::seconds(m_frame_duration - elapsed_time.asSeconds()));
 	}
 
 	std::vector<std::vector<Piece*>>* Game::get_board(void) { return m_board; }
