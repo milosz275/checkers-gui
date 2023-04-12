@@ -11,17 +11,17 @@
 
 namespace checkers
 {
-	Game::Game(int fps) : m_is_finished(false), m_fps(fps),
-		m_window(sf::VideoMode(square_size * size, square_size * size), "Checkers", sf::Style::Default, m_settings),
+	game::game(int fps) : m_is_finished(false), m_fps(fps),
+		m_window(sf::VideoMode(square_size * size, square_size * size), "checkers", sf::Style::Default, m_settings),
 		m_selected_piece(NULL), m_first_turn(true), m_available_capture(false), m_clock(), m_event(), m_settings()
 	{
-		m_board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, 0));
+		m_board = new std::vector<std::vector<piece*>>(size, std::vector<piece*>(size, 0));
 		
 		// todo: choice
 		std::string name_1 = "Some player 1";
 		std::string name_2 = "Some player 2";
-		m_player_1 = new Player('W', name_1);
-		m_player_2 = new Player('B', name_2);
+		m_player_1 = new player('W', name_1);
+		m_player_2 = new player('B', name_2);
 
 		// todo: change to algorithm
 		// rows of the second player (upper)
@@ -31,7 +31,7 @@ namespace checkers
 			{
 				if ((i + j) % 2 != 0)
 				{
-					(*m_board)[j][i] = new Piece(m_player_2->get_sign(), j, i);
+					(*m_board)[j][i] = new piece(m_player_2->get_sign(), j, i);
 					m_p_list_2.push_back((*m_board)[j][i]);
 					m_player_2->add_piece();
 				}
@@ -44,7 +44,7 @@ namespace checkers
 			{
 				if ((i + j) % 2 != 0)
 				{
-					(*m_board)[j][i] = new Piece(m_player_1->get_sign(), j, i);
+					(*m_board)[j][i] = new piece(m_player_1->get_sign(), j, i);
 					m_p_list_1.push_back((*m_board)[j][i]);
 					m_player_1->add_piece();
 				}
@@ -66,17 +66,17 @@ namespace checkers
 		print_pieces(&m_p_list_2);
 	}
 
-	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<Piece*>>* board)
+	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board)
 	{
 		os << "\t  ";
-		/*for (char a = 'a'; a < 'a' + Game::size; ++a) // colums as letters
+		/*for (char a = 'a'; a < 'a' + game::size; ++a) // colums as letters
 			os << a << "   ";*/
-		for (int i = 0; i < Checkers::size; ++i)
+		for (int i = 0; i < checkers::size; ++i)
 			os << i << "   ";
 		os << std::endl << std::endl << std::endl;
-		for (int i = 0; i < Checkers::size; ++i)
+		for (int i = 0; i < checkers::size; ++i)
 		{
-			//os << Game::size - i << "\t| ";
+			//os << game::size - i << "\t| ";
 			os << i << "\t| ";
 			for (int j = 0; j < size; ++j)
 			{
@@ -87,16 +87,16 @@ namespace checkers
 		return os;
 	}
 
-	Game::~Game()
+	game::~game()
 	{
 		delete m_board;
 		delete m_player_1;
 		delete m_player_2;
 	}
 
-	void Game::switch_turn(void) { m_first_turn = !m_first_turn; }
+	void game::switch_turn(void) { m_first_turn = !m_first_turn; }
 
-	void Game::loop(void)
+	void game::loop(void)
 	{
 		bool selected = false;
 		//rotate_board();
@@ -125,9 +125,9 @@ namespace checkers
 						
 						// find corresponding piece
 						bool is_found = false;
-						AvailableMove* found_move = NULL;
+						available_move* found_move = NULL;
 
-						all_of(m_selected_piece->get_av_list()->begin(), m_selected_piece->get_av_list()->end(), [&x, &y, &is_found, &found_move](AvailableMove* a)
+						all_of(m_selected_piece->get_av_list()->begin(), m_selected_piece->get_av_list()->end(), [&x, &y, &is_found, &found_move](available_move* a)
 						{
 							// check if selected coords match any of possible moves
 							if (a->get_x() == x && a->get_y() == y)
@@ -157,7 +157,7 @@ namespace checkers
 							if (found_move->is_capture())
 							{
 								// mark found capture
-								AvailableCapture* found_capture = dynamic_cast<AvailableCapture*>(found_move);
+								available_capture* found_capture = dynamic_cast<available_capture*>(found_move);
 								int x_d = found_capture->get_x_d();
 								int y_d = found_capture->get_y_d();
 								
@@ -168,7 +168,7 @@ namespace checkers
 								(*m_board)[x_d][y_d]->set_captured();
 
 								// temporary: delete to debug
-								Piece* piece_to_delete = (*m_board)[x_d][y_d];
+								piece* piece_to_delete = (*m_board)[x_d][y_d];
 								(*m_board)[x_d][y_d] = NULL;
 								
 								if (m_first_turn)
@@ -177,7 +177,7 @@ namespace checkers
 									delete_from_list(&m_p_list_2, piece_to_delete);
 									
 									// push to the "to delete list" (delete later) --- or maybe just to display it during multicapture
-									m_to_delete_list.push_back(new Piece('b', x_d, y_d));
+									m_to_delete_list.push_back(new piece('b', x_d, y_d));
 
 									m_player_1->set_combo(true);
 									std::cout << "player's 1 combo" << std::endl;
@@ -188,7 +188,7 @@ namespace checkers
 									delete_from_list(&m_p_list_1, piece_to_delete);
 									
 									// push to the "to delete list" (delete later)
-									m_to_delete_list.push_back(new Piece('w', x_d, y_d));
+									m_to_delete_list.push_back(new piece('w', x_d, y_d));
 
 									m_player_2->set_combo(true);
 									std::cout << "player's 2 combo" << std::endl;
@@ -310,7 +310,7 @@ namespace checkers
 							if (!(*m_board)[x][y]->get_av_list()->empty())
 							{
 								// find at least one move that is a capture
-								all_of((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [&found_capture](AvailableMove* a)
+								all_of((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [&found_capture](available_move* a)
 									{
 										if (a->is_capture())
 										{
@@ -319,7 +319,7 @@ namespace checkers
 										}
 										return true;
 									});
-								for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
+								for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [](available_move* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
 							}
 							if ((found_capture && m_available_capture) || (!found_capture && !m_available_capture)) // this lets making only capture moves, comment out to enable testing - replace to xnor
 								m_selected_piece = (*m_board)[x][y];
@@ -336,7 +336,7 @@ namespace checkers
 							if (!(*m_board)[x][y]->get_av_list()->empty())
 							{
 								// find at least one move that is a capture
-								all_of((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [&found_capture](AvailableMove* a)
+								all_of((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [&found_capture](available_move* a)
 									{
 										if (a->is_capture())
 										{
@@ -345,7 +345,7 @@ namespace checkers
 										}
 										return true;
 									});
-								for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [](AvailableMove* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
+								for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [](available_move* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
 							}
 							if ((found_capture && m_available_capture) || (!found_capture && !m_available_capture)) // this lets making only capture moves, comment out to enable testing
 								m_selected_piece = (*m_board)[x][y];
@@ -368,7 +368,7 @@ namespace checkers
 				if (!(m_selected_piece->get_av_list()->empty()))
 				{
 					highlight_selected(m_window, m_selected_piece->get_x(), m_selected_piece->get_y());
-					for_each(m_selected_piece->get_av_list()->begin(), m_selected_piece->get_av_list()->end(), [this](AvailableMove* a) { highlight_available(m_window, a->get_x(), a->get_y()); });
+					for_each(m_selected_piece->get_av_list()->begin(), m_selected_piece->get_av_list()->end(), [this](available_move* a) { highlight_available(m_window, a->get_x(), a->get_y()); });
 				}
 				else
 					m_selected_piece = NULL;
@@ -381,7 +381,7 @@ namespace checkers
 						(*m_board)[i][j]->draw(m_window);
 
 			// print pieces in multicapture
-			for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [this](Piece* p) { p->draw(m_window); });
+			for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [this](piece* p) { p->draw(m_window); });
 
 			m_window.display();
 		}
@@ -391,22 +391,22 @@ namespace checkers
 			sf::sleep(sf::seconds(m_frame_duration - elapsed_time.asSeconds()));
 	}
 
-	std::vector<std::vector<Piece*>>* Game::get_board(void) { return m_board; }
+	std::vector<std::vector<piece*>>* game::get_board(void) { return m_board; }
 
-	/*void Game::rotate_board(void)
+	/*void game::rotate_board(void)
 	{
 		is_rotated = !is_rotated;
 		for (int i = 0; i < size; ++i)
 		{
 			for (int j = 0; j < size - i; ++j)
 			{
-				Piece* tmp = (*board)[i][j];
+				piece* tmp = (*board)[i][j];
 				(*board)[i][j] = (*board)[size - 1 - i][size - 1 - j];
 				(*board)[size - 1 - i][size - 1 - j] = tmp;
 
 				if (i == j)
 				{
-					Piece* tmp = (*board)[i][size - 1 - i];
+					piece* tmp = (*board)[i][size - 1 - i];
 					(*board)[i][size - 1 - i] = (*board)[size - 1 - i][i];
 					(*board)[size - 1 - i][i] = tmp;
 				}
@@ -414,20 +414,20 @@ namespace checkers
 		}
 	}*/
 
-	void Game::print_results(std::ostream& os)
+	void game::print_results(std::ostream& os)
 	{
 		if (!m_first_won && !m_second_won)
-			std::cout << "Game wasn't finished" << std::endl;
+			std::cout << "game wasn't finished" << std::endl;
 		else if (m_first_won && m_second_won)
 			std::cout << "Draw" << std::endl;
 		else if (m_first_won)
-			std::cout << "Player: \"" << m_player_1->get_name() << "\" won!" << std::endl;
+			std::cout << "player: \"" << m_player_1->get_name() << "\" won!" << std::endl;
 		else
-			std::cout << "Player: \"" << m_player_2->get_name() << "\" won!" << std::endl;
+			std::cout << "player: \"" << m_player_2->get_name() << "\" won!" << std::endl;
 	}
 
 
-	void Game::draw(sf::RenderWindow& window)
+	void game::draw(sf::RenderWindow& window)
 	{
 		sf::RectangleShape tile;
 		tile.setSize(sf::Vector2f(square_size, square_size));
@@ -445,7 +445,7 @@ namespace checkers
 		}
 	}
 
-	void Game::highlight_selected(sf::RenderWindow& window, int x, int y)
+	void game::highlight_selected(sf::RenderWindow& window, int x, int y)
 	{
 		sf::RectangleShape tile;
 		tile.setSize(sf::Vector2f(square_size, square_size));
@@ -454,7 +454,7 @@ namespace checkers
 		window.draw(tile);
 	}
 
-	void Game::highlight_available(sf::RenderWindow& window, int x, int y)
+	void game::highlight_available(sf::RenderWindow& window, int x, int y)
 	{
 		sf::RectangleShape tile;
 		tile.setSize(sf::Vector2f(square_size, square_size));
@@ -464,10 +464,10 @@ namespace checkers
 	}
 
 
-	bool Game::evaluate(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p, int* counter)
+	bool game::evaluate(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter)
 	{
-		bool available_capture = false;
-		for_each(list.begin(), list.end(), [this, &board_p, &list, &counter, &available_capture](Piece* p)
+		bool av_capture = false;
+		for_each(list.begin(), list.end(), [this, &board_p, &list, &counter, &av_capture](piece* p)
 			{
 				int x = p->get_x();
 				int y = p->get_y();
@@ -510,25 +510,25 @@ namespace checkers
 
 				if (possible_capture_top_left || possible_capture_top_right || possible_capture_bottow_left || possible_capture_bottom_right)
 				{
-					available_capture = true;
+					av_capture = true;
 
 					// evaluate copy of the board recursively in every direction and find highest number of captures to add to base moves list
 					int capture_counter[4] = { 0, 0, 0, 0 }; // 0 - top right, 1 - top left, 2 - bottom right, 3 - bottom left
 
 					if (possible_capture_top_right)
 					{
-						//(*p).get_av_list()->push_back(new AvailableCapture(x + 2, y - 2, x + 1, y - 1));
+						//(*p).get_av_list()->push_back(new available_capture(x + 2, y - 2, x + 1, y - 1));
 						capture_counter[0] = 1; // change here to get from counter, then increment?
 
 						// copy the board and make empty list for moved piece
-						std::vector<std::vector<Piece*>>* copy_of_board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, 0));
-						std::list<Piece*> copy_of_list;
+						std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(size, std::vector<piece*>(size, 0));
+						std::list<piece*> copy_of_list;
 						if (*counter == NULL) // first call of evaluation
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*m_board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 							
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -536,11 +536,11 @@ namespace checkers
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*board_p)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
 						}
 
 						// make planned move
-						Piece* moving_piece = (*copy_of_board)[x][y];
+						piece* moving_piece = (*copy_of_board)[x][y];
 						(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
 						moving_piece->set_x(x + 2);
 						moving_piece->set_y(y - 2);
@@ -572,18 +572,18 @@ namespace checkers
 
 					if (possible_capture_top_left)
 					{
-						//(*p).get_av_list()->push_back(new AvailableCapture(x - 2, y - 2, x - 1, y - 1));
+						//(*p).get_av_list()->push_back(new available_capture(x - 2, y - 2, x - 1, y - 1));
 						capture_counter[1] = 1;
 
 						// copy the board and make empty list for moved piece
-						std::vector<std::vector<Piece*>>* copy_of_board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, 0));
-						std::list<Piece*> copy_of_list;
+						std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(size, std::vector<piece*>(size, 0));
+						std::list<piece*> copy_of_list;
 						if (*counter == NULL) // first call of evaluation
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*m_board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -591,11 +591,11 @@ namespace checkers
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*board_p)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
 						}
 
 						// make planned move
-						Piece* moving_piece = (*copy_of_board)[x][y];
+						piece* moving_piece = (*copy_of_board)[x][y];
 						(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
 						moving_piece->set_x(x - 2);
 						moving_piece->set_y(y - 2);
@@ -627,18 +627,18 @@ namespace checkers
 
 					if (possible_capture_bottom_right)
 					{
-						//(*p).get_av_list()->push_back(new AvailableCapture(x + 2, y + 2, x + 1, y + 1));
+						//(*p).get_av_list()->push_back(new available_capture(x + 2, y + 2, x + 1, y + 1));
 						capture_counter[2] = 1;
 
 						// copy the board and make empty list for moved piece
-						std::vector<std::vector<Piece*>>* copy_of_board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, 0));
-						std::list<Piece*> copy_of_list;
+						std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(size, std::vector<piece*>(size, 0));
+						std::list<piece*> copy_of_list;
 						if (*counter == NULL) // first call of evaluation
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*m_board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -646,11 +646,11 @@ namespace checkers
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*board_p)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
 						}
 
 						// make planned move
-						Piece* moving_piece = (*copy_of_board)[x][y];
+						piece* moving_piece = (*copy_of_board)[x][y];
 						(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
 						moving_piece->set_x(x + 2);
 						moving_piece->set_y(y + 2);
@@ -682,18 +682,18 @@ namespace checkers
 
 					if (possible_capture_bottow_left)
 					{
-						//(*p).get_av_list()->push_back(new AvailableCapture(x - 2, y + 2, x - 1, y + 1));
+						//(*p).get_av_list()->push_back(new available_capture(x - 2, y + 2, x - 1, y + 1));
 						capture_counter[3] = 1;
 
 						// copy the board and make empty list for moved piece
-						std::vector<std::vector<Piece*>>* copy_of_board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, 0));
-						std::list<Piece*> copy_of_list;
+						std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(size, std::vector<piece*>(size, 0));
+						std::list<piece*> copy_of_list;
 						if (*counter == NULL) // first call of evaluation
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*m_board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -701,11 +701,11 @@ namespace checkers
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*board_p)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
 						}
 
 						// make planned move
-						Piece* moving_piece = (*copy_of_board)[x][y];
+						piece* moving_piece = (*copy_of_board)[x][y];
 						(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
 						moving_piece->set_x(x - 2);
 						moving_piece->set_y(y + 2);
@@ -753,25 +753,25 @@ namespace checkers
 							case 0:
 							{
 								std::cout << "kierunek top right: " << capture_counter[0] << std::endl;
-								(*p).get_av_list()->push_back(new AvailableCapture(x + 2, y - 2, x + 1, y - 1));
+								(*p).get_av_list()->push_back(new available_capture(x + 2, y - 2, x + 1, y - 1));
 								break;
 							}
 							case 1:
 							{
 								std::cout << "kierunek top left: " << capture_counter[1] << std::endl;
-								(*p).get_av_list()->push_back(new AvailableCapture(x - 2, y - 2, x - 1, y - 1));
+								(*p).get_av_list()->push_back(new available_capture(x - 2, y - 2, x - 1, y - 1));
 								break;
 							}
 							case 2:
 							{
 								std::cout << "kierunek bottom right: " << capture_counter[2] << std::endl;
-								(*p).get_av_list()->push_back(new AvailableCapture(x + 2, y + 2, x + 1, y + 1));
+								(*p).get_av_list()->push_back(new available_capture(x + 2, y + 2, x + 1, y + 1));
 								break;
 							}
 							case 3:
 							{
 								std::cout << "kierunek bottom left: " << capture_counter[3] << std::endl;
-								(*p).get_av_list()->push_back(new AvailableCapture(x - 2, y + 2, x - 1, y + 1));
+								(*p).get_av_list()->push_back(new available_capture(x - 2, y + 2, x - 1, y + 1));
 								break;
 							}
 							default:
@@ -790,7 +790,7 @@ namespace checkers
 						if ((*board_p)[x + 1][y - 1] == NULL)
 						{
 							std::cout << "available move to the right!" << std::endl;
-							(*p).get_av_list()->push_back(new AvailableMove(x + 1, y - 1));
+							(*p).get_av_list()->push_back(new available_move(x + 1, y - 1));
 						}
 					}
 
@@ -800,22 +800,22 @@ namespace checkers
 						if ((*board_p)[x - 1][y - 1] == NULL)
 						{
 							std::cout << "available move to the left!" << std::endl;
-							(*p).get_av_list()->push_back(new AvailableMove(x - 1, y - 1));
+							(*p).get_av_list()->push_back(new available_move(x - 1, y - 1));
 						}
 					}
 				}
 
 			});
 			std::cout << "---available returning: ";
-			available_capture ? (std::cout << "true") : (std::cout << "false");
+			av_capture ? (std::cout << "true") : (std::cout << "false");
 			std::cout << std::endl;
-			return available_capture;
+			return av_capture;
 	}
 
-	bool Game::evaluate_inv(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p, int* counter)
+	bool game::evaluate_inv(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter)
 	{
-		bool available_capture = false;
-		for_each(list.begin(), list.end(), [this, &board_p, &list, &counter, &available_capture](Piece* p)
+		bool av_capture = false;
+		for_each(list.begin(), list.end(), [this, &board_p, &list, &counter, &av_capture](piece* p)
 			{
 				int x = p->get_x();
 				int y = p->get_y();
@@ -858,25 +858,25 @@ namespace checkers
 
 				if (possible_capture_top_left || possible_capture_top_right || possible_capture_bottow_left || possible_capture_bottom_right)
 				{
-					available_capture = true;
+					av_capture = true;
 
 					// evaluate copy of the board recursively in every direction and find highest number of captures to add to base moves list
 					int capture_counter[4] = { 0, 0, 0, 0 }; // 0 - top right, 1 - top left, 2 - bottom right, 3 - bottom left
 
 					if (possible_capture_top_right)
 					{
-						//(*p).get_av_list()->push_back(new AvailableCapture(x + 2, y - 2, x + 1, y - 1));
+						//(*p).get_av_list()->push_back(new available_capture(x + 2, y - 2, x + 1, y - 1));
 						capture_counter[0] = 1; // change here to get from counter, then increment?
 
 						// copy the board and make empty list for moved piece
-						std::vector<std::vector<Piece*>>* copy_of_board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, 0));
-						std::list<Piece*> copy_of_list;
+						std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(size, std::vector<piece*>(size, 0));
+						std::list<piece*> copy_of_list;
 						if (*counter == NULL) // first call of evaluation
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*m_board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -884,11 +884,11 @@ namespace checkers
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*board_p)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
 						}
 
 						// make planned move
-						Piece* moving_piece = (*copy_of_board)[x][y];
+						piece* moving_piece = (*copy_of_board)[x][y];
 						(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
 						moving_piece->set_x(x + 2);
 						moving_piece->set_y(y - 2);
@@ -920,18 +920,18 @@ namespace checkers
 
 					if (possible_capture_top_left)
 					{
-						//(*p).get_av_list()->push_back(new AvailableCapture(x - 2, y - 2, x - 1, y - 1));
+						//(*p).get_av_list()->push_back(new available_capture(x - 2, y - 2, x - 1, y - 1));
 						capture_counter[1] = 1;
 
 						// copy the board and make empty list for moved piece
-						std::vector<std::vector<Piece*>>* copy_of_board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, 0));
-						std::list<Piece*> copy_of_list;
+						std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(size, std::vector<piece*>(size, 0));
+						std::list<piece*> copy_of_list;
 						if (*counter == NULL) // first call of evaluation
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*m_board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -939,11 +939,11 @@ namespace checkers
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*board_p)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
 						}
 
 						// make planned move
-						Piece* moving_piece = (*copy_of_board)[x][y];
+						piece* moving_piece = (*copy_of_board)[x][y];
 						(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
 						moving_piece->set_x(x - 2);
 						moving_piece->set_y(y - 2);
@@ -975,18 +975,18 @@ namespace checkers
 
 					if (possible_capture_bottom_right)
 					{
-						//(*p).get_av_list()->push_back(new AvailableCapture(x + 2, y + 2, x + 1, y + 1));
+						//(*p).get_av_list()->push_back(new available_capture(x + 2, y + 2, x + 1, y + 1));
 						capture_counter[2] = 1;
 
 						// copy the board and make empty list for moved piece
-						std::vector<std::vector<Piece*>>* copy_of_board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, 0));
-						std::list<Piece*> copy_of_list;
+						std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(size, std::vector<piece*>(size, 0));
+						std::list<piece*> copy_of_list;
 						if (*counter == NULL) // first call of evaluation
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*m_board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -994,11 +994,11 @@ namespace checkers
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*board_p)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
 						}
 
 						// make planned move
-						Piece* moving_piece = (*copy_of_board)[x][y];
+						piece* moving_piece = (*copy_of_board)[x][y];
 						(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
 						moving_piece->set_x(x + 2);
 						moving_piece->set_y(y + 2);
@@ -1030,18 +1030,18 @@ namespace checkers
 
 					if (possible_capture_bottow_left)
 					{
-						//(*p).get_av_list()->push_back(new AvailableCapture(x - 2, y + 2, x - 1, y + 1));
+						//(*p).get_av_list()->push_back(new available_capture(x - 2, y + 2, x - 1, y + 1));
 						capture_counter[3] = 1;
 
 						// copy the board and make empty list for moved piece
-						std::vector<std::vector<Piece*>>* copy_of_board = new std::vector<std::vector<Piece*>>(size, std::vector<Piece*>(size, 0));
-						std::list<Piece*> copy_of_list;
+						std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(size, std::vector<piece*>(size, 0));
+						std::list<piece*> copy_of_list;
 						if (*counter == NULL) // first call of evaluation
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*m_board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
 						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
@@ -1049,11 +1049,11 @@ namespace checkers
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
 									if ((*board_p)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new Piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
+										(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
 						}
 
 						// make planned move
-						Piece* moving_piece = (*copy_of_board)[x][y];
+						piece* moving_piece = (*copy_of_board)[x][y];
 						(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
 						moving_piece->set_x(x - 2);
 						moving_piece->set_y(y + 2);
@@ -1101,25 +1101,26 @@ namespace checkers
 							case 0:
 							{
 								std::cout << "kierunek top right: " << capture_counter[0] << std::endl;
-								(*p).get_av_list()->push_back(new AvailableCapture(x + 2, y - 2, x + 1, y - 1));
+
+								(*p).get_av_list()->push_back(new available_capture(x + 2, y - 2, x + 1, y - 1));
 								break;
 							}
 							case 1:
 							{
 								std::cout << "kierunek top left: " << capture_counter[1] << std::endl;
-								(*p).get_av_list()->push_back(new AvailableCapture(x - 2, y - 2, x - 1, y - 1));
+								(*p).get_av_list()->push_back(new available_capture(x - 2, y - 2, x - 1, y - 1));
 								break;
 							}
 							case 2:
 							{
 								std::cout << "kierunek bottom right: " << capture_counter[2] << std::endl;
-								(*p).get_av_list()->push_back(new AvailableCapture(x + 2, y + 2, x + 1, y + 1));
+								(*p).get_av_list()->push_back(new available_capture(x + 2, y + 2, x + 1, y + 1));
 								break;
 							}
 							case 3:
 							{
 								std::cout << "kierunek bottom left: " << capture_counter[3] << std::endl;
-								(*p).get_av_list()->push_back(new AvailableCapture(x - 2, y + 2, x - 1, y + 1));
+								(*p).get_av_list()->push_back(new available_capture(x - 2, y + 2, x - 1, y + 1));
 								break;
 							}
 							default:
@@ -1138,7 +1139,7 @@ namespace checkers
 						if ((*board_p)[x + 1][y + 1] == NULL)
 						{
 							std::cout << "available move to the right!" << std::endl;
-							(*p).get_av_list()->push_back(new AvailableMove(x + 1, y + 1));
+							(*p).get_av_list()->push_back(new available_move(x + 1, y + 1));
 						}
 					}
 
@@ -1148,34 +1149,34 @@ namespace checkers
 						if ((*board_p)[x - 1][y + 1] == NULL)
 						{
 							std::cout << "available move to the left!" << std::endl;
-							(*p).get_av_list()->push_back(new AvailableMove(x - 1, y + 1));
+							(*p).get_av_list()->push_back(new available_move(x - 1, y + 1));
 						}
 					}
 				}
 
 			});
 		std::cout << "---available returning: ";
-		available_capture ? (std::cout << "true") : (std::cout << "false");
+		av_capture ? (std::cout << "true") : (std::cout << "false");
 		std::cout << std::endl;
-		return available_capture;
+		return av_capture;
 	}
 
-	void Game::clear_list(std::list<Piece*>* list) { for_each(list->begin(), list->end(), [this](Piece* p) { p->get_av_list()->clear(); }); }
+	void game::clear_list(std::list<piece*>* list) { for_each(list->begin(), list->end(), [this](piece* p) { p->get_av_list()->clear(); }); }
 	
-	void Game::print_pieces(std::list<Piece*>* list, std::ostream& os) { std::for_each(list->begin(), list->end(), [i = 1, this, &os](Piece* p) mutable { os << i++ << "; sign: " << p << "; x: " << p->get_x() << "; y: " << p->get_y() << std::endl; }); }
+	void game::print_pieces(std::list<piece*>* list, std::ostream& os) { std::for_each(list->begin(), list->end(), [i = 1, this, &os](piece* p) mutable { os << i++ << "; sign: " << p << "; x: " << p->get_x() << "; y: " << p->get_y() << std::endl; }); }
 
-	void Game::delete_from_list(std::list<Piece*>* list, Piece* piece_to_delete) { list->remove(piece_to_delete); }
+	void game::delete_from_list(std::list<piece*>* list, piece* piece_to_delete) { list->remove(piece_to_delete); }
 
-	void Game::clear_to_delete_list(std::list<Piece*>* del_list, std::list<Piece*>* src_list)
+	void game::clear_to_delete_list(std::list<piece*>* del_list, std::list<piece*>* src_list)
 	{
 		while (!(del_list->empty()))
 		{
 			// temporary piece from "to delete list"
-			Piece* tmp = del_list->front();
+			piece* tmp = del_list->front();
 
 			int x_d = tmp->get_x();
 			int y_d = tmp->get_y();
-			Piece* piece_to_delete = (*m_board)[x_d][y_d];
+			piece* piece_to_delete = (*m_board)[x_d][y_d];
 			(*m_board)[x_d][y_d] = NULL;
 
 			delete_from_list(src_list, piece_to_delete);

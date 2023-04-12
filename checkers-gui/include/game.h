@@ -18,7 +18,7 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Network.hpp>
 
-class Piece;
+class piece;
 
 namespace checkers
 {
@@ -34,7 +34,7 @@ namespace checkers
 	class game
 	{
 		// main game board
-		std::vector<std::vector<Piece*>>* m_board;
+		std::vector<std::vector<piece*>>* m_board;
 		// 
 		const int m_size = size;
 		// flag indicating turn of the first player
@@ -44,11 +44,11 @@ namespace checkers
 		// player 2
 		base_player* m_player_2;
 		// piece list of player 1
-		std::list<Piece*> m_p_list_1;
+		std::list<piece*> m_p_list_1;
 		// piece list of player 2
-		std::list<Piece*> m_p_list_2;
+		std::list<piece*> m_p_list_2;
 		// list of pieces to delete after multicapture (combo)
-		std::list<Piece*> m_to_delete_list;
+		std::list<piece*> m_to_delete_list;
 		// flag indicating finished game
 		bool m_is_finished;
 		// flag indicating that first player won
@@ -56,7 +56,7 @@ namespace checkers
 		// flag indicating that second player won
 		bool m_second_won;
 		// pointer to selected piece on the board
-		Piece* m_selected_piece;
+		piece* m_selected_piece;
 		// flag indicating if there is one or more captures, not allowing other moves
 		bool m_available_capture;
 		//
