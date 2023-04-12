@@ -77,7 +77,7 @@ namespace checkers
 	public:
 		
 		// create the game of given size and target frames per second
-		game(int fps = 24);
+		game(int fps = 12);
 		// deletes the game
 		~game();
 		// rotates the vector of vectors board, sets the is rotated flag to opposite

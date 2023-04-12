@@ -1,5 +1,4 @@
 #include "include/game.h"
-//#define DEBUG
 
 // todo: (*done)
 // * enable only current turn moves
@@ -63,13 +62,13 @@ namespace checkers
 		}
 
 		// set the antialiasing
-		m_settings.antialiasingLevel = 16.0;
+		m_settings.antialiasingLevel = 1.0;
 
 		// evaluate available moves for the first player
 		int dummy = 0;
 		m_available_capture = evaluate(m_p_list_1, m_board, &dummy, m_player_1->is_first());
 		
-		#ifdef DEBUG
+		#ifdef _DEBUG
 		std::cout << "List of pieces of first player" << std::endl;
 		print_pieces(&m_p_list_1);
 
@@ -142,7 +141,7 @@ namespace checkers
 							// check if selected coords match any of possible moves
 							if (a->get_x() == x && a->get_y() == y)
 							{
-								#ifdef DEBUG
+								#ifdef _DEBUG
 								std::cout << a->get_x() << " " << a->get_y() << std::endl;
 								#endif		
 								found_move = a;
@@ -173,7 +172,7 @@ namespace checkers
 								int x_d = found_capture->get_x_d();
 								int y_d = found_capture->get_y_d();
 								
-								#ifdef DEBUG
+								#ifdef _DEBUG
 								std::cout << "CONTROL" << std::endl;
 								std::cout << "Coords to delete" << x_d << " " << y_d << std::endl;
 								#endif
@@ -181,7 +180,7 @@ namespace checkers
 								// now it is not needed
 								(*m_board)[x_d][y_d]->set_captured();
 
-								// temporary: delete to debug
+								// temporary: delete to _DEBUG
 								piece* piece_to_delete = (*m_board)[x_d][y_d];
 								(*m_board)[x_d][y_d] = NULL;
 								
@@ -227,7 +226,7 @@ namespace checkers
 							m_selected_piece = NULL;
 							selected = false;
 							
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << "List of pieces of first player" << std::endl;
 							print_pieces(&m_p_list_1);
 							std::cout << "List of pieces of second player" << std::endl;
@@ -314,7 +313,7 @@ namespace checkers
 				// if the correspoding field contains a piece
 				if ((*m_board)[x][y] != NULL)
 				{
-					#ifdef DEBUG
+					#ifdef _DEBUG
 					std::cout << "x: " << x << "; y: " << y << "; piece: " << (*m_board)[x][y] << std::endl;
 					#endif
 
@@ -323,7 +322,7 @@ namespace checkers
 					{
 						if ((*m_board)[x][y]->get_sign() == m_player_1->get_sign())
 						{
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << ":)" << std::endl;
 							#endif
 							
@@ -340,7 +339,7 @@ namespace checkers
 										}
 										return true;
 									});
-								#ifdef DEBUG
+								#ifdef _DEBUG
 								for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [](available_move* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
 								#endif
 							}
@@ -349,7 +348,7 @@ namespace checkers
 						}
 						else
 						{
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << ":(" << std::endl;
 							#endif
 						}
@@ -358,7 +357,7 @@ namespace checkers
 					{
 						if ((*m_board)[x][y]->get_sign() == m_player_2->get_sign())
 						{
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << ":)" << std::endl;
 							#endif
 
@@ -375,7 +374,7 @@ namespace checkers
 										}
 										return true;
 									});
-								#ifdef DEBUG
+								#ifdef _DEBUG
 								for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [](available_move* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
 								#endif
 							}
@@ -384,7 +383,7 @@ namespace checkers
 						}
 						else
 						{
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << ":(" << std::endl;
 							#endif
 						}
@@ -392,7 +391,7 @@ namespace checkers
 				}
 				else
 				{
-					#ifdef DEBUG
+					#ifdef _DEBUG
 					std::cout << "x: " << x << "; y: " << y << std::endl;
 					#endif
 					
@@ -511,7 +510,7 @@ namespace checkers
 				int x = p->get_x();
 				int y = p->get_y();
 				
-				#ifdef DEBUG
+				#ifdef _DEBUG
 				std::cout << "evaluating" << std::endl;
 				std::cout << "x: " << x << "; y: " << y << std::endl;
 
@@ -595,7 +594,7 @@ namespace checkers
 						//evaluate recursively - separate in every direction - call tree
 						if (*counter == NULL)
 						{
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 							#endif
@@ -604,13 +603,13 @@ namespace checkers
 							evaluate(copy_of_list, copy_of_board, &moves, is_first);
 							capture_counter[0] = moves;
 
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << "moves counter (top right): " << moves << std::endl;
 							#endif
 						}
 						else
 						{
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
 							#endif
@@ -659,7 +658,7 @@ namespace checkers
 						//evaluate recursively - separate in every direction - call tree
 						if (*counter == NULL)
 						{
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 							#endif
@@ -668,13 +667,13 @@ namespace checkers
 							evaluate(copy_of_list, copy_of_board, &moves, is_first);
 							capture_counter[1] = moves;
 							
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << "moves counter (top left): " << moves << std::endl;
 							#endif
 						}
 						else
 						{
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
 							#endif
@@ -723,7 +722,7 @@ namespace checkers
 						//evaluate recursively - separate in every direction - call tree
 						if (*counter == NULL)
 						{
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 							#endif
@@ -732,13 +731,13 @@ namespace checkers
 							evaluate(copy_of_list, copy_of_board, &moves, is_first);
 							capture_counter[2] = moves;
 							
-							#ifdef DEBUG	
+							#ifdef _DEBUG	
 							std::cout << "moves counter (bottom right): " << moves << std::endl;
 							#endif
 						}
 						else
 						{
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
 							#endif
@@ -787,7 +786,7 @@ namespace checkers
 						//evaluate recursively - separate in every direction - call tree
 						if (*counter == NULL)
 						{
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 							#endif
@@ -796,13 +795,13 @@ namespace checkers
 							evaluate(copy_of_list, copy_of_board, &moves, is_first);
 							capture_counter[3] = moves;
 							
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << "moves counter (bottom left): " << moves << std::endl;
 							#endif
 						}
 						else
 						{
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
 							#endif
@@ -866,7 +865,7 @@ namespace checkers
 					{
 						if ((*board_p)[x + 1][y - 1] == NULL)
 						{
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << "available move to the right!" << std::endl;
 							#endif
 							(*p).get_av_list()->push_back(new available_move(x + 1, y - 1));
@@ -878,7 +877,7 @@ namespace checkers
 					{
 						if ((*board_p)[x - 1][y - 1] == NULL)
 						{
-							#ifdef DEBUG
+							#ifdef _DEBUG
 							std::cout << "available move to the left!" << std::endl;
 							#endif
 							(*p).get_av_list()->push_back(new available_move(x - 1, y - 1));
@@ -887,7 +886,7 @@ namespace checkers
 				}
 
 			});
-			#ifdef DEBUG
+			#ifdef _DEBUG
 			std::cout << "---available returning: ";
 			av_capture ? (std::cout << "true") : (std::cout << "false");
 			std::cout << std::endl;
