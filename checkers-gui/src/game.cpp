@@ -1,4 +1,6 @@
 #include "include/game.h"
+//#define DEBUG
+
 // todo: (*done)
 // * enable only current turn moves
 // * enable only possible moves (captures)
@@ -13,15 +15,24 @@ namespace checkers
 {
 	game::game(int fps) : m_is_finished(false), m_fps(fps),
 		m_window(sf::VideoMode(square_size * size, square_size * size), "checkers", sf::Style::Default, m_settings),
-		m_selected_piece(NULL), m_first_turn(true), m_available_capture(false), m_clock(), m_event(), m_settings()
+		m_selected_piece(NULL), m_first_turn(true), m_available_capture(false), m_clock(), m_event(), m_settings(), m_current_player(NULL)
 	{
-		m_board = new std::vector<std::vector<piece*>>(size, std::vector<piece*>(size, 0));
-		
-		// todo: choice
+		// todo: menu
+
+		// simplified: players init
 		std::string name_1 = "Some player 1";
 		std::string name_2 = "Some player 2";
 		m_player_1 = new player('W', name_1);
 		m_player_2 = new player('B', name_2);
+
+		// set play order and evaluation direction
+		m_player_1->set_first(true);
+		m_player_2->set_first(false);
+		m_player_1->set_next_player(m_player_2);
+		m_player_2->set_next_player(m_player_1);
+
+		// board init
+		m_board = new std::vector<std::vector<piece*>>(size, std::vector<piece*>(size, 0));
 
 		// todo: change to algorithm
 		// rows of the second player (upper)
@@ -52,36 +63,35 @@ namespace checkers
 		}
 
 		// set the antialiasing
-		m_settings.antialiasingLevel = 2.0;
+		m_settings.antialiasingLevel = 16.0;
 
 		// evaluate available moves for the first player
 		int dummy = 0;
-		//available_capture = evaluate(p_list_1, board, &dummy);
 		m_available_capture = evaluate(m_p_list_1, m_board, &dummy);
-
+		
+		#ifdef DEBUG
 		std::cout << "List of pieces of first player" << std::endl;
 		print_pieces(&m_p_list_1);
 
 		std::cout << "List of pieces of second player" << std::endl;
 		print_pieces(&m_p_list_2);
+		#endif
 	}
 
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board)
 	{
 		os << "\t  ";
-		/*for (char a = 'a'; a < 'a' + game::size; ++a) // colums as letters
-			os << a << "   ";*/
-		for (int i = 0; i < checkers::size; ++i)
-			os << i << "   ";
+		for (char a = 'a'; a < 'a' + checkers::size; ++a) // colums as letters
+			os << a << "   ";
+		/*for (int i = 0; i < checkers::size; ++i)
+			os << i << "   ";*/
 		os << std::endl << std::endl << std::endl;
 		for (int i = 0; i < checkers::size; ++i)
 		{
 			//os << game::size - i << "\t| ";
 			os << i << "\t| ";
 			for (int j = 0; j < size; ++j)
-			{
 				os << (*board)[j][i] << " | ";
-			}
 			os << std::endl << std::endl;
 		}
 		return os;
@@ -492,19 +502,19 @@ namespace checkers
 				// y ascendint to the bottom !
 
 				// capture top right (0)
-				if (x + 2 <= size - 1 && y - 2 >= 0 && (*board_p)[x + 1][y - 1] != NULL && (*board_p)[x + 1][y - 1]->get_sign() == m_player_2->get_sign() && !((*board_p)[x + 1][y - 1]->get_is_captured()) && (*board_p)[x + 2][y - 2] == NULL)
+				if (x + 2 <= size - 1 && y - 2 >= 0 && (*board_p)[x + 1][y - 1] != NULL && (*board_p)[x + 1][y - 1]->get_sign() == m_player_2->get_sign() && !((*board_p)[x + 1][y - 1]->is_captured()) && (*board_p)[x + 2][y - 2] == NULL)
 					possible_capture_top_right = true;
 
 				// capture top left (1)
-				if (x - 2 >= 0 && y - 2 >= 0 && (*board_p)[x - 1][y - 1] != NULL && (*board_p)[x - 1][y - 1]->get_sign() == m_player_2->get_sign() && !((*board_p)[x - 1][y - 1]->get_is_captured()) && (*board_p)[x - 2][y - 2] == NULL)
+				if (x - 2 >= 0 && y - 2 >= 0 && (*board_p)[x - 1][y - 1] != NULL && (*board_p)[x - 1][y - 1]->get_sign() == m_player_2->get_sign() && !((*board_p)[x - 1][y - 1]->is_captured()) && (*board_p)[x - 2][y - 2] == NULL)
 					possible_capture_top_left = true;
 
 				// capture bottom right (2)
-				if (x + 2 <= size - 1 && y + 2 <= size - 1 && (*board_p)[x + 1][y + 1] != NULL && (*board_p)[x + 1][y + 1]->get_sign() == m_player_2->get_sign() && !((*board_p)[x + 1][y + 1]->get_is_captured()) && (*board_p)[x + 2][y + 2] == NULL)
+				if (x + 2 <= size - 1 && y + 2 <= size - 1 && (*board_p)[x + 1][y + 1] != NULL && (*board_p)[x + 1][y + 1]->get_sign() == m_player_2->get_sign() && !((*board_p)[x + 1][y + 1]->is_captured()) && (*board_p)[x + 2][y + 2] == NULL)
 					possible_capture_bottom_right = true;
 
 				// capture bottom left (3)
-				if (x - 2 >= 0 && y + 2 <= size - 1 && (*board_p)[x - 1][y + 1] != NULL && (*board_p)[x - 1][y + 1]->get_sign() == m_player_2->get_sign() && !((*board_p)[x - 1][y + 1]->get_is_captured()) && (*board_p)[x - 2][y + 2] == NULL)
+				if (x - 2 >= 0 && y + 2 <= size - 1 && (*board_p)[x - 1][y + 1] != NULL && (*board_p)[x - 1][y + 1]->get_sign() == m_player_2->get_sign() && !((*board_p)[x - 1][y + 1]->is_captured()) && (*board_p)[x - 2][y + 2] == NULL)
 					possible_capture_bottow_left = true;
 
 
@@ -775,7 +785,7 @@ namespace checkers
 								break;
 							}
 							default:
-								throw std::exception("Eval. error: 199");
+								throw std::exception("Evaluation error on piece " + p->get_sign());
 							}
 						}
 				}
@@ -840,19 +850,19 @@ namespace checkers
 				// y ascendint to the bottom !
 
 				// capture top right (0)
-				if (x + 2 <= size - 1 && y - 2 >= 0 && (*board_p)[x + 1][y - 1] != NULL && (*board_p)[x + 1][y - 1]->get_sign() == m_player_1->get_sign() && !((*board_p)[x + 1][y - 1]->get_is_captured()) && (*board_p)[x + 2][y - 2] == NULL)
+				if (x + 2 <= size - 1 && y - 2 >= 0 && (*board_p)[x + 1][y - 1] != NULL && (*board_p)[x + 1][y - 1]->get_sign() == m_player_1->get_sign() && !((*board_p)[x + 1][y - 1]->is_captured()) && (*board_p)[x + 2][y - 2] == NULL)
 					possible_capture_top_right = true;
 
 				// capture top left (1)
-				if (x - 2 >= 0 && y - 2 >= 0 && (*board_p)[x - 1][y - 1] != NULL && (*board_p)[x - 1][y - 1]->get_sign() == m_player_1->get_sign() && !((*board_p)[x - 1][y - 1]->get_is_captured()) && (*board_p)[x - 2][y - 2] == NULL)
+				if (x - 2 >= 0 && y - 2 >= 0 && (*board_p)[x - 1][y - 1] != NULL && (*board_p)[x - 1][y - 1]->get_sign() == m_player_1->get_sign() && !((*board_p)[x - 1][y - 1]->is_captured()) && (*board_p)[x - 2][y - 2] == NULL)
 					possible_capture_top_left = true;
 
 				// capture bottom right (2)
-				if (x + 2 <= size - 1 && y + 2 <= size - 1 && (*board_p)[x + 1][y + 1] != NULL && (*board_p)[x + 1][y + 1]->get_sign() == m_player_1->get_sign() && !((*board_p)[x + 1][y + 1]->get_is_captured()) && (*board_p)[x + 2][y + 2] == NULL)
+				if (x + 2 <= size - 1 && y + 2 <= size - 1 && (*board_p)[x + 1][y + 1] != NULL && (*board_p)[x + 1][y + 1]->get_sign() == m_player_1->get_sign() && !((*board_p)[x + 1][y + 1]->is_captured()) && (*board_p)[x + 2][y + 2] == NULL)
 					possible_capture_bottom_right = true;
 
 				// capture bottom left (3)
-				if (x - 2 >= 0 && y + 2 <= size - 1 && (*board_p)[x - 1][y + 1] != NULL && (*board_p)[x - 1][y + 1]->get_sign() == m_player_1->get_sign() && !((*board_p)[x - 1][y + 1]->get_is_captured()) && (*board_p)[x - 2][y + 2] == NULL)
+				if (x - 2 >= 0 && y + 2 <= size - 1 && (*board_p)[x - 1][y + 1] != NULL && (*board_p)[x - 1][y + 1]->get_sign() == m_player_1->get_sign() && !((*board_p)[x - 1][y + 1]->is_captured()) && (*board_p)[x - 2][y + 2] == NULL)
 					possible_capture_bottow_left = true;
 
 
@@ -1124,7 +1134,7 @@ namespace checkers
 								break;
 							}
 							default:
-								throw std::exception("Eval. error: 199");
+								throw std::exception("Evaluation error on piece " + p->get_sign());
 							}
 						}
 				}

@@ -45,7 +45,7 @@ namespace checkers
 		// sets flag indicating if the piece is captured and returns set value
 		bool set_captured(bool captured = true);
 		// returns true, if piece is already captured, false respectively
-		bool get_is_captured(void);
+		bool is_captured(void);
 		// lets to print the piece in given stream
 		friend std::ostream& operator<<(std::ostream& os, const piece* piece);
 		// returns the list of all evaluated moves

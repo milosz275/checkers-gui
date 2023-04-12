@@ -43,6 +43,8 @@ namespace checkers
 		base_player* m_player_1;
 		// player 2
 		base_player* m_player_2;
+		// pointer to player making move
+		base_player* m_current_player;
 		// piece list of player 1
 		std::list<piece*> m_p_list_1;
 		// piece list of player 2

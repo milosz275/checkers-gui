@@ -5,6 +5,7 @@
 #include <string>
 #include <algorithm>
 #include <list>
+#include <cassert>
 
 namespace checkers
 {
@@ -20,11 +21,27 @@ namespace checkers
 		int m_captured_pieces;
 		// flag indicating the right to move again after capture
 		bool m_combo;
+		//
+		bool m_is_first;
+		//
+		base_player* m_next_player;
 	public:
+		// creates the player of a given sign and name
+		base_player(char sign, std::string name);
+		// deletes player
+		virtual ~base_player();
 		// returns player's sign
 		char get_sign(void);
 		// returns player nickname
 		std::string get_name(void);
+		//
+		bool is_first(void);
+		//
+		bool set_first(bool is_first);
+		//
+		base_player* get_next_player(void);
+		//
+		base_player* set_next_player(base_player* next_player);
 		// increases piece count by x
 		void add_piece(int count = 1);
 		// returns living pieces 
@@ -39,10 +56,6 @@ namespace checkers
 		void capture(void);
 		// prints pieces of the player
 		void print_player(void);
-		// creates the player of a given sign and name
-		base_player(char sign, std::string name);
-		// deletes player
-		virtual ~base_player();
 	};
 }
 

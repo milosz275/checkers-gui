@@ -18,7 +18,7 @@ namespace checkers
 
     bool piece::set_captured(bool captured) { return m_is_captured = captured; }
 
-    bool piece::get_is_captured(void) { return m_is_captured; }
+    bool piece::is_captured(void) { return m_is_captured; }
 
     std::list<available_move*>* piece::get_av_list(void) { return m_av_list; }
 
