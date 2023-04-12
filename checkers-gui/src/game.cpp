@@ -67,7 +67,7 @@ namespace checkers
 
 		// evaluate available moves for the first player
 		int dummy = 0;
-		m_available_capture = evaluate(m_p_list_1, m_board, &dummy);
+		m_available_capture = evaluate(m_p_list_1, m_board, &dummy, m_player_1->is_first());
 		
 		#ifdef DEBUG
 		std::cout << "List of pieces of first player" << std::endl;
@@ -142,7 +142,9 @@ namespace checkers
 							// check if selected coords match any of possible moves
 							if (a->get_x() == x && a->get_y() == y)
 							{
+								#ifdef DEBUG
 								std::cout << a->get_x() << " " << a->get_y() << std::endl;
+								#endif		
 								found_move = a;
 								is_found = true;
 								return false; // break
@@ -171,9 +173,11 @@ namespace checkers
 								int x_d = found_capture->get_x_d();
 								int y_d = found_capture->get_y_d();
 								
+								#ifdef DEBUG
 								std::cout << "CONTROL" << std::endl;
 								std::cout << "Coords to delete" << x_d << " " << y_d << std::endl;
-								
+								#endif
+
 								// now it is not needed
 								(*m_board)[x_d][y_d]->set_captured();
 
@@ -223,10 +227,12 @@ namespace checkers
 							m_selected_piece = NULL;
 							selected = false;
 							
+							#ifdef DEBUG
 							std::cout << "List of pieces of first player" << std::endl;
 							print_pieces(&m_p_list_1);
 							std::cout << "List of pieces of second player" << std::endl;
 							print_pieces(&m_p_list_2);
+							#endif		
 
 							// add end of game *
 
@@ -245,7 +251,7 @@ namespace checkers
 							if (m_first_turn)
 							{
 								// evaluate next move
-								m_available_capture = evaluate(m_p_list_1, m_board, &dummy);
+								m_available_capture = evaluate(m_p_list_1, m_board, &dummy, m_player_1->is_first());
 
 								// exit the combo, if no more captures
 								if (m_player_1->get_combo() && !m_available_capture)
@@ -259,7 +265,7 @@ namespace checkers
 									m_player_1->set_combo(false);
 									m_player_2->set_combo(false);
 									switch_turn();
-									m_available_capture = evaluate_inv(m_p_list_2, m_board, &dummy);
+									m_available_capture = evaluate_inv(m_p_list_2, m_board, &dummy, m_player_2->is_first());
 								}
 								else
 									clear_list(&m_p_list_2);
@@ -268,7 +274,7 @@ namespace checkers
 							else // second turn
 							{
 								// evaluate next move
-								m_available_capture = evaluate_inv(m_p_list_2, m_board, &dummy);
+								m_available_capture = evaluate_inv(m_p_list_2, m_board, &dummy, m_player_2->is_first());
 
 								// exit the combo, if no more captures
 								if (m_player_2->get_combo() && !m_available_capture)
@@ -282,7 +288,7 @@ namespace checkers
 									m_player_1->set_combo(false);
 									m_player_2->set_combo(false);
 									switch_turn();
-									m_available_capture = evaluate(m_p_list_1, m_board, &dummy);
+									m_available_capture = evaluate(m_p_list_1, m_board, &dummy, m_player_1->is_first());
 								}
 								else
 									clear_list(&m_p_list_1);
@@ -308,14 +314,19 @@ namespace checkers
 				// if the correspoding field contains a piece
 				if ((*m_board)[x][y] != NULL)
 				{
+					#ifdef DEBUG
 					std::cout << "x: " << x << "; y: " << y << "; piece: " << (*m_board)[x][y] << std::endl;
+					#endif
 
 					// check if player owns this piece
 					if (m_first_turn)
 					{
 						if ((*m_board)[x][y]->get_sign() == m_player_1->get_sign())
 						{
+							#ifdef DEBUG
 							std::cout << ":)" << std::endl;
+							#endif
+							
 							bool found_capture = false;
 							if (!(*m_board)[x][y]->get_av_list()->empty())
 							{
@@ -329,19 +340,28 @@ namespace checkers
 										}
 										return true;
 									});
+								#ifdef DEBUG
 								for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [](available_move* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
+								#endif
 							}
 							if ((found_capture && m_available_capture) || (!found_capture && !m_available_capture)) // this lets making only capture moves, comment out to enable testing - replace to xnor
 								m_selected_piece = (*m_board)[x][y];
 						}
 						else
+						{
+							#ifdef DEBUG
 							std::cout << ":(" << std::endl;
+							#endif
+						}
 					}
 					else
 					{
 						if ((*m_board)[x][y]->get_sign() == m_player_2->get_sign())
 						{
+							#ifdef DEBUG
 							std::cout << ":)" << std::endl;
+							#endif
+
 							bool found_capture = false;
 							if (!(*m_board)[x][y]->get_av_list()->empty())
 							{
@@ -355,18 +375,27 @@ namespace checkers
 										}
 										return true;
 									});
+								#ifdef DEBUG
 								for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [](available_move* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
+								#endif
 							}
 							if ((found_capture && m_available_capture) || (!found_capture && !m_available_capture)) // this lets making only capture moves, comment out to enable testing
 								m_selected_piece = (*m_board)[x][y];
 						}
 						else
+						{
+							#ifdef DEBUG
 							std::cout << ":(" << std::endl;
+							#endif
+						}
 					}
 				}
 				else
 				{
+					#ifdef DEBUG
 					std::cout << "x: " << x << "; y: " << y << std::endl;
+					#endif
+					
 					m_selected_piece = NULL;
 				}
 				selected = false;
@@ -474,19 +503,21 @@ namespace checkers
 	}
 
 
-	bool game::evaluate(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter)
+	bool game::evaluate(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter, bool is_first)
 	{
 		bool av_capture = false;
-		for_each(list.begin(), list.end(), [this, &board_p, &list, &counter, &av_capture](piece* p)
+		for_each(list.begin(), list.end(), [this, &board_p, &list, &counter, &av_capture, &is_first](piece* p)
 			{
 				int x = p->get_x();
 				int y = p->get_y();
 				
+				#ifdef DEBUG
 				std::cout << "evaluating" << std::endl;
 				std::cout << "x: " << x << "; y: " << y << std::endl;
 
 				if ((*board_p)[x][y] != NULL)
 					std::cout << (*board_p)[x][y] << std::endl;
+				#endif
 
 				// captures
 				bool possible_capture_top_left = false;
@@ -564,19 +595,28 @@ namespace checkers
 						//evaluate recursively - separate in every direction - call tree
 						if (*counter == NULL)
 						{
+							#ifdef DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
+							#endif
+
 							int moves = 1;
-							evaluate(copy_of_list, copy_of_board, &moves);
+							evaluate(copy_of_list, copy_of_board, &moves, is_first);
 							capture_counter[0] = moves;
+
+							#ifdef DEBUG
 							std::cout << "moves counter (top right): " << moves << std::endl;
+							#endif
 						}
 						else
 						{
+							#ifdef DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
+							#endif
+
 							(*counter)++;
-							evaluate(copy_of_list, copy_of_board, counter);
+							evaluate(copy_of_list, copy_of_board, counter, is_first);
 						}
 					}
 
@@ -619,19 +659,28 @@ namespace checkers
 						//evaluate recursively - separate in every direction - call tree
 						if (*counter == NULL)
 						{
+							#ifdef DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
+							#endif
+
 							int moves = 1;
-							evaluate(copy_of_list, copy_of_board, &moves);
+							evaluate(copy_of_list, copy_of_board, &moves, is_first);
 							capture_counter[1] = moves;
+							
+							#ifdef DEBUG
 							std::cout << "moves counter (top left): " << moves << std::endl;
+							#endif
 						}
 						else
 						{
+							#ifdef DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
+							#endif
+							
 							(*counter)++;
-							evaluate(copy_of_list, copy_of_board, counter);
+							evaluate(copy_of_list, copy_of_board, counter, is_first);
 						}
 					}
 
@@ -674,19 +723,28 @@ namespace checkers
 						//evaluate recursively - separate in every direction - call tree
 						if (*counter == NULL)
 						{
+							#ifdef DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
+							#endif
+							
 							int moves = 1;
-							evaluate(copy_of_list, copy_of_board, &moves);
+							evaluate(copy_of_list, copy_of_board, &moves, is_first);
 							capture_counter[2] = moves;
+							
+							#ifdef DEBUG	
 							std::cout << "moves counter (bottom right): " << moves << std::endl;
+							#endif
 						}
 						else
 						{
+							#ifdef DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
+							#endif
+
 							(*counter)++;
-							evaluate(copy_of_list, copy_of_board, counter);
+							evaluate(copy_of_list, copy_of_board, counter, is_first);
 						}
 					}
 
@@ -729,19 +787,28 @@ namespace checkers
 						//evaluate recursively - separate in every direction - call tree
 						if (*counter == NULL)
 						{
+							#ifdef DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
+							#endif
+							
 							int moves = 1;
-							evaluate(copy_of_list, copy_of_board, &moves);
+							evaluate(copy_of_list, copy_of_board, &moves, is_first);
 							capture_counter[3] = moves;
+							
+							#ifdef DEBUG
 							std::cout << "moves counter (bottom left): " << moves << std::endl;
+							#endif
 						}
 						else
 						{
+							#ifdef DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
+							#endif
+
 							(*counter)++;
-							evaluate(copy_of_list, copy_of_board, counter);
+							evaluate(copy_of_list, copy_of_board, counter, is_first);
 						}
 					} // all recursive function made
 
@@ -799,7 +866,9 @@ namespace checkers
 					{
 						if ((*board_p)[x + 1][y - 1] == NULL)
 						{
+							#ifdef DEBUG
 							std::cout << "available move to the right!" << std::endl;
+							#endif
 							(*p).get_av_list()->push_back(new available_move(x + 1, y - 1));
 						}
 					}
@@ -809,23 +878,27 @@ namespace checkers
 					{
 						if ((*board_p)[x - 1][y - 1] == NULL)
 						{
+							#ifdef DEBUG
 							std::cout << "available move to the left!" << std::endl;
+							#endif
 							(*p).get_av_list()->push_back(new available_move(x - 1, y - 1));
 						}
 					}
 				}
 
 			});
+			#ifdef DEBUG
 			std::cout << "---available returning: ";
 			av_capture ? (std::cout << "true") : (std::cout << "false");
 			std::cout << std::endl;
+			#endif
 			return av_capture;
 	}
 
-	bool game::evaluate_inv(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter)
+	bool game::evaluate_inv(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter, bool is_first)
 	{
 		bool av_capture = false;
-		for_each(list.begin(), list.end(), [this, &board_p, &list, &counter, &av_capture](piece* p)
+		for_each(list.begin(), list.end(), [this, &board_p, &list, &counter, &av_capture, &is_first](piece* p)
 			{
 				int x = p->get_x();
 				int y = p->get_y();
@@ -915,7 +988,7 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 							int moves = 1;
-							evaluate_inv(copy_of_list, copy_of_board, &moves);
+							evaluate_inv(copy_of_list, copy_of_board, &moves, is_first);
 							capture_counter[0] = moves;
 							std::cout << "moves counter (top right): " << moves << std::endl;
 						}
@@ -924,7 +997,7 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
 							(*counter)++;
-							evaluate_inv(copy_of_list, copy_of_board, counter);
+							evaluate_inv(copy_of_list, copy_of_board, counter, is_first);
 						}
 					}
 
@@ -970,7 +1043,7 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 							int moves = 1;
-							evaluate_inv(copy_of_list, copy_of_board, &moves);
+							evaluate_inv(copy_of_list, copy_of_board, &moves, is_first);
 							capture_counter[1] = moves;
 							std::cout << "moves counter (top left): " << moves << std::endl;
 						}
@@ -979,7 +1052,7 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
 							(*counter)++;
-							evaluate_inv(copy_of_list, copy_of_board, counter);
+							evaluate_inv(copy_of_list, copy_of_board, counter, is_first);
 						}
 					}
 
@@ -1025,7 +1098,7 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 							int moves = 1;
-							evaluate_inv(copy_of_list, copy_of_board, &moves);
+							evaluate_inv(copy_of_list, copy_of_board, &moves, is_first);
 							capture_counter[2] = moves;
 							std::cout << "moves counter (bottom right): " << moves << std::endl;
 						}
@@ -1034,7 +1107,7 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
 							(*counter)++;
-							evaluate_inv(copy_of_list, copy_of_board, counter);
+							evaluate_inv(copy_of_list, copy_of_board, counter, is_first);
 						}
 					}
 
@@ -1080,7 +1153,7 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 							int moves = 1;
-							evaluate_inv(copy_of_list, copy_of_board, &moves);
+							evaluate_inv(copy_of_list, copy_of_board, &moves, is_first);
 							capture_counter[3] = moves;
 							std::cout << "moves counter (bottom left): " << moves << std::endl;
 						}
@@ -1089,7 +1162,7 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter not null" << std::endl;
 							(*counter)++;
-							evaluate_inv(copy_of_list, copy_of_board, counter);
+							evaluate_inv(copy_of_list, copy_of_board, counter, is_first);
 						}
 					} // all recursive function made
 

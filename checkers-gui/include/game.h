@@ -101,9 +101,9 @@ namespace checkers
 		void highlight_available(sf::RenderWindow& window, int x, int y);
 
 		// evaluate possible moves of a player starting on the bottom of the board (first), returns true if there is at least on possible capture
-		bool evaluate(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter);
+		bool evaluate(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter, bool is_first);
 		// evaluate possible moves of a player starting on the top of the board (second) - change to one function with proper parameters
-		bool evaluate_inv(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter);
+		bool evaluate_inv(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter, bool is_first);
 		// clears available moves list for every piece in pieces list (gets through lists in list)
 		void clear_list(std::list<piece*>* list);
 		// 
