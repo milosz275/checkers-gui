@@ -1,8 +1,8 @@
-#include "Player.h"
+#include "include/player.h"
 
-namespace Checkers
+namespace checkers
 {
-	Player::Player(char s, std::string n) : BasePlayer(s, n) {}
+	player::player(char sign, std::string name) : base_player(sign, name) {}
 
-	Player::~Player() {}
+	player::~player() {}
 }

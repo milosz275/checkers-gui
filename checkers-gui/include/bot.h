@@ -1,18 +1,18 @@
 #ifndef BOT_H
 #define BOT_H
 
-#include "BasePlayer.h"
+#include "include/base_player.h"
 
-namespace Checkers
+namespace checkers
 {
-	class Bot : public BasePlayer
+	class bot : public base_player
 	{
 
 	public:
 		//
-		Bot(char sign);
+		bot(char sign);
 		//
-		~Bot();
+		~bot();
 	};
 }
 

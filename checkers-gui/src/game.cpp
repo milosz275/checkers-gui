@@ -1,4 +1,4 @@
-#include "Game.h"
+#include "include/game.h"
 // todo: (*done)
 // * enable only current turn moves
 // * enable only possible moves (captures)
@@ -9,7 +9,7 @@
 // * fix the namescheme
 // add menu
 
-namespace Checkers
+namespace checkers
 {
 	Game::Game(int fps) : m_is_finished(false), m_fps(fps),
 		m_window(sf::VideoMode(square_size * size, square_size * size), "Checkers", sf::Style::Default, m_settings),

@@ -1,8 +1,8 @@
-#include "Bot.h"
+#include "include/bot.h"
 
-namespace Checkers
+namespace checkers
 {
-	Bot::Bot(char sign) : BasePlayer(sign, "Bot") {}
+	bot::bot(char sign) : base_player(sign, "Bot") {}
 
-	Bot::~Bot() {}
+	bot::~bot() {}
 }

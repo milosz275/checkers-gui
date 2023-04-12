@@ -1,19 +1,19 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "BasePlayer.h"
+#include "include/base_player.h"
 #include <map>
 
-namespace Checkers
+namespace checkers
 {
-	class Player : public BasePlayer
+	class player : public base_player
 	{
 
 	public:
 		// creates the player of given sign and name
-		Player(char s, std::string n);
+		player(char sign, std::string name);
 		// deletes the player
-		~Player();
+		~player();
 	};
 }
 

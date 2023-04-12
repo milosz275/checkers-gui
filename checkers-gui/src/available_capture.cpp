@@ -1,10 +1,10 @@
-#include "AvailableCapture.h"
+#include "include/available_capture.h"
 
-namespace Checkers
+namespace checkers
 {
-	AvailableCapture::AvailableCapture(int x, int y, int x_d, int y_d) : AvailableMove(x, y, true), m_x_d(x_d), m_y_d(y_d) {}
+	available_capture::available_capture(int x, int y, int x_d, int y_d) : available_move(x, y, true), m_x_d(x_d), m_y_d(y_d) {}
 
-	int AvailableCapture::get_x_d(void) { return m_x_d; }
+	int available_capture::get_x_d(void) { return m_x_d; }
 
-	int AvailableCapture::get_y_d(void) { return m_y_d; }
+	int available_capture::get_y_d(void) { return m_y_d; }
 }

@@ -3,9 +3,9 @@
 
 #include <list>
 
-namespace Checkers
+namespace checkers
 {
-	class AvailableMove
+	class available_move
 	{
 		// x coordinate of available move
 		int m_x;
@@ -15,9 +15,9 @@ namespace Checkers
 		bool m_capture;
 	public:
 		// creates available move
-		AvailableMove(int x, int y, bool capture = false);
+		available_move(int x, int y, bool capture = false);
 		// deletes the move
-		virtual ~AvailableMove();
+		virtual ~available_move();
 		// returns x coordinate of available move
 		int get_x(void);
 		// returns y coordinate of available move

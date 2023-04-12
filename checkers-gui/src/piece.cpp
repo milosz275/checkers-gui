@@ -1,28 +1,28 @@
-#include "Piece.h"
+#include "include/piece.h"
 
-namespace Checkers
+namespace checkers
 {
-    Piece::Piece(char sign, int x, int y) : m_sign(sign), m_x(x), m_y(y), m_is_captured(false), m_is_king(false), m_av_list(new std::list<AvailableMove*>) {}
+    piece::piece(char sign, int x, int y) : m_sign(sign), m_x(x), m_y(y), m_is_captured(false), m_is_king(false), m_av_list(new std::list<available_move*>) {}
 
-    Piece::~Piece() {}
+    piece::~piece() {}
 
-    int Piece::get_x(void) { return m_x; }
+    int piece::get_x(void) { return m_x; }
 
-    int Piece::get_y(void) { return m_y; }
+    int piece::get_y(void) { return m_y; }
 
-    int Piece::set_x(int x) { return m_x = x; }
+    int piece::set_x(int x) { return m_x = x; }
 
-    int Piece::set_y(int y) { return m_y = y; }
+    int piece::set_y(int y) { return m_y = y; }
 
-    char Piece::get_sign(void) { return m_sign; }
+    char piece::get_sign(void) { return m_sign; }
 
-    bool Piece::set_captured(bool captured) { return m_is_captured = captured; }
+    bool piece::set_captured(bool captured) { return m_is_captured = captured; }
 
-    bool Piece::get_is_captured(void) { return m_is_captured; }
+    bool piece::get_is_captured(void) { return m_is_captured; }
 
-    std::list<AvailableMove*>* Piece::get_av_list(void) { return m_av_list; }
+    std::list<available_move*>* piece::get_av_list(void) { return m_av_list; }
 
-    std::ostream& operator<<(std::ostream& os, const Piece* piece)
+    std::ostream& operator<<(std::ostream& os, const piece* piece)
     {
         if (piece == NULL)
             return os << " ";
@@ -30,7 +30,7 @@ namespace Checkers
             return os << piece->m_sign;
     }
 
-    void Piece::draw(sf::RenderWindow& window)
+    void piece::draw(sf::RenderWindow& window)
     {
         sf::CircleShape shape(radius);
 

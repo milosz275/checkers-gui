@@ -1,13 +1,14 @@
 #ifndef BASEPLAYER_H
 #define BASEPLAYER_H
+
 #include <iostream>
 #include <string>
 #include <algorithm>
 #include <list>
 
-namespace Checkers
+namespace checkers
 {
-	class BasePlayer
+	class base_player
 	{
 		// sign distinguishing the player from others
 		char m_sign;
@@ -39,9 +40,9 @@ namespace Checkers
 		// prints pieces of the player
 		void print_player(void);
 		// creates the player of a given sign and name
-		BasePlayer(char sign, std::string name);
+		base_player(char sign, std::string name);
 		// deletes player
-		virtual ~BasePlayer();
+		virtual ~base_player();
 	};
 }
 

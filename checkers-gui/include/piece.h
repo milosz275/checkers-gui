@@ -3,15 +3,17 @@
 
 #include <iostream>
 #include <list>
-#include "Game.h"
-#include "AvailableMove.h"
+
+#include "include/game.h"
+#include "include/available_move.h"
+
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/System.hpp>
 
-namespace Checkers
+namespace checkers
 {
-	class Piece
+	class piece
 	{
 		// x coordinate of the piece
 		int m_x;
@@ -24,12 +26,12 @@ namespace Checkers
 		// flag indicating if the piece is the king: change to another class?
 		bool m_is_king;
 		// list containing all evaluated possible moves for the piece
-		std::list<AvailableMove*>* m_av_list;
+		std::list<available_move*>* m_av_list;
 	public:
 		// creates the piece of given sign and coordinates
-		Piece(char sign, int x, int y);
+		piece(char sign, int x, int y);
 		// deletes the piece
-		~Piece();
+		~piece();
 		// returns x coordinate of the piece
 		int get_x(void);
 		// returns y coordinate of the piece
@@ -45,14 +47,14 @@ namespace Checkers
 		// returns true, if piece is already captured, false respectively
 		bool get_is_captured(void);
 		// lets to print the piece in given stream
-		friend std::ostream& operator<<(std::ostream& os, const Piece* piece);
+		friend std::ostream& operator<<(std::ostream& os, const piece* piece);
 		// returns the list of all evaluated moves
-		std::list<AvailableMove*>* get_av_list(void);
+		std::list<available_move*>* get_av_list(void);
 		// draws the piece to the window
 		void draw(sf::RenderWindow& window);
 	};
 
-	std::ostream& operator<<(std::ostream& os, const Piece* piece);
+	std::ostream& operator<<(std::ostream& os, const piece* piece);
 }
 
 #endif

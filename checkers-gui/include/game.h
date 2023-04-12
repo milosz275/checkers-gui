@@ -6,11 +6,11 @@
 #include <algorithm>
 #include <map>
 
-#include "BasePlayer.h"
-#include "Player.h"
-#include "Bot.h"
-#include "Piece.h"
-#include "AvailableCapture.h"
+#include "include/base_player.h"
+#include "include/player.h"
+#include "include/bot.h"
+#include "include/piece.h"
+#include "include/available_capture.h"
 
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
@@ -20,7 +20,7 @@
 
 class Piece;
 
-namespace Checkers
+namespace checkers
 {
 	// board size
 	static const int size = 10;
@@ -31,7 +31,7 @@ namespace Checkers
 	// radius of one piece
 	const float radius = square_size / 2.5;
 
-	class Game
+	class game
 	{
 		// main game board
 		std::vector<std::vector<Piece*>>* m_board;
@@ -40,9 +40,9 @@ namespace Checkers
 		// flag indicating turn of the first player
 		bool m_first_turn;
 		// player 1
-		BasePlayer* m_player_1;
+		base_player* m_player_1;
 		// player 2
-		BasePlayer* m_player_2;
+		base_player* m_player_2;
 		// piece list of player 1
 		std::list<Piece*> m_p_list_1;
 		// piece list of player 2
@@ -75,21 +75,21 @@ namespace Checkers
 	public:
 		
 		// create the game of given size and target frames per second
-		Game(int fps = 24);
+		game(int fps = 24);
 		// deletes the game
-		~Game();
+		~game();
 		// rotates the vector of vectors board, sets the is rotated flag to opposite
 		//void rotate_board(void);
 		// switches first_turn flag, indicating that it is move of the first player
 		void switch_turn(void);
 		// returns main game board
-		std::vector<std::vector<Piece*>>* get_board(void);
+		std::vector<std::vector<piece*>>* get_board(void);
 		// executes the game
 		void loop(void);
 		// prints result to given stream
 		void print_results(std::ostream& os = std::cout);
 
-		void print_pieces(std::list<Piece*>* list, std::ostream& os = std::cout);
+		void print_pieces(std::list<piece*>* list, std::ostream& os = std::cout);
 
 		// draws main game board in the given window
 		void draw(sf::RenderWindow& window);
@@ -99,20 +99,20 @@ namespace Checkers
 		void highlight_available(sf::RenderWindow& window, int x, int y);
 
 		// evaluate possible moves of a player starting on the bottom of the board (first), returns true if there is at least on possible capture
-		bool evaluate(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p, int* counter);
+		bool evaluate(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter);
 		// evaluate possible moves of a player starting on the top of the board (second) - change to one function with proper parameters
-		bool evaluate_inv(std::list<Piece*> list, std::vector<std::vector<Piece*>>* board_p, int* counter);
+		bool evaluate_inv(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter);
 		// clears available moves list for every piece in pieces list (gets through lists in list)
-		void clear_list(std::list<Piece*>* list);
+		void clear_list(std::list<piece*>* list);
 		// 
-		void clear_to_delete_list(std::list<Piece*>* del_list, std::list<Piece*>* src_list);
+		void clear_to_delete_list(std::list<piece*>* del_list, std::list<piece*>* src_list);
 		// deletes given piece from given list
-		void delete_from_list(std::list<Piece*>* list, Piece* piece_to_delete);
+		void delete_from_list(std::list<piece*>* list, piece* piece_to_delete);
 
-		friend std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<Piece*>>* board);
+		friend std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);
 	};
 	// returns board to the stream
-	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<Piece*>>* board);
+	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);
 }
 
 #endif
