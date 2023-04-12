@@ -27,7 +27,7 @@ namespace checkers
 	// map containing letters and their corresponding integers
 	static std::map<char, int> coords{ {'a', 1}, {'b', 2}, {'c', 3}, {'d', 4}, {'e', 5}, {'f', 6}, {'g', 7}, {'h', 8}, {'i', 9}, {'j', 10} };
 	// square/tile size
-	static const float square_size = 75.0;
+	static const float square_size = 100.0;
 	// radius of one piece
 	const float radius = square_size / 2.5;
 
@@ -100,10 +100,8 @@ namespace checkers
 		// higlight selected piece of given coords (green)
 		void highlight_available(sf::RenderWindow& window, int x, int y);
 
-		// evaluate possible moves of a player starting on the bottom of the board (first), returns true if there is at least on possible capture
-		bool evaluate(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter, bool is_first);
-		// evaluate possible moves of a player starting on the top of the board (second) - change to one function with proper parameters
-		bool evaluate_inv(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter, bool is_first);
+		// evaluate possible moves of the given player, returns true if there is at least on possible capture
+		bool evaluate(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter, base_player* player);
 		// clears available moves list for every piece in pieces list (gets through lists in list)
 		void clear_list(std::list<piece*>* list);
 		// 

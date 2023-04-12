@@ -43,7 +43,7 @@ namespace checkers
             shape.setFillColor(sf::Color(26, 23, 22, 255));
             break;
         case 'w':
-            shape.setFillColor(sf::Color(197, 196, 196, 255));
+            shape.setFillColor(sf::Color(187, 186, 186, 255));
             break;
         case 'b':
             shape.setFillColor(sf::Color(59, 59, 59, 255));

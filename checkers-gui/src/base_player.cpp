@@ -16,7 +16,7 @@ namespace checkers
 
 	base_player* base_player::get_next_player(void) { assert(m_next_player != NULL); return m_next_player; }
 
-	base_player* base_player::set_next_player(base_player* next_player) { return m_next_player = next_player; }
+	base_player* base_player::set_next_player(base_player* next_player) { assert(next_player != this); return m_next_player = next_player; }
 
 	bool base_player::get_combo(void) { return m_combo; }
 
