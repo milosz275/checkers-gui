@@ -1,5 +1,5 @@
-#ifndef AVAILABLEMOVE_H
-#define AVAILABLEMOVE_H
+#ifndef AVAILABLE_MOVE_H
+#define AVAILABLE_MOVE_H
 
 #include <list>
 

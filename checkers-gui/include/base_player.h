@@ -1,5 +1,5 @@
-#ifndef BASEPLAYER_H
-#define BASEPLAYER_H
+#ifndef BASE_PLAYER_H
+#define BASE_PLAYER_H
 
 #include <iostream>
 #include <string>

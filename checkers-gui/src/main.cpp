@@ -6,6 +6,7 @@ int main(int argc, char* argv[])
 	try
 	{
 		checkers::game checkers;
+		checkers.menu();
 		checkers.loop();
 	}
 	catch (std::exception& e)

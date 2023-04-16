@@ -35,11 +35,11 @@ namespace checkers
 	{
 		// main game board
 		std::vector<std::vector<piece*>>* m_board;
-		// 
+		// local copy of the board size
 		const int m_size = size;
 		// flag indicating turn of the first player
 		bool m_first_turn;
-		//
+		// flag indicating if the input is only taken from console
 		bool m_console_mode;
 		// player 1
 		base_player* m_player_1;
@@ -79,20 +79,22 @@ namespace checkers
 	public:
 		
 		// create the game of given size and target frames per second
-		game(int fps = 12);
+		game(int fps = 24);
 		// deletes the game
 		~game();
 		// switches first_turn flag, indicating that it is move of the first player
 		void switch_turn(void);
 		// returns main game board
 		std::vector<std::vector<piece*>>* get_board(void);
+		// wrapper for all functionality
+		void menu(void);
 		// executes the game loop graphically
 		void loop(void);
-		//
+		// executes the game in console - todo
 		void play_in_console(void);
 		// prints result to given stream
 		void print_results(std::ostream& os = std::cout);
-		//
+		// prints all piece and its info as a list
 		void print_pieces(std::list<piece*>* list, std::ostream& os = std::cout);
 		// draws main game board in the given window
 		void draw(sf::RenderWindow& window);
@@ -100,17 +102,15 @@ namespace checkers
 		void highlight_selected(sf::RenderWindow& window, int x, int y);
 		// higlight selected piece of given coords (green)
 		void highlight_available(sf::RenderWindow& window, int x, int y);
-		////
-		//void display_message(std::string message);
 		// evaluate possible moves of the given player, returns true if there is at least on possible capture
 		bool evaluate(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter, base_player* player);
 		// clears available moves list for every piece in pieces list (gets through lists in list)
 		void clear_list(std::list<piece*>* list);
-		// 
+		// clears list containing dead pieces which are displayed during multicapture
 		void clear_to_delete_list(std::list<piece*>* del_list, std::list<piece*>* src_list);
 		// deletes given piece from given list
 		void delete_from_list(std::list<piece*>* list, piece* piece_to_delete);
-
+		// printing the board to console for debugging
 		friend std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);
 	};
 	// returns board to the stream

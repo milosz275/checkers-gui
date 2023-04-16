@@ -16,69 +16,12 @@
 
 namespace checkers
 {
-	game::game(int fps) : m_is_finished(false), m_console_mode(false), m_fps(fps), m_window(sf::VideoMode(square_size* size, square_size* size), "Checkers", sf::Style::Default, m_settings), m_selected_piece(NULL), m_first_turn(true), m_available_capture(false), m_clock(), m_event(), m_settings(), m_current_player(NULL)
+	game::game(int fps) : m_board(new std::vector<std::vector<piece*>>(size, std::vector<piece*>(size, 0))), m_first_turn(true), m_console_mode(false), m_player_1(NULL), m_player_2(NULL), m_current_player(NULL), m_p_list_1(NULL), m_p_list_2(NULL), m_to_delete_list(NULL), m_is_finished(false), m_first_won(false), m_second_won(false), m_selected_piece(NULL), m_available_capture(false), m_fps(fps), m_clock(), m_settings(), m_window(sf::VideoMode((unsigned int)(square_size * size), (unsigned int)(square_size * size)), "Checkers", sf::Style::Default, m_settings), m_event()
 	{
-		// todo: menu
-
-		// simplified: players init
-		std::string name_1 = "Some player 1";
-		std::string name_2 = "Some player 2";
-		m_player_1 = new player('W', name_1);
-		m_player_2 = new player('B', name_2);
-
-		// set play order and evaluation direction
-		m_player_1->set_first(true);
-		m_player_2->set_first(false);
-		m_player_1->set_next_player(m_player_2);
-		m_player_2->set_next_player(m_player_1);
-
-		// board init
-		m_board = new std::vector<std::vector<piece*>>(size, std::vector<piece*>(size, 0));
-
-		// todo: change to algorithm
-		// rows of the second player (upper)
-		for (int i = 0; i < 3; ++i)
-		{
-			for (int j = 0; j < size; ++j)
-			{
-				if ((i + j) % 2 != 0)
-				{
-					(*m_board)[j][i] = new piece(m_player_2->get_sign(), j, i);
-					m_p_list_2.push_back((*m_board)[j][i]);
-					m_player_2->add_piece();
-				}
-			}
-		}
-		// rows of the first player (lower)
-		for (int i = size - 1; i >= size - 3; --i)
-		{
-			for (int j = 0; j < size; ++j)
-			{
-				if ((i + j) % 2 != 0)
-				{
-					(*m_board)[j][i] = new piece(m_player_1->get_sign(), j, i);
-					m_p_list_1.push_back((*m_board)[j][i]);
-					m_player_1->add_piece();
-				}
-			}
-		}
-
-		// sfml setup
-		m_settings.antialiasingLevel = 1.0;
+		// SFML setup
+		m_settings.antialiasingLevel = 16;
 		m_window.setFramerateLimit(fps);
 		m_window.setVerticalSyncEnabled(true);
-
-		// evaluate available moves for the first player
-		int dummy = 0;
-		m_available_capture = evaluate(m_p_list_1, m_board, &dummy, m_player_1);
-		
-		#ifdef _DEBUG
-		std::cout << "List of pieces of first player" << std::endl;
-		print_pieces(&m_p_list_1);
-
-		std::cout << "List of pieces of second player" << std::endl;
-		print_pieces(&m_p_list_2);
-		#endif
 	}
 
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board)
@@ -109,6 +52,64 @@ namespace checkers
 
 	void game::switch_turn(void) { m_first_turn = !m_first_turn; }
 
+	void game::menu(void)
+	{
+		// todo: menu
+		// this code is the following option from the future menu: "New Game -> Player vs Player"
+
+		// simplified: players init
+		std::string name_1 = "Some player 1";
+		std::string name_2 = "Some player 2";
+		m_player_1 = new player('W', name_1);
+		m_player_2 = new player('B', name_2);
+
+		// set play order and evaluation direction
+		m_player_1->set_first(true);
+		m_player_2->set_first(false);
+		m_player_1->set_next_player(m_player_2);
+		m_player_2->set_next_player(m_player_1);
+
+		// todo: change to algorithm
+		// rows of the second player (upper)
+		for (int i = 0; i < 3; ++i)
+		{
+			for (int j = 0; j < size; ++j)
+			{
+				if ((i + j) % 2 != 0)
+				{
+					(*m_board)[j][i] = new piece(m_player_2->get_sign(), j, i);
+					m_p_list_2.push_back((*m_board)[j][i]);
+					m_player_2->add_piece();
+				}
+			}
+		}
+		// rows of the first player (lower)
+		for (int i = size - 1; i >= size - 3; --i)
+		{
+			for (int j = 0; j < size; ++j)
+			{
+				if ((i + j) % 2 != 0)
+				{
+					(*m_board)[j][i] = new piece(m_player_1->get_sign(), j, i);
+					m_p_list_1.push_back((*m_board)[j][i]);
+					m_player_1->add_piece();
+				}
+			}
+		}
+
+		// evaluate available moves for the first player
+		int dummy = 0;
+		m_available_capture = evaluate(m_p_list_1, m_board, &dummy, m_player_1);
+
+		#ifdef _DEBUG
+		std::cout << "List of pieces of first player" << std::endl;
+		print_pieces(&m_p_list_1);
+
+		std::cout << "List of pieces of second player" << std::endl;
+		print_pieces(&m_p_list_2);
+		#endif
+	}
+
 	void game::loop(void)
 	{
 		bool selected = false;
@@ -119,16 +120,6 @@ namespace checkers
 		{
 			while (m_window.pollEvent(m_event))
 			{
-				/*switch (m_event.type)
-				{
-				case sf::Event::Closed:
-					m_window.close();
-					break;
-
-
-				}*/
-
-
 				if (m_event.type == sf::Event::Closed)
 					m_window.close();
 
@@ -159,9 +150,9 @@ namespace checkers
 								#endif		
 								found_move = a;
 								is_found = true;
-								return false; // break
+								return false;
 							}
-							return true; // continue
+							return true;
 						});
 						if (!is_found) // deselection when wrong coords given
 						{
@@ -391,6 +382,7 @@ namespace checkers
 											found_capture = true;
 											return false;
 										}
+										return true;
 									});
 								#ifdef _DEBUG
 								for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [](available_move* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
@@ -524,36 +516,6 @@ namespace checkers
 		window.draw(tile);
 	}
 
-	//void game::display_message(std::string message)
-	//{
-	//	sf::Text text;
-	//	sf::Font font;
-
-	//	if (!font.loadFromFile("arial.ttf"))
-	//	{
-	//		throw std::runtime_error("Font not loaded");
-	//	}
-
-	//	// select the font
-	//	text.setFont(font); // font is a sf::Font
-
-	//	// set the string to display
-	//	text.setString("Hello world");
-
-	//	// set the character size
-	//	text.setCharacterSize(24); // in pixels, not points!
-
-	//	// set the color
-	//	text.setFillColor(sf::Color::Red);
-
-	//	// set the text style
-	//	text.setStyle(sf::Text::Bold | sf::Text::Underlined);
-
-	//	// inside the main loop, between window.clear() and window.display()
-	//	m_window.draw(text);
-	//}
-
-
 	bool game::evaluate(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter, base_player* player)
 	{
 		bool av_capture = false;
@@ -575,13 +537,6 @@ namespace checkers
 				bool possible_capture_top_right = false;
 				bool possible_capture_bottow_left = false;
 				bool possible_capture_bottom_right = false;
-
-				// check possible captures in every direction
-				// choose move with the most captures
-				// add to possible moves
-
-				// x ascending to the right  !
-				// y ascendint to the bottom !
 
 				// capture top right (0)
 				if (x + 2 <= size - 1 && y - 2 >= 0 && (*board_p)[x + 1][y - 1] != NULL && (*board_p)[x + 1][y - 1]->get_sign() == player->get_next_player()->get_sign() && !((*board_p)[x + 1][y - 1]->is_captured()) && (*board_p)[x + 2][y - 2] == NULL)
@@ -623,7 +578,7 @@ namespace checkers
 										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 							
 						}
-						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
+						else // the function call is being recursive 
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
@@ -687,7 +642,7 @@ namespace checkers
 										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
-						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
+						else // the function call is being recursive
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
@@ -751,7 +706,7 @@ namespace checkers
 										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
-						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
+						else // the function call is being recursive 
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
@@ -815,7 +770,7 @@ namespace checkers
 										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
 						}
-						else // the function call is being recursive -*-*-*-------------------------*-*-*- NEW -*-*-*-----------------------------------*-*-*-
+						else // the function call is being recursive
 						{
 							for (int i = 0; i < size; ++i)
 								for (int j = 0; j < size; ++j)
@@ -832,8 +787,9 @@ namespace checkers
 						copy_of_list.push_back(moving_piece);
 						(*copy_of_board)[x - 1][y + 1] = NULL;
 						moving_piece = NULL; // now, copy of board contains board with moved piece and the list contains only moved piece
+						#ifdef _DEBUG
 						std::cout << copy_of_board << std::endl;
-
+						#endif	
 
 						//evaluate recursively - separate in every direction - call tree
 						if (*counter == NULL)
@@ -870,7 +826,9 @@ namespace checkers
 					for (int i = 1; i < 4; ++i)
 						if (capture_counter[i] > max)
 							max = capture_counter[i];
+					#ifdef _DEBUG
 					std::cout << "found max counter: " << max << std::endl;
+					#endif
 
 					// if counter == max push back available capture
 					for (int i = 0; i < 4; ++i)
@@ -880,25 +838,33 @@ namespace checkers
 							{
 							case 0:
 							{
+								#ifdef _DEBUG
 								std::cout << "kierunek top right: " << capture_counter[0] << std::endl;
+								#endif
 								(*p).get_av_list()->push_back(new available_capture(x + 2, y - 2, x + 1, y - 1));
 								break;
 							}
 							case 1:
 							{
+								#ifdef _DEBUG
 								std::cout << "kierunek top left: " << capture_counter[1] << std::endl;
+								#endif
 								(*p).get_av_list()->push_back(new available_capture(x - 2, y - 2, x - 1, y - 1));
 								break;
 							}
 							case 2:
 							{
+								#ifdef _DEBUG
 								std::cout << "kierunek bottom right: " << capture_counter[2] << std::endl;
+								#endif
 								(*p).get_av_list()->push_back(new available_capture(x + 2, y + 2, x + 1, y + 1));
 								break;
 							}
 							case 3:
 							{
+								#ifdef _DEBUG
 								std::cout << "kierunek bottom left: " << capture_counter[3] << std::endl;
+								#endif
 								(*p).get_av_list()->push_back(new available_capture(x - 2, y + 2, x - 1, y + 1));
 								break;
 							}
@@ -946,7 +912,9 @@ namespace checkers
 						{
 							if ((*board_p)[x + 1][y + 1] == NULL)
 							{
+								#ifdef _DEBUG
 								std::cout << "available move to the right!" << std::endl;
+								#endif		
 								(*p).get_av_list()->push_back(new available_move(x + 1, y + 1));
 							}
 						}
@@ -956,7 +924,9 @@ namespace checkers
 						{
 							if ((*board_p)[x - 1][y + 1] == NULL)
 							{
+								#ifdef _DEBUG
 								std::cout << "available move to the left!" << std::endl;
+								#endif
 								(*p).get_av_list()->push_back(new available_move(x - 1, y + 1));
 							}
 						}

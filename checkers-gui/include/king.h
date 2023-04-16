@@ -1,7 +1,7 @@
 #ifndef KING_H
 #define KING_H
 
-#include "piece.h"
+#include "include/piece.h"
 
 namespace checkers
 {
