@@ -9,12 +9,14 @@
 // remake code into more functions, current player and opponent pointers
 // * fix the namescheme
 // add menu
+// add console input
+// add state saving 
+// add game load
+// add statistics
 
 namespace checkers
 {
-	game::game(int fps) : m_is_finished(false), m_fps(fps),
-		m_window(sf::VideoMode(square_size * size, square_size * size), "Checkers", sf::Style::Default, m_settings),
-		m_selected_piece(NULL), m_first_turn(true), m_available_capture(false), m_clock(), m_event(), m_settings(), m_current_player(NULL)
+	game::game(int fps) : m_is_finished(false), m_console_mode(false), m_fps(fps), m_window(sf::VideoMode(square_size* size, square_size* size), "Checkers", sf::Style::Default, m_settings), m_selected_piece(NULL), m_first_turn(true), m_available_capture(false), m_clock(), m_event(), m_settings(), m_current_player(NULL)
 	{
 		// todo: menu
 
@@ -110,7 +112,6 @@ namespace checkers
 	void game::loop(void)
 	{
 		bool selected = false;
-		//rotate_board();
 		m_clock.restart();
 
 		// main loop
@@ -118,6 +119,16 @@ namespace checkers
 		{
 			while (m_window.pollEvent(m_event))
 			{
+				/*switch (m_event.type)
+				{
+				case sf::Event::Closed:
+					m_window.close();
+					break;
+
+
+				}*/
+
+
 				if (m_event.type == sf::Event::Closed)
 					m_window.close();
 
@@ -299,10 +310,16 @@ namespace checkers
 					else
 						selected = !selected;
 				}
+				else if (m_event.type == sf::Event::MouseButtonReleased && m_event.mouseButton.button == sf::Mouse::Right)
+				{
+					selected = false;
+					m_selected_piece = NULL;
+				}
 			}
 
-			//m_window.clear();
+			m_window.clear();
 			draw(m_window);
+			
 
 			// first choice, nothing is already highlighted
 			if (selected)
@@ -430,6 +447,11 @@ namespace checkers
 			sf::sleep(sf::seconds(m_frame_duration - elapsed_time.asSeconds()));
 	}
 
+	void game::play_in_console(void)
+	{
+
+	}
+
 	std::vector<std::vector<piece*>>* game::get_board(void) { return m_board; }
 
 	/*void game::rotate_board(void)
@@ -501,6 +523,35 @@ namespace checkers
 		tile.setPosition(sf::Vector2f(square_size * x, square_size * y));
 		window.draw(tile);
 	}
+
+	//void game::display_message(std::string message)
+	//{
+	//	sf::Text text;
+	//	sf::Font font;
+
+	//	if (!font.loadFromFile("arial.ttf"))
+	//	{
+	//		throw std::runtime_error("Font not loaded");
+	//	}
+
+	//	// select the font
+	//	text.setFont(font); // font is a sf::Font
+
+	//	// set the string to display
+	//	text.setString("Hello world");
+
+	//	// set the character size
+	//	text.setCharacterSize(24); // in pixels, not points!
+
+	//	// set the color
+	//	text.setFillColor(sf::Color::Red);
+
+	//	// set the text style
+	//	text.setStyle(sf::Text::Bold | sf::Text::Underlined);
+
+	//	// inside the main loop, between window.clear() and window.display()
+	//	m_window.draw(text);
+	//}
 
 
 	bool game::evaluate(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter, base_player* player)

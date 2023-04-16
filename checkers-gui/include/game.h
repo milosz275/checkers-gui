@@ -39,6 +39,8 @@ namespace checkers
 		const int m_size = size;
 		// flag indicating turn of the first player
 		bool m_first_turn;
+		//
+		bool m_console_mode;
 		// player 1
 		base_player* m_player_1;
 		// player 2
@@ -61,17 +63,17 @@ namespace checkers
 		piece* m_selected_piece;
 		// flag indicating if there is one or more captures, not allowing other moves
 		bool m_available_capture;
-		//
+		// target frames per second in the game
 		const int m_fps;
-		//
+		// duration of one frame in seconds
 		float m_frame_duration = 1.0f / m_fps;
-		// 
+		// timer for fps
 		sf::Clock m_clock;
-		// 
+		// SFML settings
 		sf::ContextSettings m_settings;
-		//
+		// SFML window
 		sf::RenderWindow m_window;
-		//
+		// SFML events
 		sf::Event m_event;
 
 	public:
@@ -80,26 +82,26 @@ namespace checkers
 		game(int fps = 12);
 		// deletes the game
 		~game();
-		// rotates the vector of vectors board, sets the is rotated flag to opposite
-		//void rotate_board(void);
 		// switches first_turn flag, indicating that it is move of the first player
 		void switch_turn(void);
 		// returns main game board
 		std::vector<std::vector<piece*>>* get_board(void);
-		// executes the game
+		// executes the game loop graphically
 		void loop(void);
+		//
+		void play_in_console(void);
 		// prints result to given stream
 		void print_results(std::ostream& os = std::cout);
-
+		//
 		void print_pieces(std::list<piece*>* list, std::ostream& os = std::cout);
-
 		// draws main game board in the given window
 		void draw(sf::RenderWindow& window);
 		// highlights selected piece of given coords (brown)
 		void highlight_selected(sf::RenderWindow& window, int x, int y);
 		// higlight selected piece of given coords (green)
 		void highlight_available(sf::RenderWindow& window, int x, int y);
-
+		////
+		//void display_message(std::string message);
 		// evaluate possible moves of the given player, returns true if there is at least on possible capture
 		bool evaluate(std::list<piece*> list, std::vector<std::vector<piece*>>* board_p, int* counter, base_player* player);
 		// clears available moves list for every piece in pieces list (gets through lists in list)
