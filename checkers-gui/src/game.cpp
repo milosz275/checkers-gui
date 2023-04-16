@@ -9,9 +9,13 @@
 // remake code into more functions, current player and opponent pointers
 // * fix the namescheme
 // add menu
+// - new game
+// - load game
+// - player vs player
+// - player vs bot
+// - bot vs bot (show/performance improvement)
+// - online game
 // add console input
-// add state saving 
-// add game load
 // add statistics
 
 namespace checkers
@@ -108,6 +112,9 @@ namespace checkers
 		std::cout << "List of pieces of second player" << std::endl;
 		print_pieces(&m_p_list_2);
 		#endif
+
+		loop();
+		print_results();
 	}
 
 	void game::loop(void)
@@ -123,11 +130,27 @@ namespace checkers
 				if (m_event.type == sf::Event::Closed)
 					m_window.close();
 
-				if (m_event.type == sf::Event::MouseButtonReleased && m_event.mouseButton.button == sf::Mouse::Left)
+				if (m_event.type == sf::Event::MouseButtonPressed && m_event.mouseButton.button == sf::Mouse::Left)
 				{
-					//if (!available_capture) // check for new kings made
+					//if (!m_available_capture) // check for new kings made
 					//{
-
+					//	if (m_first_turn)
+					//	{
+					//		std::all_of(m_p_list_1.begin(), m_p_list_1.end(), [](piece* p)
+					//			{
+					//				#ifdef _DEBUG
+					//				if (p->get_y() == 0)
+					//				{
+					//					std::cout << "Coronation!" << std::endl;
+					//					return NULL;
+					//				}
+					//				#endif
+					//			});
+					//	}
+					//	else
+					//	{
+					//		//std::all_of(m_p_list_2.begin(), m_p_list_2.end(), []() {});
+					//	}
 					//}
 
 					if (m_selected_piece != NULL) // choice after highlighting
@@ -192,35 +215,35 @@ namespace checkers
 								{
 									m_player_2->capture();
 									delete_from_list(&m_p_list_2, piece_to_delete);
+
+									if (m_p_list_2.empty())
+										m_first_won = true;
 									
 									// push to the "to delete list" (delete later) --- or maybe just to display it during multicapture
 									m_to_delete_list.push_back(new piece('b', x_d, y_d));
 
 									m_player_1->set_combo(true);
+									#ifdef _DEBUG
 									std::cout << "player's 1 combo" << std::endl;
+									#endif
 								}
 								else
 								{
 									m_player_1->capture();
 									delete_from_list(&m_p_list_1, piece_to_delete);
+
+									if (m_p_list_1.empty())
+										m_second_won = true;
 									
 									// push to the "to delete list" (delete later)
 									m_to_delete_list.push_back(new piece('w', x_d, y_d));
 
 									m_player_2->set_combo(true);
+									#ifdef _DEBUG
 									std::cout << "player's 2 combo" << std::endl;
+									#endif
 								}
 							}
-							//else // quitting the combo
-							//{
-							//	player_1->set_combo(false);
-							//	player_2->set_combo(false);
-
-							//	clear_to_delete_list(&to_delete_list, &p_list_1);
-							//	clear_to_delete_list(&to_delete_list, &p_list_2);
-
-							//	std::cout << "combo deleted" << std::endl;
-							//}
 
 							// move the piece (piece, which is moving -> both capture and normal move)
 							(*m_board)[m_selected_piece->get_x()][m_selected_piece->get_y()] = NULL;
@@ -235,9 +258,7 @@ namespace checkers
 							print_pieces(&m_p_list_1);
 							std::cout << "List of pieces of second player" << std::endl;
 							print_pieces(&m_p_list_2);
-							#endif		
-
-							// add end of game *
+							#endif
 
 							//// switch turn, if no combo
 							if (!m_player_1->get_combo() && !m_player_2->get_combo())
@@ -247,7 +268,6 @@ namespace checkers
 								clear_list(&m_p_list_1);
 								clear_list(&m_p_list_2);
 							}
-							// add end of game *
 
 							// evaluate current player
 							int dummy = 0;
@@ -267,11 +287,17 @@ namespace checkers
 									clear_list(&m_p_list_2);
 									m_player_1->set_combo(false);
 									m_player_2->set_combo(false);
+									#ifdef _DEBUG
+									std::cout << "Combo cancelled" << std::endl;
+									#endif
+
+									// check for new kings
+
 									switch_turn();
 									m_available_capture = evaluate(m_p_list_2, m_board, &dummy, m_player_2);
 								}
 								else
-									clear_list(&m_p_list_2);
+									clear_list(&m_p_list_2); // also check for new kings
 								// check for empty evaluation?
 							}
 							else // second turn
@@ -290,11 +316,14 @@ namespace checkers
 									clear_list(&m_p_list_2);
 									m_player_1->set_combo(false);
 									m_player_2->set_combo(false);
+
+									// check for new kings
+
 									switch_turn();
 									m_available_capture = evaluate(m_p_list_1, m_board, &dummy, m_player_1);
 								}
 								else
-									clear_list(&m_p_list_1);
+									clear_list(&m_p_list_1); // also check for new kings
 							}
 						}
 					}
@@ -317,8 +346,15 @@ namespace checkers
 			{
 				m_selected_piece = NULL;
 
-				int x = sf::Mouse::getPosition(m_window).x / (m_window.getSize().x / size);
-				int y = sf::Mouse::getPosition(m_window).y / (m_window.getSize().y / size);
+				int x = -1;
+				int y = -1;
+
+				// ignore clicking at the border
+				while (x < 0 || x > size - 1 || y < 0 || y > size - 1)
+				{
+					x = sf::Mouse::getPosition(m_window).x / (m_window.getSize().x / size);
+					y = sf::Mouse::getPosition(m_window).y / (m_window.getSize().y / size);
+				}
 
 				// if the correspoding field contains a piece
 				if ((*m_board)[x][y] != NULL)
@@ -595,8 +631,9 @@ namespace checkers
 						copy_of_list.push_back(moving_piece);
 						(*copy_of_board)[x + 1][y - 1] = NULL;
 						moving_piece = NULL; // now, copy of board contains board with moved piece and the list contains only moved piece
+						#ifdef _DEBUG
 						std::cout << copy_of_board << std::endl;
-						
+						#endif
 
 						//evaluate recursively - separate in every direction - call tree
 						if (*counter == NULL)
@@ -659,8 +696,9 @@ namespace checkers
 						copy_of_list.push_back(moving_piece);
 						(*copy_of_board)[x - 1][y - 1] = NULL;
 						moving_piece = NULL; // now, copy of board contains board with moved piece and the list contains only moved piece
+						#ifdef _DEBUG
 						std::cout << copy_of_board << std::endl;
-
+						#endif
 
 						//evaluate recursively - separate in every direction - call tree
 						if (*counter == NULL)
@@ -723,8 +761,9 @@ namespace checkers
 						copy_of_list.push_back(moving_piece);
 						(*copy_of_board)[x + 1][y + 1] = NULL;
 						moving_piece = NULL; // now, copy of board contains board with moved piece and the list contains only moved piece
+						#ifdef _DEBUG
 						std::cout << copy_of_board << std::endl;
-
+						#endif
 
 						//evaluate recursively - separate in every direction - call tree
 						if (*counter == NULL)
