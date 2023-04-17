@@ -132,7 +132,8 @@ namespace checkers
 
 				if (m_event.type == sf::Event::MouseButtonPressed && m_event.mouseButton.button == sf::Mouse::Left)
 				{
-					//if (!m_available_capture) // check for new kings made
+					//// This part of code will be responsible for changing pieces into kings
+					//if (!m_available_capture) // check for new kings made 
 					//{
 					//	if (m_first_turn)
 					//	{
