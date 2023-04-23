@@ -1,4 +1,5 @@
 #include "include/base_player.h"
+#include "include/piece.h"
 
 namespace checkers
 {
@@ -18,6 +19,10 @@ namespace checkers
 
 	base_player* base_player::set_next_player(base_player* next_player) { assert(next_player != this); return m_next_player = next_player; }
 
+	std::list<piece*>* base_player::get_list(void) { return m_piece_list; }
+
+	std::list<piece*>* base_player::set_list(std::list<piece*>* piece_list) { return m_piece_list = piece_list; }
+
 	bool base_player::get_combo(void) { return m_combo; }
 
 	bool base_player::set_combo(bool combo) { return m_combo = combo; }
@@ -28,7 +33,7 @@ namespace checkers
 
 	int base_player::get_captured_pieces(void) { return m_captured_pieces; }
 
-	void base_player::capture(void) { m_pieces--; m_captured_pieces++; }
+	void base_player::make_capture(void) { m_pieces--; m_captured_pieces++; }
 
 	void base_player::print_player(void) { std::cout << m_name << "; sign: " << m_sign << "; pieces: " << m_pieces << "; captured pieces: " << m_captured_pieces << std::endl; }
 }

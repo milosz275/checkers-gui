@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -Werror -std=c++20
+CFLAGS = -Wall -Werror -Wextra -pedantic -std=c++20
 INCLUDES = -I.
 
 SRC_DIR = src

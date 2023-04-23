@@ -1,6 +1,7 @@
-#ifndef AVAILABLE_CAPTURE_H
-#define AVAILABLE_CAPTURE_H
+#ifndef AVAILABLECAPTURE_H
+#define AVAILABLECAPTURE_H
 
+#include <list>
 #include "include/available_move.h"
 
 namespace checkers

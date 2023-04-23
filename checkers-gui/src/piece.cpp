@@ -2,7 +2,26 @@
 
 namespace checkers
 {
-    piece::piece(char sign, int x, int y) : m_sign(sign), m_x(x), m_y(y), m_is_captured(false), m_is_king(false), m_av_list(new std::list<available_move*>) {}
+    piece::piece(char sign, int x, int y) : m_sign(sign), m_x(x), m_y(y), m_is_king(false), m_av_list(new std::list<available_move*>), m_shape(radius)
+    {
+        switch (m_sign)
+        {
+        case 'W':
+            m_shape.setFillColor(sf::Color(217, 216, 216, 255));
+            break;
+        case 'B':
+            m_shape.setFillColor(sf::Color(26, 23, 22, 255));
+            break;
+        case 'w':
+            m_shape.setFillColor(sf::Color(187, 186, 186, 255));
+            break;
+        case 'b':
+            m_shape.setFillColor(sf::Color(59, 59, 59, 255));
+            break;
+        default:
+            throw std::runtime_error("Wrong piece sign");
+        }
+    }
 
     piece::~piece() {}
 
@@ -16,10 +35,6 @@ namespace checkers
 
     char piece::get_sign(void) { return m_sign; }
 
-    bool piece::set_captured(bool captured) { return m_is_captured = captured; }
-
-    bool piece::is_captured(void) { return m_is_captured; }
-
     std::list<available_move*>* piece::get_av_list(void) { return m_av_list; }
 
     std::ostream& operator<<(std::ostream& os, const piece* piece)
@@ -32,27 +47,9 @@ namespace checkers
 
     void piece::draw(sf::RenderWindow& window)
     {
-        sf::CircleShape shape(radius);
-
-        switch (m_sign)
-        {
-        case 'W':
-            shape.setFillColor(sf::Color(217, 216, 216, 255));
-            break;
-        case 'B':
-            shape.setFillColor(sf::Color(26, 23, 22, 255));
-            break;
-        case 'w':
-            shape.setFillColor(sf::Color(187, 186, 186, 255));
-            break;
-        case 'b':
-            shape.setFillColor(sf::Color(59, 59, 59, 255));
-            break;
-        default:
-            throw std::runtime_error("Wrong piece sign");
-        }
-
-        shape.setPosition(sf::Vector2f(m_x * square_size + (square_size - radius * 2) / 2, m_y * square_size + (square_size - 2 * radius) / 2));
-        window.draw(shape);
+        // update location
+        m_shape.setPosition(sf::Vector2f(m_x * s_square_size + (s_square_size - radius * 2) / 2, m_y * s_square_size + (s_square_size - 2 * radius) / 2));
+        // draw on the board
+        window.draw(m_shape);
     }
 }
