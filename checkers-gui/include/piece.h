@@ -15,6 +15,7 @@ namespace checkers
 {
 	class piece
 	{
+	protected:
 		// x coordinate of the piece
 		int m_x;
 		// y coordinates of the piece
@@ -29,9 +30,9 @@ namespace checkers
 		sf::CircleShape m_shape;
 	public:
 		// creates the piece of given sign and coordinates
-		piece(char sign, int x, int y);
+		piece(char sign, int x, int y, bool is_king = false);
 		// deletes the piece
-		~piece();
+		virtual ~piece();
 		// returns x coordinate of the piece
 		int get_x(void);
 		// returns y coordinate of the piece
@@ -42,6 +43,8 @@ namespace checkers
 		int set_y(int y);
 		// returns sign of the piece
 		char get_sign(void);
+		//
+		bool is_king(void);
 		// lets to print the piece in given stream
 		friend std::ostream& operator<<(std::ostream& os, const piece* piece);
 		// returns the list of all evaluated moves

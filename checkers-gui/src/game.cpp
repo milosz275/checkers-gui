@@ -1,15 +1,12 @@
 #include "include/game.h"
+#include "include/king.h"
 
 // todo: (*done)
-// * enable only current turn moves
-// * enable only possible moves (captures)
-// * enable hit series
 // add check if king to evaluation
-//		if the counter won't work: get value from argument and copy to local variable, then pass it to resursive function call
 // remake code into more functions, current player and opponent pointers
-// * fix the namescheme
 // add menu
-// * change turns to pointer
+// optimise drawing
+// change checking new kings to function
 
 namespace checkers
 {
@@ -197,12 +194,11 @@ namespace checkers
 #endif
 							}
 
-							// move the piece (piece, which is moving -> both capture and normal move)
+							// move the piece (piece, which is moving -> both capture and normal move), keep selected_piece pointer for the possible king
 							(*m_board)[m_selected_piece->get_x()][m_selected_piece->get_y()] = NULL;
 							m_selected_piece->set_x(x);
 							m_selected_piece->set_y(y);
 							(*m_board)[x][y] = m_selected_piece;
-							m_selected_piece = NULL;
 							selected = false;
 
 #ifdef _DEBUG
@@ -211,16 +207,25 @@ namespace checkers
 							std::cout << "List of pieces of second player" << std::endl;
 							print_pieces(&m_p_list_2);
 #endif		
+							// tmp flag indicating, that the king check was made this round
+							bool made_king_check = false;
+
 							// switch turn, if no combo
 							if (!m_player_1->get_combo() && !m_player_2->get_combo())
+							{
+								// king function
+								if (!made_king_check)
+									m_current_player->kings(m_selected_piece, m_board);
+								made_king_check = true;
 								switch_turn();
+							}
 							else // section to test (fixes stuff)
 							{
 								clear_list(&m_p_list_1);
 								clear_list(&m_p_list_2);
 							}
 
-							// evaluate current player
+							// evaluate current player and check if there is more captures, if not, check for new kings
 							int dummy = 0;
 							m_available_capture = evaluate(m_current_player->get_list(), m_board, &dummy, m_current_player);
 
@@ -238,13 +243,18 @@ namespace checkers
 #ifdef _DEBUG
 								std::cout << "Combo cancelled" << std::endl;
 #endif
-								// check for new kings
-
+								// king function
+								if (!made_king_check)
+									m_current_player->kings(m_selected_piece, m_board);
+								made_king_check = true;
 								switch_turn();
 								m_available_capture = evaluate(m_current_player->get_list(), m_board, &dummy, m_current_player);
 							}
-							else
-								clear_list(m_current_player->get_next_player()->get_list()); // also check for new kings
+							else // continue the combo
+								clear_list(m_current_player->get_next_player()->get_list());
+
+							m_selected_piece = NULL;
+
 							// check for empty evaluation?
 						}
 					}
@@ -827,7 +837,16 @@ namespace checkers
 
 	void game::clear_list(std::list<piece*>* list) { for_each(list->begin(), list->end(), [this](piece* p) { p->get_av_list()->clear(); }); }
 
-	void game::print_pieces(std::list<piece*>* list, std::ostream& os) { std::for_each(list->begin(), list->end(), [i = 1, this, &os](piece* p) mutable { os << i++ << "; sign: " << p << "; x: " << p->get_x() << "; y: " << p->get_y() << std::endl; }); }
+	void game::print_pieces(std::list<piece*>* list, std::ostream& os)
+	{
+		std::for_each(list->begin(), list->end(), [i = 1, this, &os](piece* p) mutable
+			{
+				os << i++ << "; sign: " << p << "; x: " << p->get_x() << "; y: " << p->get_y();
+				if (p->is_king())
+					os << "; king";
+				os << std::endl;
+			});
+	}
 
 	void game::delete_from_list(std::list<piece*>* list, piece* piece_to_delete) { list->remove(piece_to_delete); }
 

@@ -27,7 +27,9 @@ namespace checkers
 	// square/tile size
 	static const float s_square_size = 100.0;
 	// radius of one piece
-	const float radius = s_square_size / 2.5;
+	static const float s_radius = s_square_size / 2.5;
+
+	class king;
 
 	class game
 	{
@@ -86,9 +88,8 @@ namespace checkers
 		void loop(void);
 		// prints result to given stream
 		void print_results(std::ostream& os = std::cout);
-
+		//
 		void print_pieces(std::list<piece*>* list, std::ostream& os = std::cout);
-
 		// draws main game board in the given window
 		void draw(sf::RenderWindow& window);
 		// highlights selected piece of given coords (brown)

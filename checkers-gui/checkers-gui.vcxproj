@@ -24,6 +24,7 @@
     <ClInclude Include="include\base_player.h" />
     <ClInclude Include="include\bot.h" />
     <ClInclude Include="include\game.h" />
+    <ClInclude Include="include\king.h" />
     <ClInclude Include="include\piece.h" />
     <ClInclude Include="include\player.h" />
   </ItemGroup>
@@ -33,6 +34,7 @@
     <ClCompile Include="src\base_player.cpp" />
     <ClCompile Include="src\bot.cpp" />
     <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\king.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\piece.cpp" />
     <ClCompile Include="src\player.cpp" />

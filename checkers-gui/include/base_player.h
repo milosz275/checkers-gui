@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 #include <algorithm>
 #include <list>
 #include <cassert>
@@ -10,6 +11,7 @@
 namespace checkers
 {
 	class piece;
+	class king;
 
 	class base_player
 	{
@@ -62,6 +64,8 @@ namespace checkers
 		bool set_combo(bool combo);
 		// decreases pieces count, increases captured pieces count
 		void make_capture(void);
+		//
+		void kings(piece* target, std::vector<std::vector<piece*>>* board);
 		// prints pieces of the player
 		void print_player(void);
 	};

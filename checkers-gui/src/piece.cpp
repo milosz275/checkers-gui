@@ -2,7 +2,7 @@
 
 namespace checkers
 {
-    piece::piece(char sign, int x, int y) : m_sign(sign), m_x(x), m_y(y), m_is_king(false), m_av_list(new std::list<available_move*>), m_shape(radius)
+    piece::piece(char sign, int x, int y, bool is_king) : m_sign(sign), m_x(x), m_y(y), m_is_king(is_king), m_av_list(new std::list<available_move*>), m_shape(s_radius)
     {
         switch (m_sign)
         {
@@ -35,6 +35,8 @@ namespace checkers
 
     char piece::get_sign(void) { return m_sign; }
 
+    bool piece::is_king(void) { return m_is_king; }
+
     std::list<available_move*>* piece::get_av_list(void) { return m_av_list; }
 
     std::ostream& operator<<(std::ostream& os, const piece* piece)
@@ -48,7 +50,7 @@ namespace checkers
     void piece::draw(sf::RenderWindow& window)
     {
         // update location
-        m_shape.setPosition(sf::Vector2f(m_x * s_square_size + (s_square_size - radius * 2) / 2, m_y * s_square_size + (s_square_size - 2 * radius) / 2));
+        m_shape.setPosition(sf::Vector2f(m_x * s_square_size + (s_square_size - s_radius * 2) / 2, m_y * s_square_size + (s_square_size - 2 * s_radius) / 2));
         // draw on the board
         window.draw(m_shape);
     }
