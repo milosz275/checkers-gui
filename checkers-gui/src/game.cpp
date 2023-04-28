@@ -1,18 +1,21 @@
 #include "include/game.h"
 #include "include/king.h"
 
-// todo: (*done)
-// add check if king to evaluation
+// todo:
 // remake code into more functions, current player and opponent pointers
 // add menu
 // optimise drawing
-// change checking new kings to function
+// add animation
+// add setting rows and check if set correctly
+// switch to polymorphism completely (get rid of is_king flag)
+// evaluate kings
+// consider current moving piece to eliminate situation where two pieces have possible captures
 
 namespace checkers
 {
 	game::game(int fps) : m_is_finished(false), m_fps(fps),
 		m_window(sf::VideoMode(s_square_size* s_size, s_square_size* s_size), "Checkers", sf::Style::Default, m_settings),
-		m_selected_piece(NULL), m_available_capture(false), m_tile(), m_clock(), m_event(), m_settings(), m_current_player(NULL)
+		m_selected_piece(NULL), m_moving_piece(NULL), m_available_capture(false), m_tile(), m_clock(), m_event(), m_settings(), m_current_player(NULL)
 	{
 		// todo: menu
 
@@ -347,8 +350,8 @@ namespace checkers
 			// print pieces in multicapture
 			for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [this](piece* p) { p->draw(m_window); });
 
+			// sleep time complementary to the frame time
 			sf::Time elapsed_time = m_clock.restart();
-
 			if (elapsed_time.asSeconds() < m_frame_duration)
 				sf::sleep(sf::seconds(m_frame_duration - elapsed_time.asSeconds()));
 			m_window.display();
@@ -409,18 +412,12 @@ namespace checkers
 	bool game::evaluate(std::list<piece*>* list, std::vector<std::vector<piece*>>* board_p, int* counter, base_player* player)
 	{
 		bool av_capture = false;
+
+		// todo: list with each piece with a possible capture and corresponding score, after for_each add capture for only the higest score
 		for_each(list->begin(), list->end(), [this, &board_p, &list, &counter, &av_capture, &player](piece* p)
 			{
 				int x = p->get_x();
 				int y = p->get_y();
-
-#ifdef _DEBUG
-				std::cout << "evaluating" << std::endl;
-				std::cout << "x: " << x << "; y: " << y << std::endl;
-
-				if ((*board_p)[x][y] != NULL)
-					std::cout << (*board_p)[x][y] << std::endl;
-#endif
 
 				// captures
 				bool possible_capture_top_left = false;
@@ -428,407 +425,442 @@ namespace checkers
 				bool possible_capture_bottow_left = false;
 				bool possible_capture_bottom_right = false;
 
-				// capture top right (0)
-				if (x + 2 <= s_size - 1 && y - 2 >= 0 && (*board_p)[x + 1][y - 1] != NULL && (*board_p)[x + 1][y - 1]->get_sign() == player->get_next_player()->get_sign() && (*board_p)[x + 2][y - 2] == NULL)
-					possible_capture_top_right = true;
-
-				// capture top left (1)
-				if (x - 2 >= 0 && y - 2 >= 0 && (*board_p)[x - 1][y - 1] != NULL && (*board_p)[x - 1][y - 1]->get_sign() == player->get_next_player()->get_sign() && (*board_p)[x - 2][y - 2] == NULL)
-					possible_capture_top_left = true;
-
-				// capture bottom right (2)
-				if (x + 2 <= s_size - 1 && y + 2 <= s_size - 1 && (*board_p)[x + 1][y + 1] != NULL && (*board_p)[x + 1][y + 1]->get_sign() == player->get_next_player()->get_sign() && (*board_p)[x + 2][y + 2] == NULL)
-					possible_capture_bottom_right = true;
-
-				// capture bottom left (3)
-				if (x - 2 >= 0 && y + 2 <= s_size - 1 && (*board_p)[x - 1][y + 1] != NULL && (*board_p)[x - 1][y + 1]->get_sign() == player->get_next_player()->get_sign() && (*board_p)[x - 2][y + 2] == NULL)
-					possible_capture_bottow_left = true;
-
-
-				if (possible_capture_top_left || possible_capture_top_right || possible_capture_bottow_left || possible_capture_bottom_right)
+				// todo: cancel possible moves or captures if another type (piece or king) has higher score
+				// or change to one common moves enabler
+				if (!p->is_king())
 				{
-					av_capture = true;
+#ifdef _DEBUG
+					std::cout << "evaluating normal piece" << std::endl;
+					std::cout << "x: " << x << "; y: " << y << std::endl;
 
-					// evaluate copy of the board recursively in every direction and find highest number of captures to add to base moves list
-					int capture_counter[4] = { 0, 0, 0, 0 }; // 0 - top right, 1 - top left, 2 - bottom right, 3 - bottom left
+					if ((*board_p)[x][y] != NULL)
+						std::cout << (*board_p)[x][y] << std::endl;
+#endif
 
-					if (possible_capture_top_right)
+					// capture top right (0)
+					if (x + 2 <= s_size - 1 && y - 2 >= 0 && (*board_p)[x + 1][y - 1] != NULL && (*board_p)[x + 1][y - 1]->get_sign() == player->get_next_player()->get_sign() && (*board_p)[x + 2][y - 2] == NULL)
+						possible_capture_top_right = true;
+
+					// capture top left (1)
+					if (x - 2 >= 0 && y - 2 >= 0 && (*board_p)[x - 1][y - 1] != NULL && (*board_p)[x - 1][y - 1]->get_sign() == player->get_next_player()->get_sign() && (*board_p)[x - 2][y - 2] == NULL)
+						possible_capture_top_left = true;
+
+					// capture bottom right (2)
+					if (x + 2 <= s_size - 1 && y + 2 <= s_size - 1 && (*board_p)[x + 1][y + 1] != NULL && (*board_p)[x + 1][y + 1]->get_sign() == player->get_next_player()->get_sign() && (*board_p)[x + 2][y + 2] == NULL)
+						possible_capture_bottom_right = true;
+
+					// capture bottom left (3)
+					if (x - 2 >= 0 && y + 2 <= s_size - 1 && (*board_p)[x - 1][y + 1] != NULL && (*board_p)[x - 1][y + 1]->get_sign() == player->get_next_player()->get_sign() && (*board_p)[x - 2][y + 2] == NULL)
+						possible_capture_bottow_left = true;
+
+
+					if (possible_capture_top_left || possible_capture_top_right || possible_capture_bottow_left || possible_capture_bottom_right)
 					{
-						//(*p).get_av_list()->push_back(new available_capture(x + 2, y - 2, x + 1, y - 1));
-						capture_counter[0] = 1; // change here to get from counter, then increment?
+						av_capture = true;
 
-						// copy the board and make empty list for moved piece
-						std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, 0));
-						std::list<piece*> copy_of_list;
-						if (*counter == NULL) // first call of evaluation
+						// evaluate copy of the board recursively in every direction and find highest number of captures to add to base moves list
+						int capture_counter[4] = { 0, 0, 0, 0 }; // 0 - top right, 1 - top left, 2 - bottom right, 3 - bottom left
+
+						if (possible_capture_top_right)
 						{
-							for (int i = 0; i < s_size; ++i)
-								for (int j = 0; j < s_size; ++j)
-									if ((*m_board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
+							//(*p).get_av_list()->push_back(new available_capture(x + 2, y - 2, x + 1, y - 1));
+							capture_counter[0] = 1; // change here to get from counter, then increment?
 
-						}
-						else // the function call is being recursive 
-						{
-							for (int i = 0; i < s_size; ++i)
-								for (int j = 0; j < s_size; ++j)
-									if ((*board_p)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
-						}
+							// copy the board and make empty list for moved piece
+							std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, 0));
+							std::list<piece*> copy_of_list;
+							if (*counter == NULL) // first call of evaluation
+							{
+								for (int i = 0; i < s_size; ++i)
+									for (int j = 0; j < s_size; ++j)
+										if ((*m_board)[i][j] != NULL)
+											(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
-						// make planned move
-						piece* moving_piece = (*copy_of_board)[x][y];
-						(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
-						moving_piece->set_x(x + 2);
-						moving_piece->set_y(y - 2);
-						(*copy_of_board)[x + 2][y - 2] = moving_piece;
-						copy_of_list.push_back(moving_piece);
-						(*copy_of_board)[x + 1][y - 1] = NULL;
-						moving_piece = NULL; // now, copy of board contains board with moved piece and the list contains only moved piece
+							}
+							else // the function call is being recursive 
+							{
+								for (int i = 0; i < s_size; ++i)
+									for (int j = 0; j < s_size; ++j)
+										if ((*board_p)[i][j] != NULL)
+											(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
+							}
+
+							// make planned move
+							piece* moving_piece = (*copy_of_board)[x][y];
+							(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
+							moving_piece->set_x(x + 2);
+							moving_piece->set_y(y - 2);
+							(*copy_of_board)[x + 2][y - 2] = moving_piece;
+							copy_of_list.push_back(moving_piece);
+							(*copy_of_board)[x + 1][y - 1] = NULL;
+							moving_piece = NULL; // now, copy of board contains board with moved piece and the list contains only moved piece
 #ifdef _DEBUG
-						std::cout << copy_of_board << std::endl;
+							std::cout << copy_of_board << std::endl;
 #endif
 
-						//evaluate recursively - separate in every direction - call tree
-						if (*counter == NULL)
-						{
+							//evaluate recursively - separate in every direction - call tree
+							if (*counter == NULL)
+							{
 #ifdef _DEBUG
-							std::cout << "---------------------------------------------------------------" << std::endl;
-							std::cout << "counter null" << std::endl;
+								std::cout << "---------------------------------------------------------------" << std::endl;
+								std::cout << "counter null" << std::endl;
 #endif
 
-							int moves = 1;
-							evaluate(&copy_of_list, copy_of_board, &moves, player);
-							capture_counter[0] = moves;
+								int moves = 1;
+								evaluate(&copy_of_list, copy_of_board, &moves, player);
+								capture_counter[0] = moves;
 
 #ifdef _DEBUG
-							std::cout << "moves counter (top right): " << moves << std::endl;
+								std::cout << "moves counter (top right): " << moves << std::endl;
 #endif
-						}
-						else
-						{
+							}
+							else
+							{
 #ifdef _DEBUG
-							std::cout << "---------------------------------------------------------------" << std::endl;
-							std::cout << "counter not null" << std::endl;
+								std::cout << "---------------------------------------------------------------" << std::endl;
+								std::cout << "counter not null" << std::endl;
 #endif
 
-							(*counter)++;
-							evaluate(&copy_of_list, copy_of_board, counter, player);
-						}
-					}
-
-					if (possible_capture_top_left)
-					{
-						//(*p).get_av_list()->push_back(new available_capture(x - 2, y - 2, x - 1, y - 1));
-						capture_counter[1] = 1;
-
-						// copy the board and make empty list for moved piece
-						std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, 0));
-						std::list<piece*> copy_of_list;
-						if (*counter == NULL) // first call of evaluation
-						{
-							for (int i = 0; i < s_size; ++i)
-								for (int j = 0; j < s_size; ++j)
-									if ((*m_board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
-
-						}
-						else // the function call is being recursive
-						{
-							for (int i = 0; i < s_size; ++i)
-								for (int j = 0; j < s_size; ++j)
-									if ((*board_p)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
+								(*counter)++;
+								evaluate(&copy_of_list, copy_of_board, counter, player);
+							}
 						}
 
-						// make planned move
-						piece* moving_piece = (*copy_of_board)[x][y];
-						(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
-						moving_piece->set_x(x - 2);
-						moving_piece->set_y(y - 2);
-						(*copy_of_board)[x - 2][y - 2] = moving_piece;
-						copy_of_list.push_back(moving_piece);
-						(*copy_of_board)[x - 1][y - 1] = NULL;
-						moving_piece = NULL; // now, copy of board contains board with moved piece and the list contains only moved piece
-#ifdef _DEBUG
-						std::cout << copy_of_board << std::endl;
-#endif
-
-						//evaluate recursively - separate in every direction - call tree
-						if (*counter == NULL)
+						if (possible_capture_top_left)
 						{
+							//(*p).get_av_list()->push_back(new available_capture(x - 2, y - 2, x - 1, y - 1));
+							capture_counter[1] = 1;
+
+							// copy the board and make empty list for moved piece
+							std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, 0));
+							std::list<piece*> copy_of_list;
+							if (*counter == NULL) // first call of evaluation
+							{
+								for (int i = 0; i < s_size; ++i)
+									for (int j = 0; j < s_size; ++j)
+										if ((*m_board)[i][j] != NULL)
+											(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
+
+							}
+							else // the function call is being recursive
+							{
+								for (int i = 0; i < s_size; ++i)
+									for (int j = 0; j < s_size; ++j)
+										if ((*board_p)[i][j] != NULL)
+											(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
+							}
+
+							// make planned move
+							piece* moving_piece = (*copy_of_board)[x][y];
+							(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
+							moving_piece->set_x(x - 2);
+							moving_piece->set_y(y - 2);
+							(*copy_of_board)[x - 2][y - 2] = moving_piece;
+							copy_of_list.push_back(moving_piece);
+							(*copy_of_board)[x - 1][y - 1] = NULL;
+							moving_piece = NULL; // now, copy of board contains board with moved piece and the list contains only moved piece
 #ifdef _DEBUG
-							std::cout << "---------------------------------------------------------------" << std::endl;
-							std::cout << "counter null" << std::endl;
+							std::cout << copy_of_board << std::endl;
 #endif
 
-							int moves = 1;
-							evaluate(&copy_of_list, copy_of_board, &moves, player);
-							capture_counter[1] = moves;
+							//evaluate recursively - separate in every direction - call tree
+							if (*counter == NULL)
+							{
+#ifdef _DEBUG
+								std::cout << "---------------------------------------------------------------" << std::endl;
+								std::cout << "counter null" << std::endl;
+#endif
+
+								int moves = 1;
+								evaluate(&copy_of_list, copy_of_board, &moves, player);
+								capture_counter[1] = moves;
 
 #ifdef _DEBUG
-							std::cout << "moves counter (top left): " << moves << std::endl;
+								std::cout << "moves counter (top left): " << moves << std::endl;
 #endif
+							}
+							else
+							{
+#ifdef _DEBUG
+								std::cout << "---------------------------------------------------------------" << std::endl;
+								std::cout << "counter not null" << std::endl;
+#endif
+
+								(*counter)++;
+								evaluate(&copy_of_list, copy_of_board, counter, player);
+							}
 						}
-						else
+
+						if (possible_capture_bottom_right)
 						{
+							//(*p).get_av_list()->push_back(new available_capture(x + 2, y + 2, x + 1, y + 1));
+							capture_counter[2] = 1;
+
+							// copy the board and make empty list for moved piece
+							std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, 0));
+							std::list<piece*> copy_of_list;
+							if (*counter == NULL) // first call of evaluation
+
+							{
+								for (int i = 0; i < s_size; ++i)
+									for (int j = 0; j < s_size; ++j)
+										if ((*m_board)[i][j] != NULL)
+											(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
+
+							}
+							else // the function call is being recursive 
+							{
+								for (int i = 0; i < s_size; ++i)
+									for (int j = 0; j < s_size; ++j)
+										if ((*board_p)[i][j] != NULL)
+											(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
+							}
+
+							// make planned move
+							piece* moving_piece = (*copy_of_board)[x][y];
+							(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
+							moving_piece->set_x(x + 2);
+							moving_piece->set_y(y + 2);
+							(*copy_of_board)[x + 2][y + 2] = moving_piece;
+							copy_of_list.push_back(moving_piece);
+							(*copy_of_board)[x + 1][y + 1] = NULL;
+							moving_piece = NULL; // now, copy of board contains board with moved piece and the list contains only moved piece
 #ifdef _DEBUG
-							std::cout << "---------------------------------------------------------------" << std::endl;
-							std::cout << "counter not null" << std::endl;
+							std::cout << copy_of_board << std::endl;
 #endif
 
-							(*counter)++;
-							evaluate(&copy_of_list, copy_of_board, counter, player);
-						}
-					}
-
-					if (possible_capture_bottom_right)
-					{
-						//(*p).get_av_list()->push_back(new available_capture(x + 2, y + 2, x + 1, y + 1));
-						capture_counter[2] = 1;
-
-						// copy the board and make empty list for moved piece
-						std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, 0));
-						std::list<piece*> copy_of_list;
-						if (*counter == NULL) // first call of evaluation
-						{
-							for (int i = 0; i < s_size; ++i)
-								for (int j = 0; j < s_size; ++j)
-									if ((*m_board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
-
-						}
-						else // the function call is being recursive 
-						{
-							for (int i = 0; i < s_size; ++i)
-								for (int j = 0; j < s_size; ++j)
-									if ((*board_p)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
-						}
-
-						// make planned move
-						piece* moving_piece = (*copy_of_board)[x][y];
-						(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
-						moving_piece->set_x(x + 2);
-						moving_piece->set_y(y + 2);
-						(*copy_of_board)[x + 2][y + 2] = moving_piece;
-						copy_of_list.push_back(moving_piece);
-						(*copy_of_board)[x + 1][y + 1] = NULL;
-						moving_piece = NULL; // now, copy of board contains board with moved piece and the list contains only moved piece
+							//evaluate recursively - separate in every direction - call tree
+							if (*counter == NULL)
+							{
 #ifdef _DEBUG
-						std::cout << copy_of_board << std::endl;
+								std::cout << "---------------------------------------------------------------" << std::endl;
+								std::cout << "counter null" << std::endl;
 #endif
 
-						//evaluate recursively - separate in every direction - call tree
-						if (*counter == NULL)
-						{
-#ifdef _DEBUG
-							std::cout << "---------------------------------------------------------------" << std::endl;
-							std::cout << "counter null" << std::endl;
-#endif
-
-							int moves = 1;
-							evaluate(&copy_of_list, copy_of_board, &moves, player);
-							capture_counter[2] = moves;
+								int moves = 1;
+								evaluate(&copy_of_list, copy_of_board, &moves, player);
+								capture_counter[2] = moves;
 
 #ifdef _DEBUG	
-							std::cout << "moves counter (bottom right): " << moves << std::endl;
+								std::cout << "moves counter (bottom right): " << moves << std::endl;
 #endif
-						}
-						else
-						{
+							}
+							else
+							{
 #ifdef _DEBUG
-							std::cout << "---------------------------------------------------------------" << std::endl;
-							std::cout << "counter not null" << std::endl;
+								std::cout << "---------------------------------------------------------------" << std::endl;
+								std::cout << "counter not null" << std::endl;
 #endif
 
-							(*counter)++;
-							evaluate(&copy_of_list, copy_of_board, counter, player);
+								(*counter)++;
+								evaluate(&copy_of_list, copy_of_board, counter, player);
+							}
 						}
-					}
 
-					if (possible_capture_bottow_left)
-					{
-						//(*p).get_av_list()->push_back(new available_capture(x - 2, y + 2, x - 1, y + 1));
-						capture_counter[3] = 1;
-
-						// copy the board and make empty list for moved piece
-						std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, 0));
-						std::list<piece*> copy_of_list;
-						if (*counter == NULL) // first call of evaluation
+						if (possible_capture_bottow_left)
 						{
-							for (int i = 0; i < s_size; ++i)
-								for (int j = 0; j < s_size; ++j)
-									if ((*m_board)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
+							//(*p).get_av_list()->push_back(new available_capture(x - 2, y + 2, x - 1, y + 1));
+							capture_counter[3] = 1;
 
-						}
-						else // the function call is being recursive
-						{
-							for (int i = 0; i < s_size; ++i)
-								for (int j = 0; j < s_size; ++j)
-									if ((*board_p)[i][j] != NULL)
-										(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
-						}
+							// copy the board and make empty list for moved piece
+							std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, 0));
+							std::list<piece*> copy_of_list;
+							if (*counter == NULL) // first call of evaluation
+							{
+								for (int i = 0; i < s_size; ++i)
+									for (int j = 0; j < s_size; ++j)
+										if ((*m_board)[i][j] != NULL)
+											(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
 
-						// make planned move
-						piece* moving_piece = (*copy_of_board)[x][y];
-						(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
-						moving_piece->set_x(x - 2);
-						moving_piece->set_y(y + 2);
-						(*copy_of_board)[x - 2][y + 2] = moving_piece;
-						copy_of_list.push_back(moving_piece);
-						(*copy_of_board)[x - 1][y + 1] = NULL;
-						moving_piece = NULL; // now, copy of board contains board with moved piece and the list contains only moved piece
+							}
+							else // the function call is being recursive
+							{
+								for (int i = 0; i < s_size; ++i)
+									for (int j = 0; j < s_size; ++j)
+										if ((*board_p)[i][j] != NULL)
+											(*copy_of_board)[i][j] = new piece((*board_p)[i][j]->get_sign(), (*board_p)[i][j]->get_x(), (*board_p)[i][j]->get_y());
+							}
+
+							// make planned move
+							piece* moving_piece = (*copy_of_board)[x][y];
+							(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
+							moving_piece->set_x(x - 2);
+							moving_piece->set_y(y + 2);
+							(*copy_of_board)[x - 2][y + 2] = moving_piece;
+							copy_of_list.push_back(moving_piece);
+							(*copy_of_board)[x - 1][y + 1] = NULL;
+							moving_piece = NULL; // now, copy of board contains board with moved piece and the list contains only moved piece
 #ifdef _DEBUG
-						std::cout << copy_of_board << std::endl;
+							std::cout << copy_of_board << std::endl;
 #endif	
 
-						//evaluate recursively - separate in every direction - call tree
-						if (*counter == NULL)
+							//evaluate recursively - separate in every direction - call tree
+							if (*counter == NULL)
+							{
+#ifdef _DEBUG
+								std::cout << "---------------------------------------------------------------" << std::endl;
+								std::cout << "counter null" << std::endl;
+#endif
+
+								int moves = 1;
+								evaluate(&copy_of_list, copy_of_board, &moves, player);
+								capture_counter[3] = moves;
+
+#ifdef _DEBUG
+								std::cout << "moves counter (bottom left): " << moves << std::endl;
+#endif
+							}
+							else
+							{
+#ifdef _DEBUG
+								std::cout << "---------------------------------------------------------------" << std::endl;
+								std::cout << "counter not null" << std::endl;
+#endif
+
+								(*counter)++;
+								evaluate(&copy_of_list, copy_of_board, counter, player);
+							}
+						} // all recursive function made
+
+						// tmp: write all counters
+
+						//find max counter
+						int max = capture_counter[0];
+						for (int i = 1; i < 4; ++i)
+							if (capture_counter[i] > max)
+								max = capture_counter[i];
+#ifdef _DEBUG
+						std::cout << "found max counter: " << max << std::endl;
+#endif
+
+						// if counter == max push back available capture
+						for (int i = 0; i < 4; ++i)
+							if (capture_counter[i] == max)
+							{
+								switch (i)
+								{
+								case 0:
+								{
+#ifdef _DEBUG
+									std::cout << "top right direction: " << capture_counter[0] << std::endl;
+#endif
+									(*p).get_av_list()->push_back(new available_capture(x + 2, y - 2, x + 1, y - 1));
+									break;
+								}
+								case 1:
+								{
+#ifdef _DEBUG
+									std::cout << "top left direction: " << capture_counter[1] << std::endl;
+#endif
+									(*p).get_av_list()->push_back(new available_capture(x - 2, y - 2, x - 1, y - 1));
+									break;
+								}
+								case 2:
+								{
+#ifdef _DEBUG
+									std::cout << "bottom right direction: " << capture_counter[2] << std::endl;
+#endif
+									(*p).get_av_list()->push_back(new available_capture(x + 2, y + 2, x + 1, y + 1));
+									break;
+								}
+								case 3:
+								{
+#ifdef _DEBUG
+									std::cout << "bottom left direction: " << capture_counter[3] << std::endl;
+#endif
+									(*p).get_av_list()->push_back(new available_capture(x - 2, y + 2, x - 1, y + 1));
+									break;
+								}
+								default:
+									throw std::exception("Evaluation error on piece " + p->get_sign());
+								}
+							}
+					}
+					else
+					{
+						if (*counter != NULL)
+							return;
+
+						// different direction of ordinary move
+						if (player->is_first())
 						{
+							// moves to right
+							if (x != s_size - 1 && y != 0)
+							{
+								if ((*board_p)[x + 1][y - 1] == NULL)
+								{
 #ifdef _DEBUG
-							std::cout << "---------------------------------------------------------------" << std::endl;
-							std::cout << "counter null" << std::endl;
+									std::cout << "available move to the right!" << std::endl;
 #endif
+									(*p).get_av_list()->push_back(new available_move(x + 1, y - 1));
+								}
+							}
 
-							int moves = 1;
-							evaluate(&copy_of_list, copy_of_board, &moves, player);
-							capture_counter[3] = moves;
-
+							// moves to left
+							if (x != 0 && y != 0)
+							{
+								if ((*board_p)[x - 1][y - 1] == NULL)
+								{
 #ifdef _DEBUG
-							std::cout << "moves counter (bottom left): " << moves << std::endl;
+									std::cout << "available move to the left!" << std::endl;
 #endif
+									(*p).get_av_list()->push_back(new available_move(x - 1, y - 1));
+								}
+							}
 						}
-						else
+						else // next player is primary player (first, lower on board): checked by assertions
 						{
-#ifdef _DEBUG
-							std::cout << "---------------------------------------------------------------" << std::endl;
-							std::cout << "counter not null" << std::endl;
-#endif
-
-							(*counter)++;
-							evaluate(&copy_of_list, copy_of_board, counter, player);
-						}
-					} // all recursive function made
-
-					// tmp: write all counters
-
-					//find max counter
-					int max = capture_counter[0];
-					for (int i = 1; i < 4; ++i)
-						if (capture_counter[i] > max)
-							max = capture_counter[i];
-#ifdef _DEBUG
-					std::cout << "found max counter: " << max << std::endl;
-#endif
-
-					// if counter == max push back available capture
-					for (int i = 0; i < 4; ++i)
-						if (capture_counter[i] == max)
-						{
-							switch (i)
+							// moves to right
+							if (x != s_size - 1 && y != s_size - 1)
 							{
-							case 0:
-							{
+								if ((*board_p)[x + 1][y + 1] == NULL)
+								{
 #ifdef _DEBUG
-								std::cout << "kierunek top right: " << capture_counter[0] << std::endl;
-#endif
-								(*p).get_av_list()->push_back(new available_capture(x + 2, y - 2, x + 1, y - 1));
-								break;
+									std::cout << "available move to the right!" << std::endl;
+#endif		
+									(*p).get_av_list()->push_back(new available_move(x + 1, y + 1));
+								}
 							}
-							case 1:
+
+							// moves to left
+							if (x != 0 && y != s_size - 1)
 							{
+								if ((*board_p)[x - 1][y + 1] == NULL)
+								{
 #ifdef _DEBUG
-								std::cout << "kierunek top left: " << capture_counter[1] << std::endl;
+									std::cout << "available move to the left!" << std::endl;
 #endif
-								(*p).get_av_list()->push_back(new available_capture(x - 2, y - 2, x - 1, y - 1));
-								break;
-							}
-							case 2:
-							{
-#ifdef _DEBUG
-								std::cout << "kierunek bottom right: " << capture_counter[2] << std::endl;
-#endif
-								(*p).get_av_list()->push_back(new available_capture(x + 2, y + 2, x + 1, y + 1));
-								break;
-							}
-							case 3:
-							{
-#ifdef _DEBUG
-								std::cout << "kierunek bottom left: " << capture_counter[3] << std::endl;
-#endif
-								(*p).get_av_list()->push_back(new available_capture(x - 2, y + 2, x - 1, y + 1));
-								break;
-							}
-							default:
-								throw std::exception("Evaluation error on piece " + p->get_sign());
+									(*p).get_av_list()->push_back(new available_move(x - 1, y + 1));
+								}
 							}
 						}
+					}
 				}
 				else
 				{
-					if (*counter != NULL)
-						return;
+#ifdef _DEBUG
+					std::cout << "evaluating the king" << std::endl;
+					std::cout << "x: " << x << "; y: " << y << std::endl;
 
-					// different direction of ordinary move
-					if (player->is_first())
-					{
-						// moves to right
-						if (x != s_size - 1 && y != 0)
-						{
-							if ((*board_p)[x + 1][y - 1] == NULL)
-							{
-#ifdef _DEBUG
-								std::cout << "available move to the right!" << std::endl;
+					if ((*board_p)[x][y] != NULL)
+						std::cout << (*board_p)[x][y] << std::endl;
 #endif
-								(*p).get_av_list()->push_back(new available_move(x + 1, y - 1));
-							}
-						}
+					// evaluate
+					
+					// check if is there at least one capture in each direction (flags)
 
-						// moves to left
-						if (x != 0 && y != 0)
-						{
-							if ((*board_p)[x - 1][y - 1] == NULL)
-							{
-#ifdef _DEBUG
-								std::cout << "available move to the left!" << std::endl;
-#endif
-								(*p).get_av_list()->push_back(new available_move(x - 1, y - 1));
-							}
-						}
-					}
-					else // next player is primary player (first, lower on board): checked by assertions
-					{
-						// moves to right
-						if (x != s_size - 1 && y != s_size - 1)
-						{
-							if ((*board_p)[x + 1][y + 1] == NULL)
-							{
-#ifdef _DEBUG
-								std::cout << "available move to the right!" << std::endl;
-#endif		
-								(*p).get_av_list()->push_back(new available_move(x + 1, y + 1));
-							}
-						}
+					// evaluate in each direction to reveal highest score
+					
+					// if there is available capture, add all available capture moves to the max score
 
-						// moves to left
-						if (x != 0 && y != s_size - 1)
-						{
-							if ((*board_p)[x - 1][y + 1] == NULL)
-							{
-#ifdef _DEBUG
-								std::cout << "available move to the left!" << std::endl;
-#endif
-								(*p).get_av_list()->push_back(new available_move(x - 1, y + 1));
-							}
-						}
-					}
+					// else add all normal moves
 				}
+
+				
 
 			});
 #ifdef _DEBUG
-		std::cout << "---available returning: ";
+		std::cout << "Evaluation returns: ";
 		av_capture ? (std::cout << "true") : (std::cout << "false");
 		std::cout << std::endl;
 #endif

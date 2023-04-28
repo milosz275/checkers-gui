@@ -10,6 +10,7 @@
 
 namespace checkers
 {
+	// declare to avoid compile conflict
 	class piece;
 	class king;
 
@@ -48,9 +49,9 @@ namespace checkers
 		base_player* get_next_player(void);
 		// sets and returns pointer to the next player
 		base_player* set_next_player(base_player* next_player);
-		//
+		// returns the list of possible moves of the player
 		std::list<piece*>* get_list(void);
-		//
+		// sets and returns the list of possible moves of the player
 		std::list<piece*>* set_list(std::list<piece*>* piece_list);
 		// increases piece count by x
 		void add_piece(int count = 1);
@@ -64,7 +65,7 @@ namespace checkers
 		bool set_combo(bool combo);
 		// decreases pieces count, increases captured pieces count
 		void make_capture(void);
-		//
+		// checks if the target piece could change into king and does it, if yes
 		void kings(piece* target, std::vector<std::vector<piece*>>* board);
 		// prints pieces of the player
 		void print_player(void);

@@ -26,7 +26,7 @@ namespace checkers
 		bool m_is_king;
 		// list containing all evaluated possible moves for the piece
 		std::list<available_move*>* m_av_list;
-		//
+		// object that is printed in the window
 		sf::CircleShape m_shape;
 	public:
 		// creates the piece of given sign and coordinates
@@ -43,7 +43,7 @@ namespace checkers
 		int set_y(int y);
 		// returns sign of the piece
 		char get_sign(void);
-		//
+		// returns if the piece is king (todo: remove)
 		bool is_king(void);
 		// lets to print the piece in given stream
 		friend std::ostream& operator<<(std::ostream& os, const piece* piece);

@@ -29,6 +29,7 @@ namespace checkers
 	// radius of one piece
 	static const float s_radius = s_square_size / 2.5;
 
+	// declare to avoid compile conflict
 	class king;
 
 	class game
@@ -55,27 +56,28 @@ namespace checkers
 		bool m_second_won;
 		// pointer to selected piece on the board
 		piece* m_selected_piece;
+		// pointer to piece moving in the last move
+		piece* m_moving_piece;
 		// flag indicating if there is one or more captures, not allowing other moves
 		bool m_available_capture;
-		//
+		// frames per second in the game
 		const int m_fps;
-		//
+		// fraction of second that is time of one frame
 		float m_frame_duration = 1.0f / m_fps;
-		//
+		// SFML object drawing checkerboard
 		sf::RectangleShape m_tile;
-		// 
+		// SFML clock
 		sf::Clock m_clock;
-		// 
+		// SFML settings
 		sf::ContextSettings m_settings;
-		//
+		// SFML window
 		sf::RenderWindow m_window;
-		//
+		// SFML event
 		sf::Event m_event;
 
 	public:
-		
 		// create the game of given size and target frames per second
-		game(int fps = 12);
+		game(int fps = 24);
 		// deletes the game
 		~game();
 		// rotates the vector of vectors board, sets the is rotated flag to opposite
@@ -86,9 +88,9 @@ namespace checkers
 		std::vector<std::vector<piece*>>* get_board(void);
 		// executes the game
 		void loop(void);
-		// prints result to given stream
+		// prints result to the given stream
 		void print_results(std::ostream& os = std::cout);
-		//
+		// prints alive pieces to the given stream
 		void print_pieces(std::list<piece*>* list, std::ostream& os = std::cout);
 		// draws main game board in the given window
 		void draw(sf::RenderWindow& window);
@@ -96,12 +98,11 @@ namespace checkers
 		void highlight_selected(sf::RenderWindow& window, int x, int y);
 		// higlight selected piece of given coords (green)
 		void highlight_available(sf::RenderWindow& window, int x, int y);
-
 		// evaluate possible moves of the given player, returns true if there is at least on possible capture
 		bool evaluate(std::list<piece*>* list, std::vector<std::vector<piece*>>* board_p, int* counter, base_player* player);
 		// clears available moves list for every piece in pieces list (gets through lists in list)
 		void clear_list(std::list<piece*>* list);
-		// 
+		// clears list of dead pieces printed in multicapture
 		void clear_to_delete_list(std::list<piece*>* del_list, std::list<piece*>* src_list);
 		// deletes given piece from given list
 		void delete_from_list(std::list<piece*>* list, piece* piece_to_delete);
