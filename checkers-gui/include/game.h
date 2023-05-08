@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <map>
+#include <cassert>
 
 #include "include/base_player.h"
 #include "include/player.h"
@@ -86,6 +87,10 @@ namespace checkers
 		void switch_turn(void);
 		// returns main game board
 		std::vector<std::vector<piece*>>* get_board(void);
+		//
+		void populate_board(void);
+		//
+		void populate_board_debug(void);
 		// executes the game
 		void loop(void);
 		// prints result to the given stream
