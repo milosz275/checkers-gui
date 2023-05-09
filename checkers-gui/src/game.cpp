@@ -12,7 +12,7 @@
 
 namespace checkers
 {
-	game::game(int fps, std::istream& is, std::ostream& os) : m_console_game(true), m_is_finished(false), m_fps(fps),
+	game::game(int fps, std::istream& is, std::ostream& os) : m_console_game(false), m_is_finished(false), m_fps(fps),
 		m_window(sf::VideoMode(s_square_size* s_size, s_square_size* s_size), "Checkers", sf::Style::Default, m_settings),
 		m_selected_piece(NULL), m_moving_piece(NULL), m_available_capture(false), m_last_capture_direction(-1), m_is(is), m_os(os),
 		m_tile(), m_clock(), m_event(), m_settings(), m_current_player(NULL)
@@ -614,22 +614,6 @@ namespace checkers
 								for (int j = 0; j < s_size; ++j)
 									if ((*board)[i][j] != NULL)
 										(*copy_of_board)[i][j] = new piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
-							
-							//if (*counter == NULL) // first call of evaluation
-							//{
-							//	for (int i = 0; i < s_size; ++i)
-							//		for (int j = 0; j < s_size; ++j)
-							//			if ((*m_board)[i][j] != NULL)
-							//				(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
-
-							//}
-							//else // the function call is being recursive 
-							//{
-							//	for (int i = 0; i < s_size; ++i)
-							//		for (int j = 0; j < s_size; ++j)
-							//			if ((*board)[i][j] != NULL)
-							//				(*copy_of_board)[i][j] = new piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
-							//}
 
 							// make planned move
 							piece* moving_piece = (*copy_of_board)[x][y];
@@ -685,22 +669,6 @@ namespace checkers
 								for (int j = 0; j < s_size; ++j)
 									if ((*board)[i][j] != NULL)
 										(*copy_of_board)[i][j] = new piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
-							
-							//if (*counter == NULL) // first call of evaluation
-							//{
-							//	for (int i = 0; i < s_size; ++i)
-							//		for (int j = 0; j < s_size; ++j)
-							//			if ((*m_board)[i][j] != NULL)
-							//				(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
-
-							//}
-							//else // the function call is being recursive
-							//{
-							//	for (int i = 0; i < s_size; ++i)
-							//		for (int j = 0; j < s_size; ++j)
-							//			if ((*board)[i][j] != NULL)
-							//				(*copy_of_board)[i][j] = new piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
-							//}
 
 							// make planned move
 							piece* moving_piece = (*copy_of_board)[x][y];
@@ -757,23 +725,6 @@ namespace checkers
 									if ((*board)[i][j] != NULL)
 										(*copy_of_board)[i][j] = new piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
 							
-							//if (*counter == NULL) // first call of evaluation
-
-							//{
-							//	for (int i = 0; i < s_size; ++i)
-							//		for (int j = 0; j < s_size; ++j)
-							//			if ((*m_board)[i][j] != NULL)
-							//				(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
-
-							//}
-							//else // the function call is being recursive 
-							//{
-							//	for (int i = 0; i < s_size; ++i)
-							//		for (int j = 0; j < s_size; ++j)
-							//			if ((*board)[i][j] != NULL)
-							//				(*copy_of_board)[i][j] = new piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
-							//}
-
 							// make planned move
 							piece* moving_piece = (*copy_of_board)[x][y];
 							(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
@@ -829,22 +780,6 @@ namespace checkers
 									if ((*board)[i][j] != NULL)
 										(*copy_of_board)[i][j] = new piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
 							
-							//if (*counter == NULL) // first call of evaluation
-							//{
-							//	for (int i = 0; i < s_size; ++i)
-							//		for (int j = 0; j < s_size; ++j)
-							//			if ((*m_board)[i][j] != NULL)
-							//				(*copy_of_board)[i][j] = new piece((*m_board)[i][j]->get_sign(), (*m_board)[i][j]->get_x(), (*m_board)[i][j]->get_y());
-
-							//}
-							//else // the function call is being recursive
-							//{
-							//	for (int i = 0; i < s_size; ++i)
-							//		for (int j = 0; j < s_size; ++j)
-							//			if ((*board)[i][j] != NULL)
-							//				(*copy_of_board)[i][j] = new piece((*board)[i][j]->get_sign(), (*board)[i][j]->get_x(), (*board)[i][j]->get_y());
-							//}
-
 							// make planned move
 							piece* moving_piece = (*copy_of_board)[x][y];
 							(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = NULL;
