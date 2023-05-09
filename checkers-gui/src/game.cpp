@@ -61,13 +61,15 @@ namespace checkers
 		{
 			auto get_coords = std::bind(&game::get_click_coordinates, this);
 			m_player_1 = new player('W', "Player1", get_coords);
+			m_player_2 = new player('B', "Player2", get_coords);
 		}
 		else
 		{
 			auto get_coords = std::bind(&game::get_coordinates_from_stream, this);
 			m_player_1 = new player('W', "Player1", get_coords);
+			m_player_2 = new player('B', "Player2", get_coords);
 		}
-		m_player_2 = new bot('B', this);
+		//m_player_2 = new bot('B', this);
 
 		// set play order and evaluation direction
 		m_player_1->set_first(true);
