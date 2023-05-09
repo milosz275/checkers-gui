@@ -37,6 +37,8 @@ namespace checkers
 		base_player(char sign, std::string name);
 		// deletes player
 		virtual ~base_player();
+		// loads coordinates
+		virtual std::tuple<int, int> get_coordinates(void) = 0;
 		// returns player's sign
 		char get_sign(void);
 		// returns player nickname
@@ -66,7 +68,7 @@ namespace checkers
 		// decreases pieces count, increases captured pieces count
 		void make_capture(void);
 		// checks if the target piece could change into king and does it, if yes
-		void kings(piece* target, std::vector<std::vector<piece*>>* board);
+		void change_to_king(piece* target, std::vector<std::vector<piece*>>* board);
 		// prints pieces of the player
 		void print_player(void);
 	};

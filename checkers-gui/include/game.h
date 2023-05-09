@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <map>
 #include <cassert>
+#include <tuple>
 
 #include "include/base_player.h"
 #include "include/player.h"
@@ -37,6 +38,8 @@ namespace checkers
 	{
 		// main game board
 		std::vector<std::vector<piece*>>* m_board;
+		//
+		bool m_console_game;
 		// player 1
 		base_player* m_player_1;
 		// player 2
@@ -61,10 +64,16 @@ namespace checkers
 		piece* m_moving_piece;
 		// flag indicating if there is one or more captures, not allowing other moves
 		bool m_available_capture;
+		//
+		int m_last_capture_direction;
 		// frames per second in the game
 		const int m_fps;
 		// fraction of second that is time of one frame
 		float m_frame_duration = 1.0f / m_fps;
+		// default input stream
+		std::istream& m_is = std::cin;
+		// default output stream
+		std::ostream& m_os = std::cout;
 		// SFML object drawing checkerboard
 		sf::RectangleShape m_tile;
 		// SFML clock
@@ -78,7 +87,7 @@ namespace checkers
 
 	public:
 		// create the game of given size and target frames per second
-		game(int fps = 24);
+		game(int fps = 24, std::istream& is = std::cin, std::ostream& os = std::cout);
 		// deletes the game
 		~game();
 		// rotates the vector of vectors board, sets the is rotated flag to opposite
@@ -87,16 +96,24 @@ namespace checkers
 		void switch_turn(void);
 		// returns main game board
 		std::vector<std::vector<piece*>>* get_board(void);
+		// gets move coordinates from the current player
+		std::tuple<int, int> get_coordinates(void);
+		// gets coordinates of click in the window
+		std::tuple<int, int> get_click_coordinates(void);
 		//
-		void populate_board(void);
-		//
+		std::tuple<int, int> get_coordinates_from_stream(void);
+		// populates the board with pieces for each player
+		void populate_board(int rows);
+		// 
 		void populate_board_debug(void);
+		// adds new piece to the specific piece list, board and player at wanted coords
+		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, int x, int y);
 		// executes the game
 		void loop(void);
 		// prints result to the given stream
 		void print_results(std::ostream& os = std::cout);
 		// prints alive pieces to the given stream
-		void print_pieces(std::list<piece*>* list, std::ostream& os = std::cout);
+		void print_pieces(std::list<piece*>* list);
 		// draws main game board in the given window
 		void draw(sf::RenderWindow& window);
 		// highlights selected piece of given coords (brown)
@@ -104,7 +121,7 @@ namespace checkers
 		// higlight selected piece of given coords (green)
 		void highlight_available(sf::RenderWindow& window, int x, int y);
 		// evaluate possible moves of the given player, returns true if there is at least on possible capture
-		bool evaluate(std::list<piece*>* list, std::vector<std::vector<piece*>>* board_p, int* counter, base_player* player);
+		bool evaluate(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, base_player* player);
 		// clears available moves list for every piece in pieces list (gets through lists in list)
 		void clear_list(std::list<piece*>* list);
 		// clears list of dead pieces printed in multicapture

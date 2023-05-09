@@ -38,7 +38,7 @@ namespace checkers
 
 	void base_player::print_player(void) { std::cout << m_name << "; sign: " << m_sign << "; pieces: " << m_pieces << "; captured pieces: " << m_captured_pieces << std::endl; }
 
-	void base_player::kings(piece* target, std::vector<std::vector<piece*>>* board)
+	void base_player::change_to_king(piece* target, std::vector<std::vector<piece*>>* board)
 	{
 		// make sure the list is not set
 		assert(m_piece_list != NULL);
@@ -60,18 +60,6 @@ namespace checkers
 		}
 		if (!is_king)
 			return;
-
-		//// make sure piece is owned by the player
-		//is_king = false;
-		//all_of(m_piece_list->begin(), m_piece_list->end(), [&target, &is_king](piece* p)
-		//	{
-		//		if (p == target)
-		//		{
-		//			is_king = true;
-		//			return false;
-		//		}
-		//	});
-		//assert(is_king); // breaks stuff
 
 		// change the piece to king
 		int x = target->get_x();
