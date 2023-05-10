@@ -38,7 +38,7 @@ namespace checkers
 	{
 		// main game board
 		std::vector<std::vector<piece*>>* m_board;
-		//
+		// indicates if the players should use stream to choose pieces and moves
 		bool m_console_game;
 		// player 1
 		base_player* m_player_1;
@@ -102,11 +102,11 @@ namespace checkers
 		std::tuple<int, int> get_coordinates(void);
 		// gets coordinates of click in the window
 		std::tuple<int, int> get_click_coordinates(void);
-		//
+		// gets coordinates from game's input stream
 		std::tuple<int, int> get_coordinates_from_stream(void);
 		// populates the board with pieces for each player
 		void populate_board(int rows);
-		// 
+		// populates the board for testing purposes
 		void populate_board_debug(void);
 		// adds new piece to the specific piece list, board and player at wanted coords
 		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, int x, int y);

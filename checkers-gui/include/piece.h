@@ -31,7 +31,7 @@ namespace checkers
 	public:
 		// creates the piece of given sign and coordinates
 		piece(char sign, int x, int y, bool is_king = false);
-		//
+		// copies the piece
 		piece(const piece& piece);
 		// deletes the piece
 		virtual ~piece();

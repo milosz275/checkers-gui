@@ -35,7 +35,7 @@ namespace checkers
 	public:
 		// creates the player of a given sign and name
 		base_player(char sign, std::string name);
-		//
+		// copies the player
 		base_player(const base_player& player);
 		// deletes player
 		virtual ~base_player();
