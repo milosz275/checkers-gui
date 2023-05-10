@@ -3,6 +3,7 @@
 
 #include "include/base_player.h"
 #include "include/game.h"
+#include <cassert>
 
 namespace checkers
 {
@@ -18,6 +19,8 @@ namespace checkers
 		int m_x;
 		// y coordinate of planned move
 		int m_y;
+		// anti-loop field reseting, when a piece is selected
+		int m_counter;
 	public:
 		//
 		bot(char sign, game* game);

@@ -70,7 +70,7 @@ namespace checkers
 		// checks if the target piece could change into king and does it, if yes
 		void change_to_king(piece* target, std::vector<std::vector<piece*>>* board);
 		// prints pieces of the player
-		void print_player(void);
+		void print_player(std::ostream& os = std::cout);
 	};
 }
 

@@ -2,20 +2,35 @@
 
 namespace checkers
 {
-	bot::bot(char sign, game* game) : base_player(sign, "Bot") { m_game = game; m_considered_moves_ahead = 3; m_x = -1; m_y = -1; }
+	bot::bot(char sign, game* game) : base_player(sign, "Bot") { m_game = game; m_considered_moves_ahead = 3; m_x = -1; m_y = -1; m_counter = 0; }
 
 	bot::~bot() {}
 
 	std::tuple<int, int> bot::get_coordinates(void)
 	{
-		// best move evaluation
+		assert(m_game->m_current_player == this);
+		++m_counter;
+		if (m_counter > 3)
+			throw std::runtime_error("Bot is stuck in a loop");
 
-		if (m_x == -1)
+		if (m_game->m_selected_piece == NULL) // bot has not selected any piece yet
 		{
-			m_x = 0;
-			return std::make_tuple<int, int>(2, 7);
+			// best move evaluation
+			// for each piece and its move copy the board and lists and evaluate saving iterations and score after
+			// find one piece that corresponds to the best move and save capture coords in m_x, m_y
+
 		}
-		else
-			return std::make_tuple<int, int>(1, 8);
+		else // bot selected the piece and makes planned move
+		{
+			// reset the counter
+			m_counter = 0;
+#ifdef _DEBUG
+			m_game->m_os << "Bot is making planned move" << std::endl;
+#endif
+			return std::make_tuple(m_x, m_y); 
+		}
+
+
+		return std::make_tuple(1, 8);
 	}
 }

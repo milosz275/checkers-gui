@@ -4,7 +4,11 @@
 
 namespace checkers
 {
-	base_player::base_player(char sign, std::string name) : m_sign(sign), m_name(name), m_pieces(0), m_captured_pieces(0), m_combo(false), m_next_player(NULL), m_piece_list(NULL), m_is_first(false) {}
+	base_player::base_player(char sign, std::string name) : m_name(name), m_pieces(0), m_captured_pieces(0), m_combo(false), m_next_player(NULL), m_piece_list(NULL), m_is_first(false)
+	{
+		assert(std::isalpha(sign));
+		m_sign = std::toupper(sign);
+	}
 
 	base_player::~base_player() {}
 
@@ -36,7 +40,7 @@ namespace checkers
 
 	void base_player::make_capture(void) { assert(m_pieces > 0); m_pieces--; m_captured_pieces++; }
 
-	void base_player::print_player(void) { std::cout << m_name << "; sign: " << m_sign << "; pieces: " << m_pieces << "; captured pieces: " << m_captured_pieces << std::endl; }
+	void base_player::print_player(std::ostream& os) { os << m_name << "; sign: " << m_sign << "; pieces: " << m_pieces << "; captured pieces: " << m_captured_pieces << std::endl; }
 
 	void base_player::change_to_king(piece* target, std::vector<std::vector<piece*>>* board)
 	{

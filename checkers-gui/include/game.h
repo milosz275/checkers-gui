@@ -88,6 +88,8 @@ namespace checkers
 	public:
 		// create the game of given size and target frames per second
 		game(int fps = 24, std::istream& is = std::cin, std::ostream& os = std::cout);
+		//
+		game(const game& game_copy);
 		// deletes the game
 		~game();
 		// rotates the vector of vectors board, sets the is rotated flag to opposite
@@ -111,7 +113,7 @@ namespace checkers
 		// executes the game
 		void loop(void);
 		// prints result to the given stream
-		void print_results(std::ostream& os = std::cout);
+		void print_results(std::ostream& os);
 		// prints alive pieces to the given stream
 		void print_pieces(std::list<piece*>* list);
 		// draws main game board in the given window
@@ -130,6 +132,7 @@ namespace checkers
 		void delete_from_list(std::list<piece*>* list, piece* piece_to_delete);
 
 		friend std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);
+		friend class bot;
 	};
 	// returns board to the stream
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);

@@ -1,6 +1,6 @@
 #include "include/game.h"
 // The game is based on: https://en.wikipedia.org/wiki/International_draughts
-// project uses snake_case name convenction, however SFML is the exception as an external library
+// project uses snake_case name convention, however SFML is the exception as an external library
 
 int main(int argc, char* argv[])
 {
@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 	}
 	catch (std::exception& e)
 	{
-		std::cout << e.what() << std::endl;
+		std::cerr << e.what() << std::endl;
 	}
 	return 0;
 }

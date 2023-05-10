@@ -109,6 +109,72 @@ namespace checkers
 		m_window.clear();
 	}
 
+	game::game(const game& game) : m_fps(game.m_fps)
+	{
+		// copy the board
+		m_board = new std::vector<std::vector<piece*>>;
+		std::transform(game.m_board->begin(), game.m_board->end(), std::back_inserter(*m_board), [](const std::vector<piece*>& row)
+			{
+				std::vector<piece*> new_row;
+				std::transform(row.begin(), row.end(), std::back_inserter(new_row), [](piece* p)
+					{
+						return p ? new piece(*p) : nullptr;
+					});
+				return new_row;
+			});
+
+		// copy player 1
+		if (dynamic_cast<player*>(game.m_player_1))
+			m_player_1 = new player(*dynamic_cast<player*>(game.m_player_1));
+		else if (dynamic_cast<bot*>(game.m_player_1))
+			m_player_1 = new bot(*dynamic_cast<bot*>(game.m_player_1));
+		else
+			m_player_1 = nullptr;
+
+		// copy player 2
+		if (dynamic_cast<player*>(game.m_player_2))
+			m_player_2 = new player(*dynamic_cast<player*>(game.m_player_2));
+		else if (dynamic_cast<bot*>(game.m_player_2))
+			m_player_2 = new bot(*dynamic_cast<bot*>(game.m_player_2));
+		else
+			m_player_2 = nullptr;
+
+		// recreate the piece lists
+		for_each(m_board->begin(), m_board->end(), [this](const std::vector<piece*>& row)
+			{
+				for_each(row.begin(), row.end(), [this](piece* p)
+					{
+						if (p->get_sign() == m_player_1->get_sign())
+							m_p_list_1.push_back(p);
+						else
+							m_p_list_2.push_back(p);
+					});
+			});
+		m_player_1->set_list(&m_p_list_1);
+		m_player_2->set_list(&m_p_list_2);
+
+		// copy the rest
+		m_console_game = game.m_console_game;
+		m_current_player = game.m_current_player == game.m_player_1 ? m_player_1 : m_player_2;
+		m_to_delete_list = game.m_to_delete_list;
+		m_is_finished = game.m_is_finished;
+		m_first_won = game.m_first_won;
+		m_second_won = game.m_second_won;
+		m_selected_piece = game.m_selected_piece ? new piece(*game.m_selected_piece) : nullptr;
+		m_moving_piece = game.m_moving_piece ? new piece(*game.m_moving_piece) : nullptr;
+		m_available_capture = game.m_available_capture;
+		m_last_capture_direction = game.m_last_capture_direction;
+		m_frame_duration = game.m_frame_duration;
+		/*m_is = game.m_is;
+		m_os = game.m_os;
+		m_tile = game.m_tile;
+		m_clock = game.m_clock;
+		m_settings = game.m_settings;
+		m_window = game.m_window;
+		m_event = game.m_event;*/
+	}
+
+
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board)
 	{
 		os << "\t  ";
@@ -166,31 +232,30 @@ namespace checkers
 	{
 		assert(m_board->size() == s_size);
 
-		// todo: change to algorithm
 		// rows of the second player (upper)
-		int j = 1;
-		for (int i = 0; i < 8; ++i)
-		{
-			if ((i + j) % 2 != 0)
-				add_new_piece(&m_p_list_2, m_board, m_player_2, j, i);
-			++j;
-			if (j >= 3)
-				j = 1;
-		}
-		// rows of the first player (lower)
-		j = 9;
-		for (int i = s_size - 1; i >= s_size - 8; --i)
-		{
-			if ((i + j) % 2 != 0)
-				add_new_piece(&m_p_list_1, m_board, m_player_1, j, i);
-			--j;
-			if (j >= 6)
-				j = 9;
-		}
+		add_new_piece(&m_p_list_2, m_board, m_player_2, 1, 8);
 
-		add_new_piece(&m_p_list_1, m_board, m_player_1, 7, 8);
-		add_new_piece(&m_p_list_1, m_board, m_player_1, 8, 7);
-		add_new_piece(&m_p_list_1, m_board, m_player_1, 6, 9);
+		//// rows of the first player (lower)
+		//j = 9;
+		//for (int i = s_size - 1; i >= s_size - 8; --i)
+		//{
+		//	if ((i + j) % 2 != 0)
+		//		add_new_piece(&m_p_list_1, m_board, m_player_1, j, i);
+		//	--j;
+		//	if (j >= 6)
+		//		j = 9;
+		//}
+
+		//add_new_piece(&m_p_list_1, m_board, m_player_1, 7, 8);
+		//add_new_piece(&m_p_list_1, m_board, m_player_1, 8, 7);
+		//add_new_piece(&m_p_list_1, m_board, m_player_1, 6, 9);
+		add_new_piece(&m_p_list_1, m_board, m_player_1, 1, 2);
+
+		add_new_piece(&m_p_list_1, m_board, m_player_1, 5, 6);
+		add_new_piece(&m_p_list_1, m_board, m_player_1, 5, 4);
+		add_new_piece(&m_p_list_1, m_board, m_player_1, 5, 2);
+		add_new_piece(&m_p_list_1, m_board, m_player_1, 7, 2);
+		add_new_piece(&m_p_list_1, m_board, m_player_1, 7, 4);
 	}
 
 	void game::add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, int x, int y)
@@ -341,16 +406,34 @@ namespace checkers
 
 								// save capture direction: 0 - top right, 1 - top left, 2 - bottom right, 3 - bottom left
 								if (x_d > x && y_d < y)
-									m_last_capture_direction = 0;
-								else if (x_d < x && y_d < y)
-									m_last_capture_direction = 1;
-								else if (x_d > x && y_d > y)
-									m_last_capture_direction = 2;
-								else if (x_d < x && y_d > y)
 									m_last_capture_direction = 3;
+								else if (x_d < x && y_d < y)
+									m_last_capture_direction = 2;
+								else if (x_d > x && y_d > y)
+									m_last_capture_direction = 1;
+								else if (x_d < x && y_d > y)
+									m_last_capture_direction = 0;
 								else
 									throw std::runtime_error("Capturing in wrong direction");
 #ifdef _DEBUG
+								m_os << "/ saved last capture direction: ";
+								switch (m_last_capture_direction)
+								{
+								case 0:
+									m_os << "top right";
+									break;
+								case 1:
+									m_os << "top left";
+									break;
+								case 2:
+									m_os << "bottom right";
+									break;
+								case 3:
+									m_os << "bottom left";
+									break;
+								}
+								m_os << std::endl;
+
 								std::cout << "CONTROL" << std::endl;
 								std::cout << "Coords to delete" << x_d << " " << y_d << std::endl;
 #endif
@@ -547,7 +630,7 @@ namespace checkers
 				sf::sleep(sf::seconds(m_frame_duration - elapsed_time.asSeconds()));
 			m_window.display();
 		}
-		print_results();
+		print_results(m_os);
 	}
 
 	bool game::evaluate(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, base_player* player)
@@ -629,7 +712,6 @@ namespace checkers
 #ifdef _DEBUG
 							std::cout << copy_of_board << std::endl;
 #endif
-
 							//evaluate recursively - separate in every direction - call tree
 							if (*counter == NULL)
 							{
@@ -637,11 +719,9 @@ namespace checkers
 								std::cout << "---------------------------------------------------------------" << std::endl;
 								std::cout << "counter null" << std::endl;
 #endif
-
 								int moves = 1;
 								evaluate(&copy_of_list, copy_of_board, &moves, player);
 								capture_counter[0] = moves;
-
 #ifdef _DEBUG
 								std::cout << "moves counter (top right): " << moves << std::endl;
 #endif
@@ -652,7 +732,6 @@ namespace checkers
 								std::cout << "---------------------------------------------------------------" << std::endl;
 								std::cout << "counter not null" << std::endl;
 #endif
-
 								(*counter)++;
 								evaluate(&copy_of_list, copy_of_board, counter, player);
 							}
@@ -974,6 +1053,16 @@ namespace checkers
 							throw std::runtime_error("Wrong direction");
 						}
 					}
+#ifdef _DEBUG
+					if (!possible_top_right)
+						m_os << "/ top right capture won't be available" << std::endl;
+					if (!possible_top_left)
+						m_os << "/ top left capture won't be available" << std::endl;
+					if (!possible_bottom_right)
+						m_os << "/ bottom right capture won't be available" << std::endl;
+					if (!possible_bottom_left)
+						m_os << "/ bottom left capture won't be available" << std::endl;
+#endif
 
 					// vector, where true indicates a piece to be captured on specific place, it can be captured going into a few separate locations
 					std::vector<bool> possible_capture_top_right;
@@ -999,6 +1088,23 @@ namespace checkers
 					std::vector<available_capture> local_captures_bottom_right;
 					std::vector<available_capture> local_captures_bottom_left;
 
+					// make temporary board with dead pieces
+					//std::vector<std::vector<piece*>>* dead_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, 0));
+					std::vector<std::vector<piece*>> dead_board(s_size, std::vector<piece*>(s_size, NULL));
+					for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [&dead_board, this](piece* p)
+						{
+							int x = p->get_x();
+							int y = p->get_y();
+							if (dead_board[x][y] == NULL)
+								dead_board[x][y] = new piece(p->get_sign(), x, y, p->is_king());
+							else
+								throw std::runtime_error("Copying to delete list: wrong piece data");
+						});
+#ifdef _DEBUG
+					m_os << "Dead board:" << std::endl;
+					m_os << &dead_board << std::endl;
+#endif
+
 					// capture top right (0) + -
 #ifdef _DEBUG
 					std::cout << "top right checking" << std::endl;
@@ -1018,12 +1124,21 @@ namespace checkers
 							possible_capture_top_right.push_back(false);
 							break;
 						}
+						// searching for dead piece (cannot jump across them)
+						else if (dead_board[x + i][y - i] != NULL && dead_board[x + i][y - i]->get_sign() == player->get_next_player()->get_sign())
+						{
+#ifdef _DEBUG
+							std::cout << "*found dead piece and breaking" << std::endl;
+#endif
+							possible_capture_top_right.push_back(false);
+							break;
+						}
 						else if ((*board)[x + i][y - i] != NULL && (*board)[x + i][y - i]->get_sign() == player->get_next_player()->get_sign())
 						{
 #ifdef _DEBUG
 							std::cout << "*found opponent's piece and checking for next fields" << std::endl;
 #endif
-							if ((*board)[x + i + 1][y - i - 1] == NULL)
+							if ((*board)[x + i + 1][y - i - 1] == NULL && dead_board[x + i + 1][y - i - 1] == NULL)
 							{
 #ifdef _DEBUG
 								std::cout << "*found opponent's piece that can be captured, searching for next" << std::endl;
@@ -1033,7 +1148,7 @@ namespace checkers
 
 								// adding all possible capture options
 								int j = 0;
-								while (x + i + 1 + j <= s_size - 1 && y - i - 1 - j >= 0 && (*board)[x + i + 1 + j][y - i - 1 - j] == NULL)
+								while (x + i + 1 + j <= s_size - 1 && y - i - 1 - j >= 0 && (*board)[x + i + 1 + j][y - i - 1 - j] == NULL && dead_board[x + i + 1 + j][y - i - 1 - j] == NULL)
 								{
 #ifdef _DEBUG
 									std::cout << "\%piece at x: " << x << ", y: " << y << " can capture on coords: x: " << x + i + 1 + j << ", y: " << y - i - 1 - j << std::endl;
@@ -1108,12 +1223,21 @@ namespace checkers
 							possible_capture_top_left.push_back(false);
 							break;
 						}
+						// searching for dead piece (cannot jump across them)
+						else if (dead_board[x - i][y - i] != NULL && dead_board[x - i][y - i]->get_sign() == player->get_next_player()->get_sign())
+						{
+#ifdef _DEBUG
+							std::cout << "*found dead piece and breaking" << std::endl;
+#endif
+							possible_capture_top_right.push_back(false);
+							break;
+						}
 						else if ((*board)[x - i][y - i] != NULL && (*board)[x - i][y - i]->get_sign() == player->get_next_player()->get_sign())
 						{
 #ifdef _DEBUG
 							std::cout << "*found opponent's piece and checking for next fields" << std::endl;
 #endif
-							if ((*board)[x - i - 1][y - i - 1] == NULL)
+							if ((*board)[x - i - 1][y - i - 1] == NULL && dead_board[x - i - 1][y - i - 1] == NULL)
 							{
 #ifdef _DEBUG
 								std::cout << "*found opponent's piece that can be captured, searching for next" << std::endl;
@@ -1123,7 +1247,7 @@ namespace checkers
 
 								// adding all possible capture options
 								int j = 0;
-								while (x - i - 1 - j >= 0 && y - i - 1 - j >= 0 && (*board)[x - i - 1 - j][y - i - 1 - j] == NULL)
+								while (x - i - 1 - j >= 0 && y - i - 1 - j >= 0 && (*board)[x - i - 1 - j][y - i - 1 - j] == NULL && dead_board[x - i - 1 - j][y - i - 1 - j] == NULL)
 								{
 #ifdef _DEBUG
 									std::cout << "\%piece at x: " << x << ", y: " << y << " can capture on coords: x: " << x - i - 1 - j << ", y: " << y - i - 1 - j << std::endl;
@@ -1198,12 +1322,21 @@ namespace checkers
 							possible_capture_bottom_right.push_back(false);
 							break;
 						}
+						// searching for dead piece (cannot jump across them)
+						else if (dead_board[x + i][y + i] != NULL && dead_board[x + i][y + i]->get_sign() == player->get_next_player()->get_sign())
+						{
+#ifdef _DEBUG
+							std::cout << "*found dead piece and breaking" << std::endl;
+#endif
+							possible_capture_top_right.push_back(false);
+							break;
+						}
 						else if ((*board)[x + i][y + i] != NULL && (*board)[x + i][y + i]->get_sign() == player->get_next_player()->get_sign())
 						{
 #ifdef _DEBUG
 							std::cout << "*found opponent's piece and checking for next fields" << std::endl;
 #endif
-							if ((*board)[x + i + 1][y + i + 1] == NULL)
+							if ((*board)[x + i + 1][y + i + 1] == NULL && dead_board[x + i + 1][y + i + 1] == NULL)
 							{
 #ifdef _DEBUG
 								std::cout << "*found opponent's piece that can be captured, searching for next" << std::endl;
@@ -1213,7 +1346,7 @@ namespace checkers
 
 								// adding all possible capture options
 								int j = 0;
-								while (x + i + 1 + j <= s_size - 1 && y + i + 1 + j <= s_size - 1 && (*board)[x + i + 1 + j][y + i + 1 + j] == NULL)
+								while (x + i + 1 + j <= s_size - 1 && y + i + 1 + j <= s_size - 1 && (*board)[x + i + 1 + j][y + i + 1 + j] == NULL && dead_board[x + i + 1 + j][y + i + 1 + j] == NULL)
 								{
 #ifdef _DEBUG
 									std::cout << "\%piece at x: " << x << ", y: " << y << " can capture on coords: x: " << x + i + 1 + j << ", y: " << y + i + 1 + j << std::endl;
@@ -1288,12 +1421,21 @@ namespace checkers
 							possible_capture_bottom_left.push_back(false);
 							break;
 						}
+						// searching for dead piece (cannot jump across them)
+						else if (dead_board[x - i][y + i] != NULL && dead_board[x - i][y + i]->get_sign() == player->get_next_player()->get_sign())
+						{
+#ifdef _DEBUG
+							std::cout << "*found dead piece and breaking" << std::endl;
+#endif
+							possible_capture_top_right.push_back(false);
+							break;
+						}
 						else if ((*board)[x - i][y + i] != NULL && (*board)[x - i][y + i]->get_sign() == player->get_next_player()->get_sign())
 						{
 #ifdef _DEBUG
 							std::cout << "*found opponent's piece and checking for next fields" << std::endl;
 #endif
-							if ((*board)[x - i - 1][y + i + 1] == NULL)
+							if ((*board)[x - i - 1][y + i + 1] == NULL && dead_board[x - i - 1][y + i + 1] == NULL)
 							{
 #ifdef _DEBUG
 								std::cout << "*found opponent's piece that can be captured, searching for next" << std::endl;
@@ -1303,7 +1445,7 @@ namespace checkers
 
 								// adding all possible capture options
 								int j = 0;
-								while (x - i - 1 - j >= 0 && y + i + 1 + j <= s_size - 1 && (*board)[x - i - 1 - j][y + i + 1 + j] == NULL)
+								while (x - i - 1 - j >= 0 && y + i + 1 + j <= s_size - 1 && (*board)[x - i - 1 - j][y + i + 1 + j] == NULL && dead_board[x - i - 1 - j][y + i + 1 + j] == NULL)
 								{
 #ifdef _DEBUG
 									std::cout << "\%piece at x: " << x << ", y: " << y << " can capture on coords: x: " << x - i - 1 - j << ", y: " << y + i + 1 + j << std::endl;
