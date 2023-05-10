@@ -9,6 +9,7 @@
 // add setting rows and check if set correctly
 // switch to polymorphism completely (get rid of is_king flag)
 // consider current moving piece to eliminate situation where two pieces have possible captures
+// move some methods into private
 
 namespace checkers
 {
@@ -61,15 +62,15 @@ namespace checkers
 		{
 			auto get_coords = std::bind(&game::get_click_coordinates, this);
 			m_player_1 = new player('W', "Player1", get_coords);
-			m_player_2 = new player('B', "Player2", get_coords);
+			//m_player_2 = new player('B', "Player2", get_coords);
 		}
 		else
 		{
 			auto get_coords = std::bind(&game::get_coordinates_from_stream, this);
 			m_player_1 = new player('W', "Player1", get_coords);
-			m_player_2 = new player('B', "Player2", get_coords);
+			//m_player_2 = new player('B', "Player2", get_coords);
 		}
-		//m_player_2 = new bot('B', this);
+		m_player_2 = new bot('B', this);
 
 		// set play order and evaluation direction
 		m_player_1->set_first(true);
@@ -111,25 +112,13 @@ namespace checkers
 
 	game::game(const game& game) : m_fps(game.m_fps)
 	{
-		// copy the board
-		m_board = new std::vector<std::vector<piece*>>;
-		std::transform(game.m_board->begin(), game.m_board->end(), std::back_inserter(*m_board), [](const std::vector<piece*>& row)
-			{
-				std::vector<piece*> new_row;
-				std::transform(row.begin(), row.end(), std::back_inserter(new_row), [](piece* p)
-					{
-						return p ? new piece(*p) : nullptr;
-					});
-				return new_row;
-			});
-
 		// copy player 1
 		if (dynamic_cast<player*>(game.m_player_1))
 			m_player_1 = new player(*dynamic_cast<player*>(game.m_player_1));
 		else if (dynamic_cast<bot*>(game.m_player_1))
 			m_player_1 = new bot(*dynamic_cast<bot*>(game.m_player_1));
 		else
-			m_player_1 = nullptr;
+			m_player_1 = NULL;
 
 		// copy player 2
 		if (dynamic_cast<player*>(game.m_player_2))
@@ -137,31 +126,62 @@ namespace checkers
 		else if (dynamic_cast<bot*>(game.m_player_2))
 			m_player_2 = new bot(*dynamic_cast<bot*>(game.m_player_2));
 		else
-			m_player_2 = nullptr;
+			m_player_2 = NULL;
 
-		// recreate the piece lists
-		for_each(m_board->begin(), m_board->end(), [this](const std::vector<piece*>& row)
+		assert(m_player_1 != NULL);
+		assert(m_player_2 != NULL);
+
+		// copy the board and recreate the lists
+		m_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, NULL));
+		std::vector<std::vector<piece*>>* original_board = game.m_board;
+		for (int i = 0; i < s_size; ++i)
+			for (int j = 0; j < s_size; ++j)
 			{
-				for_each(row.begin(), row.end(), [this](piece* p)
-					{
-						if (p->get_sign() == m_player_1->get_sign())
-							m_p_list_1.push_back(p);
-						else
-							m_p_list_2.push_back(p);
-					});
-			});
+				if ((*original_board)[i][j] != NULL)
+				{
+					piece* p = (*original_board)[i][j];
+					std::cout << "well" << std::endl;
+					if (p->get_sign() == game.m_player_1->get_sign())
+						add_new_piece(&m_p_list_1, m_board, m_player_1, i, j);
+					else if (p->get_sign() == game.m_player_2->get_sign())
+						add_new_piece(&m_p_list_2, m_board, m_player_2, i, j);
+					else
+						throw std::runtime_error("Copying the board: player signs not matching");
+				}
+			}
+#ifdef _DEBUG
+		std::cout << "Board after copying: " << std::endl;
+		std::cout << m_board << std::endl;
+
+		std::cout << "List of pieces of first player" << std::endl;
+		print_pieces(&m_p_list_1);
+
+		std::cout << "List of pieces of second player" << std::endl;
+		print_pieces(&m_p_list_2);
+#endif
+
 		m_player_1->set_list(&m_p_list_1);
 		m_player_2->set_list(&m_p_list_2);
 
+		// recreate to delete list
+		// ...
+
+
+
+		std::cout << "test 5" << std::endl;
 		// copy the rest
 		m_console_game = game.m_console_game;
 		m_current_player = game.m_current_player == game.m_player_1 ? m_player_1 : m_player_2;
-		m_to_delete_list = game.m_to_delete_list;
+		
+		m_selected_piece = NULL;
+
 		m_is_finished = game.m_is_finished;
 		m_first_won = game.m_first_won;
 		m_second_won = game.m_second_won;
-		m_selected_piece = game.m_selected_piece ? new piece(*game.m_selected_piece) : nullptr;
-		m_moving_piece = game.m_moving_piece ? new piece(*game.m_moving_piece) : nullptr;
+		
+		//m_selected_piece = game.m_selected_piece ? new piece(*game.m_selected_piece) : nullptr;
+		//m_moving_piece = game.m_moving_piece ? new piece(*game.m_moving_piece) : nullptr;
+
 		m_available_capture = game.m_available_capture;
 		m_last_capture_direction = game.m_last_capture_direction;
 		m_frame_duration = game.m_frame_duration;
@@ -172,6 +192,7 @@ namespace checkers
 		m_settings = game.m_settings;
 		m_window = game.m_window;
 		m_event = game.m_event;*/
+		std::cout << "test 6" << std::endl;
 	}
 
 
@@ -235,16 +256,16 @@ namespace checkers
 		// rows of the second player (upper)
 		add_new_piece(&m_p_list_2, m_board, m_player_2, 1, 8);
 
-		//// rows of the first player (lower)
-		//j = 9;
-		//for (int i = s_size - 1; i >= s_size - 8; --i)
-		//{
-		//	if ((i + j) % 2 != 0)
-		//		add_new_piece(&m_p_list_1, m_board, m_player_1, j, i);
-		//	--j;
-		//	if (j >= 6)
-		//		j = 9;
-		//}
+		// rows of the first player (lower)
+		int j = 9;
+		for (int i = s_size - 1; i >= s_size - 8; --i)
+		{
+			if ((i + j) % 2 != 0)
+				add_new_piece(&m_p_list_1, m_board, m_player_1, j, i);
+			--j;
+			if (j >= 6)
+				j = 9;
+		}
 
 		//add_new_piece(&m_p_list_1, m_board, m_player_1, 7, 8);
 		//add_new_piece(&m_p_list_1, m_board, m_player_1, 8, 7);

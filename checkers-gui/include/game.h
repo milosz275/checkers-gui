@@ -89,7 +89,7 @@ namespace checkers
 		// create the game of given size and target frames per second
 		game(int fps = 24, std::istream& is = std::cin, std::ostream& os = std::cout);
 		//
-		game(const game& game_copy);
+		game(const game& game);
 		// deletes the game
 		~game();
 		// rotates the vector of vectors board, sets the is rotated flag to opposite

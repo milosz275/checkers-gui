@@ -10,6 +10,8 @@ namespace checkers
 		m_sign = std::toupper(sign);
 	}
 
+	base_player::base_player(const base_player& player) : m_sign(player.m_sign), m_name(player.m_name), m_pieces(player.m_pieces), m_captured_pieces(player.m_combo), m_combo(player.m_combo), m_next_player(NULL), m_piece_list(NULL), m_is_first(player.m_is_first) {}
+
 	base_player::~base_player() {}
 
 	char base_player::get_sign(void) { return m_sign; }

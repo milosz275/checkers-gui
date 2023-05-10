@@ -14,6 +14,8 @@ namespace checkers
 	public:
 		// creates the player of given sign and name
 		player(char sign, std::string name, std::function<std::tuple<int, int>()> get_coords);
+		//
+		player(const player& player);
 		// deletes the player
 		~player();
 		//

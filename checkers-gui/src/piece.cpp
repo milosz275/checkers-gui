@@ -23,6 +23,8 @@ namespace checkers
         }
     }
 
+    piece::piece(const piece& piece) : m_sign(piece.m_sign), m_x(piece.m_x), m_y(piece.m_y), m_is_king(piece.m_is_king), m_av_list(new std::list<available_move*>), m_shape(s_radius) {}
+
     piece::~piece() {}
 
     int piece::get_x(void) { return m_x; }
@@ -35,7 +37,7 @@ namespace checkers
 
     char piece::get_sign(void) { return m_sign; }
 
-    bool piece::is_king(void) { return m_is_king; }
+    bool piece::is_king(void) { return m_is_king; } // change to dynamic cast
 
     std::list<available_move*>* piece::get_av_list(void) { return m_av_list; }
 

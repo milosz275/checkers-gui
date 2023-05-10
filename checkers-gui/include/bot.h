@@ -11,9 +11,9 @@ namespace checkers
 
 	class bot : public base_player
 	{
-		//
+		// level of bot's "intelligence"
 		int m_considered_moves_ahead;
-		//
+		// pointer to the game
 		game* m_game;
 		// x coordinate of planned move
 		int m_x;
@@ -25,9 +25,13 @@ namespace checkers
 		//
 		bot(char sign, game* game);
 		//
+		bot(const bot& bot);
+		//
 		~bot();
 		//
 		std::tuple<int, int> get_coordinates(void);
+		//
+		int minimax(game* game, int depth, int alpha, int beta, int is_maximizing);
 	};
 }
 

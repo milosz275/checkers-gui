@@ -9,9 +9,9 @@ namespace checkers
 	{
 
 	public:
-		//
+		// creates the king
 		king(char sign, int x, int y);
-		//
+		// deletes the king
 		~king();
 	};
 }
