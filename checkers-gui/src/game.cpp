@@ -10,6 +10,7 @@
 // switch to polymorphism completely (get rid of is_king flag)
 // consider current moving piece to eliminate situation where two pieces have possible captures
 // move some methods into private
+// save highest evaluation of capture in current move
 
 namespace checkers
 {
