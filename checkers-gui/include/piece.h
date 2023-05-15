@@ -22,15 +22,15 @@ namespace checkers
 		int m_y;
 		// sign corresponding to piece's owner
 		char m_sign;
-		// flag indicating if the piece is the king: change to another class?
-		bool m_is_king;
 		// list containing all evaluated possible moves for the piece
 		std::list<available_move*>* m_av_list;
 		// object that is printed in the window
 		sf::CircleShape m_shape;
+		// pointer to the piece's owner
+		base_player* m_owner;
 	public:
 		// creates the piece of given sign and coordinates
-		piece(char sign, int x, int y, bool is_king = false);
+		piece(char sign, int x, int y, base_player* owner);
 		// copies the piece
 		piece(const piece& piece);
 		// deletes the piece
@@ -45,8 +45,10 @@ namespace checkers
 		int set_y(int y);
 		// returns sign of the piece
 		char get_sign(void);
-		// returns if the piece is king (todo: remove)
-		bool is_king(void);
+		// returns the piece's owner
+		base_player* get_owner(void);
+		// sets and returns the piece's owner
+		base_player* set_owner(base_player* owner);
 		// lets to print the piece in given stream
 		friend std::ostream& operator<<(std::ostream& os, const piece* piece);
 		// returns the list of all evaluated moves

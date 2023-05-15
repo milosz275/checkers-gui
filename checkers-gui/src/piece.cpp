@@ -2,8 +2,16 @@
 
 namespace checkers
 {
-    piece::piece(char sign, int x, int y, bool is_king) : m_sign(sign), m_x(x), m_y(y), m_is_king(is_king), m_av_list(new std::list<available_move*>), m_shape(s_radius)
+    class king;
+    piece::piece(char sign, int x, int y, base_player* owner) : m_sign(sign), m_x(x), m_y(y), m_owner(owner), m_av_list(new std::list<available_move*>), m_shape(s_radius)
     {
+        assert(m_owner); // owner cannot be empty
+
+        //if (!(dynamic_cast<king*>(this)))
+        //    assert(m_sign != std::tolower(m_sign)); // sign cannot be lowercase when normal piece
+        //else
+        //    assert(m_sign == std::tolower(m_sign)); // sign has to be lowercase when king
+
         switch (m_sign)
         {
         case 'W':
@@ -23,7 +31,7 @@ namespace checkers
         }
     }
 
-    piece::piece(const piece& piece) : m_sign(piece.m_sign), m_x(piece.m_x), m_y(piece.m_y), m_is_king(piece.m_is_king), m_av_list(new std::list<available_move*>), m_shape(s_radius) {}
+    piece::piece(const piece& piece) : m_sign(piece.m_sign), m_x(piece.m_x), m_y(piece.m_y), m_owner(nullptr), m_av_list(new std::list<available_move*>), m_shape(s_radius) {}
 
     piece::~piece() {}
 
@@ -37,7 +45,9 @@ namespace checkers
 
     char piece::get_sign(void) { return m_sign; }
 
-    bool piece::is_king(void) { return m_is_king; } // change to dynamic cast
+    base_player* piece::get_owner(void) { return m_owner; }
+
+    base_player* piece::set_owner(base_player* owner) { assert(!m_owner); return m_owner = owner; }
 
     std::list<available_move*>* piece::get_av_list(void) { return m_av_list; }
 

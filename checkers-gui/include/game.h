@@ -88,12 +88,25 @@ namespace checkers
 	public:
 		// create the game of given size and target frames per second
 		game(int fps = 24, std::istream& is = std::cin, std::ostream& os = std::cout);
-		//
+		// copies the game (without GUI)
 		game(const game& game);
 		// deletes the game
 		~game();
-		// rotates the vector of vectors board, sets the is rotated flag to opposite
-		//void rotate_board(void);
+
+		// todo
+		void handle_events(void);
+		//
+		void draw_board(void);
+		//
+		void select_piece(void);
+		//
+		void check_game_completion(void);
+		//
+		void make_move(void);
+		//
+		void make_capture(void);
+
+
 		// switches first_turn flag, indicating that it is move of the first player
 		void switch_turn(void);
 		// returns main game board
@@ -110,6 +123,8 @@ namespace checkers
 		void populate_board_debug(void);
 		// adds new piece to the specific piece list, board and player at wanted coords
 		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, int x, int y);
+		// adds new piece to the specific piece list, board and player based on given piece from other board
+		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, piece* based_on);
 		// executes the game
 		void loop(void);
 		// prints result to the given stream

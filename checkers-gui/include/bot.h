@@ -12,18 +12,20 @@ namespace checkers
 	class bot : public base_player
 	{
 		// level of bot's "intelligence"
-		int m_considered_moves_ahead;
+		int m_depth;
 		// pointer to the game
-		game* m_game;
+		const game* m_game;
 		// x coordinate of planned move
 		int m_x;
 		// y coordinate of planned move
 		int m_y;
 		// anti-loop field reseting, when a piece is selected
-		int m_counter;
+		int m_counter_select;
+		// anti-loop field reseting, when a piece is moved
+		int m_counter_move;
 	public:
 		//
-		bot(char sign, game* game);
+		bot(char sign, const game* game);
 		//
 		bot(const bot& bot);
 		//

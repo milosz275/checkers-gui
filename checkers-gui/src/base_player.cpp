@@ -52,6 +52,8 @@ namespace checkers
 		// make sure the list is not empty
 		assert(!m_piece_list->empty());
 
+		// add asertion if this is not the current player and if has no captures
+
 		// check if any new kings are made
 		bool is_king = false;
 		if (is_first())
@@ -64,6 +66,7 @@ namespace checkers
 			if (target->get_y() == s_size - 1)
 				is_king = true;
 		}
+
 		if (!is_king)
 			return;
 
@@ -73,7 +76,7 @@ namespace checkers
 		(*board)[x][y] = NULL;
 		m_piece_list->remove(target);
 
-		(*board)[x][y] = new king(get_sign(), x, y);
+		(*board)[x][y] = new king(get_sign(), x, y, this);
 		m_piece_list->push_back((*board)[x][y]);
 	}
 }
