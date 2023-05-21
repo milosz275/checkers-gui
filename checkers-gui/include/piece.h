@@ -28,9 +28,11 @@ namespace checkers
 		sf::CircleShape m_shape;
 		// pointer to the piece's owner
 		base_player* m_owner;
+
+		bool m_is_alive;
 	public:
 		// creates the piece of given sign and coordinates
-		piece(char sign, int x, int y, base_player* owner);
+		piece(char sign, int x, int y, bool is_alive, base_player* owner);
 		// copies the piece
 		piece(const piece& piece);
 		// deletes the piece
@@ -45,6 +47,8 @@ namespace checkers
 		int set_y(int y);
 		// returns sign of the piece
 		char get_sign(void);
+
+		bool is_alive(void);
 		// returns the piece's owner
 		base_player* get_owner(void);
 		// sets and returns the piece's owner

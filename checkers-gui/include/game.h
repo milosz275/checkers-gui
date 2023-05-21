@@ -50,7 +50,7 @@ namespace checkers
 		std::list<piece*> m_p_list_1;
 		// piece list of player 2
 		std::list<piece*> m_p_list_2;
-		// list of pieces to delete after multicapture (combo)
+		// list of pieces to delete after multicapture (combo), indicates multicapture
 		std::list<piece*> m_to_delete_list;
 		// flag indicating finished game
 		bool m_is_finished;
@@ -58,6 +58,8 @@ namespace checkers
 		bool m_first_won;
 		// flag indicating that second player won
 		bool m_second_won;
+		//
+		bool m_selected;
 		// pointer to selected piece on the board
 		piece* m_selected_piece;
 		// pointer to piece moving in the last move
@@ -75,7 +77,7 @@ namespace checkers
 		// default output stream
 		std::ostream& m_os = std::cout;
 		// SFML object drawing checkerboard
-		sf::RectangleShape m_tile;
+		std::vector<std::vector<sf::RectangleShape>> m_tiles;
 		// SFML clock
 		sf::Clock m_clock;
 		// SFML settings
@@ -100,21 +102,30 @@ namespace checkers
 		//
 		void select_piece(void);
 		//
+		void move_piece(piece* piece_to_move, std::vector<std::vector<piece*>>* board, int x, int y);
+		//
+		void delete_piece(piece* piece_to_delete, std::vector<std::vector<piece*>>* board, base_player* owner);
+		//
 		void check_game_completion(void);
+		
 		//
-		void make_move(void);
-		//
-		void make_capture(void);
-
+		void debug_info(void);
 
 		// switches first_turn flag, indicating that it is move of the first player
 		void switch_turn(void);
 		// returns main game board
 		std::vector<std::vector<piece*>>* get_board(void);
+		
+		////
+		//std::vector<std::vector<piece*>>* copy_board(std::vector<std::vector<piece*>>* source_board);
+
+		
 		// gets move coordinates from the current player
 		std::tuple<int, int> get_coordinates(void);
 		// gets coordinates of click in the window
 		std::tuple<int, int> get_click_coordinates(void);
+		
+		
 		// gets coordinates from game's input stream
 		std::tuple<int, int> get_coordinates_from_stream(void);
 		// populates the board with pieces for each player
@@ -122,9 +133,11 @@ namespace checkers
 		// populates the board for testing purposes
 		void populate_board_debug(void);
 		// adds new piece to the specific piece list, board and player at wanted coords
-		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, int x, int y);
+		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, int x, int y, bool is_alive);
 		// adds new piece to the specific piece list, board and player based on given piece from other board
 		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, piece* based_on);
+		//
+		void test_loop(void);
 		// executes the game
 		void loop(void);
 		// prints result to the given stream
@@ -137,8 +150,14 @@ namespace checkers
 		void highlight_selected(sf::RenderWindow& window, int x, int y);
 		// higlight selected piece of given coords (green)
 		void highlight_available(sf::RenderWindow& window, int x, int y);
+		
 		// evaluate possible moves of the given player, returns true if there is at least on possible capture
-		bool evaluate(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, base_player* player);
+		bool evaluate(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, base_player* player, int last_capture_direction, std::list<piece*>* dead_list, piece* moving_piece);
+		// 
+		bool evaluate_piece(piece* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, base_player* player);
+		//
+		bool evaluate_piece(king* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, base_player* player, int last_capture_direction, std::list<piece*>* dead_list);
+
 		// clears available moves list for every piece in pieces list (gets through lists in list)
 		void clear_list(std::list<piece*>* list);
 		// clears list of dead pieces printed in multicapture

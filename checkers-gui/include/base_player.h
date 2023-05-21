@@ -70,10 +70,14 @@ namespace checkers
 		// decreases pieces count, increases captured pieces count
 		void make_capture(void);
 		// checks if the target piece could change into king and does it, if yes
-		void change_to_king(piece* target, std::vector<std::vector<piece*>>* board);
+		bool change_to_king(piece* target, std::vector<std::vector<piece*>>* board);
 		// prints pieces of the player
 		void print_player(std::ostream& os = std::cout);
+
+		friend std::ostream& operator<<(std::ostream& os, const base_player* player);
 	};
+
+	std::ostream& operator<<(std::ostream& os, const base_player* player);
 }
 
 #endif

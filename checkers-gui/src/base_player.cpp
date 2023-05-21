@@ -4,10 +4,9 @@
 
 namespace checkers
 {
-	base_player::base_player(char sign, std::string name) : m_name(name), m_pieces(0), m_captured_pieces(0), m_combo(false), m_next_player(NULL), m_piece_list(NULL), m_is_first(false)
+	base_player::base_player(char sign, std::string name) : m_sign(std::toupper(sign)), m_name(name), m_pieces(0), m_captured_pieces(0), m_combo(false), m_next_player(NULL), m_piece_list(NULL), m_is_first(false)
 	{
-		assert(std::isalpha(sign));
-		m_sign = std::toupper(sign);
+		assert(std::isalpha(sign, std::locale()));
 	}
 
 	base_player::base_player(const base_player& player) : m_sign(player.m_sign), m_name(player.m_name), m_pieces(player.m_pieces), m_captured_pieces(player.m_combo), m_combo(player.m_combo), m_next_player(NULL), m_piece_list(NULL), m_is_first(player.m_is_first) {}
@@ -44,13 +43,16 @@ namespace checkers
 
 	void base_player::print_player(std::ostream& os) { os << m_name << "; sign: " << m_sign << "; pieces: " << m_pieces << "; captured pieces: " << m_captured_pieces << std::endl; }
 
-	void base_player::change_to_king(piece* target, std::vector<std::vector<piece*>>* board)
+	bool base_player::change_to_king(piece* target, std::vector<std::vector<piece*>>* board) // std::list<piece*>* list
 	{
 		// make sure the list is not set
-		assert(m_piece_list != NULL);
+		assert(target->get_owner()->get_list() != NULL);
 
 		// make sure the list is not empty
-		assert(!m_piece_list->empty());
+		assert(!target->get_owner()->get_list()->empty());
+
+		//
+		assert(target->is_alive());
 
 		// add asertion if this is not the current player and if has no captures
 
@@ -68,15 +70,27 @@ namespace checkers
 		}
 
 		if (!is_king)
-			return;
+			return false;
 
 		// change the piece to king
 		int x = target->get_x();
 		int y = target->get_y();
 		(*board)[x][y] = NULL;
-		m_piece_list->remove(target);
+		target->get_owner()->get_list()->remove(target);
 
-		(*board)[x][y] = new king(get_sign(), x, y, this);
-		m_piece_list->push_back((*board)[x][y]);
+		(*board)[x][y] = new king(get_sign(), x, y, true, this);
+		target->get_owner()->get_list()->push_back((*board)[x][y]);
+
+		return true;
+	}
+
+	std::ostream& operator<<(std::ostream& os, const base_player* player)
+	{
+		os << "name: " << player->m_name << "; sign: " << player->m_sign << "; alive pieces: " << player->m_pieces << "(" << player->m_piece_list->size() << ")" << "; dead pieces: " << player->m_captured_pieces;
+		os << "; combo: ";
+		player->m_combo ? os << "true" : os << "false";
+		os << "; is first player: ";
+		player->m_is_first ? os << "true" << std::endl : os << "false" << std::endl;
+		return os;
 	}
 }

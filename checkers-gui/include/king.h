@@ -9,7 +9,7 @@ namespace checkers
 	{
 	public:
 		// creates the king
-		king(char sign, int x, int y, base_player* owner);
+		king(char sign, int x, int y, bool is_alive, base_player* owner);
 		// deletes the king
 		~king();
 	};
