@@ -15,7 +15,7 @@ namespace checkers
 		//
 		int m_max_score;
 	public:
-		//
+		// creates new capture move with given goto, delete coords and max score of evaluated multicapture
 		available_capture(int x, int y, int x_d, int y_d, int max_score);
 		// returns x coordinate of a piece to delete making a capture
 		int get_x_d(void);
