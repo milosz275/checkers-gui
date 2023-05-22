@@ -22,7 +22,7 @@ namespace checkers
 		m_tiles(s_size, std::vector<sf::RectangleShape>(s_size, sf::RectangleShape())), m_clock(), m_event(), m_settings(), m_current_player(NULL)
 	{
 		assert(s_size % 2 == 0);
-		
+
 		//// create a font object
 		//sf::Font font;
 		//if (!font.loadFromFile("arial.ttf"))
@@ -81,7 +81,7 @@ namespace checkers
 		m_player_1->set_next_player(m_player_2);
 		m_player_2->set_next_player(m_player_1);
 		m_current_player = m_player_1;
-		
+
 		// board init
 		m_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, 0));
 
@@ -119,7 +119,7 @@ namespace checkers
 			});
 
 		//m_tile.setSize(sf::Vector2f(s_square_size, s_square_size));
-		
+
 		/*for (int i = 0; i < s_size; ++i)
 		{
 			for (int j = 0; j < s_size; ++j)
@@ -181,7 +181,7 @@ namespace checkers
 		// copy the board and recreate the lists
 		m_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, NULL));
 		std::vector<std::vector<piece*>>* original_board = game.m_board;
-		
+
 		for (int i = 0; i < s_size; ++i)
 			for (int j = 0; j < s_size; ++j)
 			{
@@ -206,7 +206,7 @@ namespace checkers
 						else
 							throw std::runtime_error("Copying the board: normal piece: player signs not matching");
 					}
-					
+
 				}
 			}
 		m_player_1->set_list(&m_p_list_1);
@@ -431,17 +431,17 @@ namespace checkers
 	{
 
 	}
-	
+
 	void game::draw_board(void)
 	{
 
 	}
-	
+
 	void game::select_piece(void)
 	{
 
 	}
-	
+
 	void game::move_piece(piece* piece_to_move, std::vector<std::vector<piece*>>* board, int x, int y)
 	{
 		assert((*board)[x][y] == NULL);
@@ -487,7 +487,7 @@ namespace checkers
 			sf::sleep(sf::seconds(m_frame_duration));
 		}
 	}
-		
+
 	void game::loop(void)
 	{
 		// start frame clock
@@ -611,7 +611,7 @@ namespace checkers
 								// create new piece which represents dead piece during multicapture, it is indifferent whether it was normal piece or king
 								m_to_delete_list.push_back(new piece(m_current_player->get_next_player()->get_sign(), x_d, y_d, false, m_current_player->get_next_player()));
 								m_current_player->set_combo(true);
-								
+
 #ifdef _DEBUG
 								std::cout << m_current_player->get_name() << " combo" << std::endl;
 #endif
@@ -748,7 +748,7 @@ namespace checkers
 					int x = std::get<0>(coords);
 					int y = std::get<1>(coords);
 					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == NULL)
-							add_new_piece(&m_p_list_1, m_board, m_player_1, x, y, true);
+						add_new_piece(&m_p_list_1, m_board, m_player_1, x, y, true);
 				}
 				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::I)
 				{
@@ -757,7 +757,7 @@ namespace checkers
 					int x = std::get<0>(coords);
 					int y = std::get<1>(coords);
 					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == NULL)
-							add_new_piece(&m_p_list_2, m_board, m_player_2, x, y, true);
+						add_new_piece(&m_p_list_2, m_board, m_player_2, x, y, true);
 				}
 				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::L)
 				{
@@ -841,7 +841,13 @@ namespace checkers
 									return true;
 								});
 #ifdef _DEBUG
-							for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [](available_move* a) { std::cout << "available: x: " << a->get_x() << "; y: " << a->get_y() << std::endl; });
+							for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [this](available_move* a)
+								{
+									m_os << "available: x: " << a->get_x() << "; y: " << a->get_y();
+									if (dynamic_cast<available_capture*>(a))
+										m_os << "; max captures: " << dynamic_cast<available_capture*>(a)->get_max_score();
+									m_os << std::endl;
+								});
 #endif
 						}
 						if ((found_capture && m_available_capture) || (!found_capture && !m_available_capture)) // this lets making only capture moves, comment out to enable testing - replace to xnor
@@ -899,7 +905,7 @@ namespace checkers
 	{
 		bool av_capture = false;
 		clear_list(list);
-		
+
 		// is there a multicapture
 		if (moving_piece)
 		{
@@ -939,6 +945,71 @@ namespace checkers
 								av_capture = true;
 						}
 					});
+
+				// check, when there wasn't multicapture, but there are two pieces that can do captures
+				int pieces_with_captures = 0;
+				all_of(list->begin(), list->end(), [&pieces_with_captures](piece* p)
+					{
+						all_of(p->get_av_list()->begin(), p->get_av_list()->end(), [&pieces_with_captures](available_move* a)
+							{
+								// if at least one of available moves is a capture, increment and go to the next piece
+								if (dynamic_cast<available_capture*>(a))
+								{
+									pieces_with_captures++;
+									return false;
+								}
+								return true;
+							});
+						// stop checking, if there is at least two pieces containing separate captures
+						if (pieces_with_captures >= 2)
+							return false;
+						return true;
+					});
+				if (pieces_with_captures >= 2)
+				{
+					// find maximal capture counter over all captures
+					int max_captures_overall = 0;
+					for_each(list->begin(), list->end(), [&max_captures_overall](piece* p)
+						{
+							for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [&max_captures_overall](available_move* a)
+								{
+									if (dynamic_cast<available_capture*>(a))
+									{
+										int captures = dynamic_cast<available_capture*>(a)->get_max_score();
+										if (captures > max_captures_overall)
+											max_captures_overall = captures;
+									}
+								});
+						});
+#ifdef _DEBUG
+					m_os << "max captures overall: " << max_captures_overall << std::endl;
+#endif
+					// delete possible captures with score lower than max
+					for_each(list->begin(), list->end(), [this, &max_captures_overall](piece* p)
+						{
+							std::list<available_move*> to_delete;
+							for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [this, &to_delete, &max_captures_overall, &p](available_move* a)
+								{
+									if (dynamic_cast<available_capture*>(a))
+									{
+										int captures = dynamic_cast<available_capture*>(a)->get_max_score();
+										if (captures < max_captures_overall)
+										{
+											to_delete.push_back(a);
+#ifdef _DEBUG
+											m_os << "deleting capture: x: " << a->get_x() << "; y: " << a->get_y() << "; captures: " << captures << std::endl;
+#endif
+										}
+									}
+								});
+							while (!to_delete.empty())
+							{
+								available_move* a = to_delete.front();
+								p->get_av_list()->remove(a);
+								to_delete.pop_front();
+							}
+						});
+				}
 			}
 		}
 #ifdef _DEBUG
@@ -996,7 +1067,7 @@ namespace checkers
 
 			// evaluate copy of the board recursively in every direction and find highest number of captures to add to base moves list
 			int capture_counter[4] = { 0, 0, 0, 0 }; // 0 - top right, 1 - top left, 2 - bottom right, 3 - bottom left
-			
+
 			int last_capture_direction;
 
 			if (possible_capture_top_right)
@@ -1439,13 +1510,13 @@ namespace checkers
 #endif
 		return av_capture;
 	}
-	
+
 	bool game::evaluate_piece(king* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, base_player* player, int last_capture_direction, std::list<piece*>* dead_list)
 	{
 		assert(dynamic_cast<king*>(p));
 
 		bool av_capture = false;
-		
+
 		// x coordinate of evaluated piece
 		int x = p->get_x();
 		// y coordinate of evaluated piece
@@ -1717,7 +1788,7 @@ namespace checkers
 #ifdef _DEBUG
 						std::cout << "*there is no capture, checked field is empty and next field is not empty" << std::endl;
 #endif
-						if (at_least_one_capture_top_right)
+						if (at_least_one_capture_top_left)
 						{
 #ifdef _DEBUG
 							std::cout << "*no more places to check, it is a singular check" << std::endl;
@@ -1819,7 +1890,7 @@ namespace checkers
 #ifdef _DEBUG
 						std::cout << "*there is no capture, checked field is empty and next field is not empty" << std::endl;
 #endif
-						if (at_least_one_capture_top_right)
+						if (at_least_one_capture_bottom_right)
 						{
 #ifdef _DEBUG
 							std::cout << "*no more places to check, it is a singular check" << std::endl;
@@ -1921,7 +1992,7 @@ namespace checkers
 #ifdef _DEBUG
 						std::cout << "*there is no capture, checked field is empty and next field is not empty" << std::endl;
 #endif
-						if (at_least_one_capture_top_right)
+						if (at_least_one_capture_bottom_left)
 						{
 #ifdef _DEBUG
 							std::cout << "*no more places to check, it is a singular check" << std::endl;
@@ -2003,10 +2074,13 @@ namespace checkers
 			// for storing recursively evaluated capture counters
 			std::vector<int> capture_counter[4] = { std::vector<int>(top_right), std::vector<int>(top_left), std::vector<int>(bottom_right), std::vector<int>(bottom_left) }; // 0 - top right, 1 - top left, 2 - bottom right, 3 - bottom left
 
+			if (*counter != NULL)
+				(*counter)++;
+
 			// top right recursive evaluation
 			if (at_least_one_capture_top_right)
 			{
-				for_each(local_captures_top_right.begin(), local_captures_top_right.end(), [i = 0, this, &capture_counter, &counter, &board, &player, &x, &y, &last_capture_direction, &dead_list](available_capture& a) mutable
+				for_each(local_captures_top_right.begin(), local_captures_top_right.end(), [i = 0, this, &capture_counter, &counter, &board, &player, &x, &y, &dead_list](available_capture& a) mutable
 					{
 						// todo: save last capture direction locally after the move, copy dead piece list
 
@@ -2060,6 +2134,7 @@ namespace checkers
 						moving_piece->set_y(y_to_go);
 						(*copy_of_board)[x_to_go][y_to_go] = moving_piece;
 						copy_of_list.push_back(moving_piece);
+						copy_of_dead.push_back((*copy_of_board)[x_to_delete][y_to_delete]);
 						(*copy_of_board)[x_to_delete][y_to_delete] = NULL;
 #ifdef _DEBUG
 						std::cout << copy_of_board << std::endl;
@@ -2071,11 +2146,9 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 #endif
-							int moves = 1;
-							evaluate(&copy_of_list, copy_of_board, &moves, player, 0, &copy_of_dead, moving_piece);
-							capture_counter[0][i] = moves;
+							evaluate(&copy_of_list, copy_of_board, &(capture_counter[0][i]), player, 0, &copy_of_dead, moving_piece);
 #ifdef _DEBUG
-							std::cout << "moves counter (top right): " << moves << std::endl;
+							std::cout << "moves counter (top right): " << capture_counter[0][i] << std::endl;
 #endif
 						}
 						else
@@ -2084,7 +2157,7 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter equal to: " << (*counter) << std::endl;
 #endif
-							(*counter)++;
+
 							evaluate(&copy_of_list, copy_of_board, counter, player, 0, &copy_of_dead, moving_piece);
 						}
 						++i;
@@ -2152,6 +2225,7 @@ namespace checkers
 						moving_piece->set_y(y_to_go);
 						(*copy_of_board)[x_to_go][y_to_go] = moving_piece;
 						copy_of_list.push_back(moving_piece);
+						copy_of_dead.push_back((*copy_of_board)[x_to_delete][y_to_delete]);
 						(*copy_of_board)[x_to_delete][y_to_delete] = NULL;
 #ifdef _DEBUG
 						std::cout << copy_of_board << std::endl;
@@ -2163,11 +2237,9 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 #endif
-							int moves = 1;
-							evaluate(&copy_of_list, copy_of_board, &moves, player, 1, &copy_of_dead, moving_piece);
-							capture_counter[1][i] = moves;
+							evaluate(&copy_of_list, copy_of_board, &(capture_counter[1][i]), player, 1, &copy_of_dead, moving_piece);
 #ifdef _DEBUG
-							std::cout << "moves counter (top left): " << moves << std::endl;
+							std::cout << "moves counter (top left): " << capture_counter[1][i] << std::endl;
 #endif
 						}
 						else
@@ -2176,7 +2248,6 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter equal to: " << (*counter) << std::endl;
 #endif
-							(*counter)++;
 							evaluate(&copy_of_list, copy_of_board, counter, player, 1, &copy_of_dead, moving_piece);
 						}
 						++i;
@@ -2245,6 +2316,7 @@ namespace checkers
 						moving_piece->set_y(y_to_go);
 						(*copy_of_board)[x_to_go][y_to_go] = moving_piece;
 						copy_of_list.push_back(moving_piece);
+						copy_of_dead.push_back((*copy_of_board)[x_to_delete][y_to_delete]);
 						(*copy_of_board)[x_to_delete][y_to_delete] = NULL;
 #ifdef _DEBUG
 						std::cout << copy_of_board << std::endl;
@@ -2256,11 +2328,9 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 #endif
-							int moves = 1;
-							evaluate(&copy_of_list, copy_of_board, &moves, player, 2, &copy_of_dead, moving_piece);
-							capture_counter[2][i] = moves;
+							evaluate(&copy_of_list, copy_of_board, &(capture_counter[2][i]), player, 2, &copy_of_dead, moving_piece);
 #ifdef _DEBUG
-							std::cout << "moves counter (bottom right): " << moves << std::endl;
+							std::cout << "moves counter (bottom right): " << capture_counter[2][i] << std::endl;
 #endif
 						}
 						else
@@ -2269,7 +2339,6 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter equal to: " << (*counter) << std::endl;
 #endif
-							(*counter)++;
 							evaluate(&copy_of_list, copy_of_board, counter, player, 2, &copy_of_dead, moving_piece);
 						}
 						++i;
@@ -2327,7 +2396,10 @@ namespace checkers
 								}
 							}
 						}
-						for_each(dead_list->begin(), dead_list->end(), [&copy_of_dead](piece* p) { copy_of_dead.push_back(new piece(p->get_sign(), p->get_x(), p->get_y(), false, p->get_owner())); });
+						for_each(dead_list->begin(), dead_list->end(), [&copy_of_dead](piece* p)
+							{
+								copy_of_dead.push_back(new piece(p->get_sign(), p->get_x(), p->get_y(), false, p->get_owner()));
+							});
 
 						// make planned move
 						piece* moving_piece = (*copy_of_board)[x][y];
@@ -2336,6 +2408,7 @@ namespace checkers
 						moving_piece->set_y(y_to_go);
 						(*copy_of_board)[x_to_go][y_to_go] = moving_piece;
 						copy_of_list.push_back(moving_piece);
+						copy_of_dead.push_back((*copy_of_board)[x_to_delete][y_to_delete]);
 						(*copy_of_board)[x_to_delete][y_to_delete] = NULL;
 #ifdef _DEBUG
 						std::cout << copy_of_board << std::endl;
@@ -2347,11 +2420,9 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter null" << std::endl;
 #endif
-							int moves = 1;
-							evaluate(&copy_of_list, copy_of_board, &moves, player, 3, &copy_of_dead, moving_piece);
-							capture_counter[3][i] = moves;
+							evaluate(&copy_of_list, copy_of_board, &(capture_counter[3][i]), player, 3, &copy_of_dead, moving_piece);
 #ifdef _DEBUG
-							std::cout << "moves counter (bottom left): " << moves << std::endl;
+							std::cout << "moves counter (bottom left): " << capture_counter[3][i] << std::endl;
 #endif
 						}
 						else
@@ -2360,7 +2431,6 @@ namespace checkers
 							std::cout << "---------------------------------------------------------------" << std::endl;
 							std::cout << "counter equal to: " << (*counter) << std::endl;
 #endif
-							(*counter)++;
 							evaluate(&copy_of_list, copy_of_board, counter, player, 3, &copy_of_dead, moving_piece);
 						}
 						++i;
@@ -2377,11 +2447,11 @@ namespace checkers
 
 			// save how many places have max captures
 			int elements_with_max = 0;
-			
+
 			for (int i = 0; i < 4; ++i)
 				for_each(capture_counter[i].begin(), capture_counter[i].end(), [&max_captures, &elements_with_max](int c)
 					{
-						if (c == elements_with_max)
+						if (c == max_captures)
 							++elements_with_max;
 						else if (c > max_captures)
 						{
@@ -2457,7 +2527,7 @@ namespace checkers
 #endif
 		return av_capture;
 	}
-	
+
 	void game::clear_list(std::list<piece*>* list) { for_each(list->begin(), list->end(), [this](piece* p) { p->get_av_list()->clear(); }); }
 
 	void game::print_pieces(std::list<piece*>* list)
@@ -2496,19 +2566,19 @@ namespace checkers
 	{
 		m_os << "Board:" << std::endl;
 		m_os << m_board << std::endl;
-		
+
 		m_os << "console game: ";
 		m_console_game ? m_os << "true" << std::endl : m_os << "false" << std::endl;
-		
+
 		m_player_1 ? m_os << "player 1: " << m_player_1 : m_os << "not set" << std::endl;
-		
+
 		m_player_2 ? m_os << "player 2: " << m_player_2 : m_os << "not set" << std::endl;
-		
+
 		m_current_player ? m_os << "current player: " << m_current_player : m_os << "not set" << std::endl;
-		
+
 		m_os << "available capture: ";
 		m_available_capture ? m_os << "true" << std::endl : m_os << "false" << std::endl;
-		
+
 		m_os << "last capture direction: ";
 		switch (m_last_capture_direction)
 		{
@@ -2527,19 +2597,19 @@ namespace checkers
 		default:
 			m_os << "not set" << std::endl;
 		}
-		
+
 		m_os << "finished game: ";
 		m_is_finished ? m_os << "true" << std::endl : m_os << "false" << std::endl;
-		
+
 		m_os << "first won: ";
 		m_first_won ? m_os << "true" << std::endl : m_os << "false" << std::endl;
-		
+
 		m_os << "second won: ";
 		m_second_won ? m_os << "true" << std::endl : m_os << "false" << std::endl;
-		
+
 		m_os << "selected: ";
 		m_selected ? m_os << "true" << std::endl : m_os << "false" << std::endl;
-		
+
 		m_os << "selected piece: ";
 		if (m_selected_piece)
 		{
@@ -2551,7 +2621,7 @@ namespace checkers
 		{
 			m_os << "null" << std::endl;
 		}
-		
+
 		m_os << "moving piece: ";
 		if (m_moving_piece)
 		{
@@ -2579,7 +2649,7 @@ namespace checkers
 			}
 			else
 				m_os << "null" << std::endl;
-			
+
 		}
 
 		m_os << "fps: " << m_fps << std::endl;
