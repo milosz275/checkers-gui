@@ -238,8 +238,7 @@ namespace checkers
 			m_moving_piece = (*m_board)[game.m_moving_piece->get_x()][game.m_moving_piece->get_y()];
 
 		// check if the source game was normal
-		assert(m_to_delete_list.empty() && m_moving_piece == NULL);
-		assert(!m_to_delete_list.empty() && m_moving_piece != NULL);
+		assert(m_to_delete_list.empty() && m_moving_piece == NULL || !m_to_delete_list.empty() && m_moving_piece != NULL);
 
 		// other fields
 		m_last_capture_direction = game.m_last_capture_direction;
@@ -722,6 +721,26 @@ namespace checkers
 					// write a separator
 					m_os << "--------------------------------------------------------------" << std::endl;
 				}
+				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::U && (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)))
+				{
+					// add new piece to the first player
+					std::tuple<int, int> coords = get_click_coordinates();
+					int x = std::get<0>(coords);
+					int y = std::get<1>(coords);
+					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == NULL)
+						add_new_piece(&m_p_list_1, m_board, m_player_1, new king(m_player_1->get_sign(), x, y, true, m_player_1));
+				}
+				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::I && (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)))
+				{
+					std::cout << "here" << std::endl;
+
+					// add new piece to the second player
+					std::tuple<int, int> coords = get_click_coordinates();
+					int x = std::get<0>(coords);
+					int y = std::get<1>(coords);
+					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == NULL)
+						add_new_piece(&m_p_list_2, m_board, m_player_2, new king(m_player_2->get_sign(), x, y, true, m_player_2));
+				}
 				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::U)
 				{
 					// add new piece to the first player
@@ -745,6 +764,14 @@ namespace checkers
 					// load pieces from file
 					// tmp: load normal board
 					populate_board(s_size / 2 - 1);
+				}
+				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::S)
+				{
+					switch_turn();
+				}
+				else if (m_event.type == sf::Event::KeyPressed)
+				{
+					m_os << "Key code: \'" << m_event.key.code << "\' is not programmed." << std::endl;
 				}
 #endif
 			}
@@ -772,15 +799,20 @@ namespace checkers
 				int y = std::get<1>(coordinates);
 
 				if (x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1)
-					break;
+					continue;
 
 				//
 				if (!m_to_delete_list.empty() && (*m_board)[x][y] != m_moving_piece)
 				{
 #ifdef _DEBUG
-					std::cout << "Multicapture: this isn't the moving piece." << std::endl;
+					if ((*m_board)[x][y])
+						std::cout << "Multicapture: this isn't the moving piece." << std::endl;
+					else
+						std::cout << "Multicapture: this is an empty space." << std::endl;
 #endif
-					break;
+					m_selected = false;
+					m_selected_piece = NULL;
+					continue;
 				}
 
 				// check if the correspoding field contains a piece
@@ -2050,13 +2082,14 @@ namespace checkers
 						{
 #ifdef _DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
-							std::cout << "counter not null" << std::endl;
+							std::cout << "counter equal to: " << (*counter) << std::endl;
 #endif
 							(*counter)++;
 							evaluate(&copy_of_list, copy_of_board, counter, player, 0, &copy_of_dead, moving_piece);
 						}
 						++i;
 					});
+
 #ifdef _DEBUG
 				// print
 				std::cout << "for every capture option, these are multi capture counters" << std::endl;
@@ -2141,7 +2174,7 @@ namespace checkers
 						{
 #ifdef _DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
-							std::cout << "counter not null" << std::endl;
+							std::cout << "counter equal to: " << (*counter) << std::endl;
 #endif
 							(*counter)++;
 							evaluate(&copy_of_list, copy_of_board, counter, player, 1, &copy_of_dead, moving_piece);
@@ -2234,7 +2267,7 @@ namespace checkers
 						{
 #ifdef _DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
-							std::cout << "counter not null" << std::endl;
+							std::cout << "counter equal to: " << (*counter) << std::endl;
 #endif
 							(*counter)++;
 							evaluate(&copy_of_list, copy_of_board, counter, player, 2, &copy_of_dead, moving_piece);
@@ -2325,7 +2358,7 @@ namespace checkers
 						{
 #ifdef _DEBUG
 							std::cout << "---------------------------------------------------------------" << std::endl;
-							std::cout << "counter not null" << std::endl;
+							std::cout << "counter equal to: " << (*counter) << std::endl;
 #endif
 							(*counter)++;
 							evaluate(&copy_of_list, copy_of_board, counter, player, 3, &copy_of_dead, moving_piece);
