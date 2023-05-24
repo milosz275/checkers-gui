@@ -23,6 +23,7 @@
     <ClInclude Include="include\available_move.h" />
     <ClInclude Include="include\base_player.h" />
     <ClInclude Include="include\bot.h" />
+    <ClInclude Include="include\dependencies.h" />
     <ClInclude Include="include\game.h" />
     <ClInclude Include="include\king.h" />
     <ClInclude Include="include\piece.h" />

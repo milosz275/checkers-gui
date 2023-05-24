@@ -1,24 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <map>
-#include <cassert>
-#include <tuple>
-
-#include "include/base_player.h"
-#include "include/player.h"
-#include "include/bot.h"
-#include "include/piece.h"
-#include "include/available_capture.h"
-
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include <SFML/Network.hpp>
+#include "dependencies.h"
 
 namespace checkers
 {
@@ -76,6 +59,10 @@ namespace checkers
 		std::istream& m_is = std::cin;
 		// default output stream
 		std::ostream& m_os = std::cout;
+		// 
+		std::ostream& m_log = std::clog;
+		//
+		std::ofstream m_log_file;
 		// SFML object drawing checkerboard
 		std::vector<std::vector<sf::RectangleShape>> m_tiles;
 		// SFML clock
@@ -89,7 +76,7 @@ namespace checkers
 
 	public:
 		// create the game of given size and target frames per second
-		game(int fps = 24, std::istream& is = std::cin, std::ostream& os = std::cout);
+		game(int fps = 16, std::istream& is = std::cin, std::ostream& os = std::cout);
 		// copies the game (without GUI)
 		game(const game& game);
 		// deletes the game
@@ -116,7 +103,7 @@ namespace checkers
 		void copy_board(std::vector<std::vector<piece*>>* source_board, std::vector<std::vector<piece*>>* copy_of_board, base_player* owner);
 
 		//
-		void debug_info(void);
+		void debug_info(std::ostream& os);
 
 		// switches first_turn flag, indicating that it is move of the first player
 		void switch_turn(void);
@@ -139,6 +126,10 @@ namespace checkers
 		void populate_board(int rows);
 		// populates the board for testing purposes
 		void populate_board_debug(void);
+		//
+		bool load_pieces_from_file(const std::string file_name);
+		//
+		void save_to_file(std::string file_name);
 		// adds new piece to the specific piece list, board and player at wanted coords
 		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, int x, int y, bool is_alive);
 		// adds new piece to the specific piece list, board and player based on given piece from other board
@@ -161,7 +152,7 @@ namespace checkers
 		// evaluate possible moves of the given player, returns true if there is at least on possible capture
 		bool evaluate(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive, base_player* player, int last_capture_direction, std::list<piece*>* dead_list, piece* moving_piece);
 		// 
-		bool evaluate_piece(piece* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, base_player* player);
+		bool evaluate_piece(piece* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive, base_player* player);
 		//
 		bool evaluate_piece(king* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive, base_player* player, int last_capture_direction, std::list<piece*>* dead_list);
 

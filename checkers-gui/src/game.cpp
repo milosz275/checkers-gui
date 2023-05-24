@@ -23,10 +23,28 @@ namespace checkers
 	game::game(int fps, std::istream& is, std::ostream& os) : m_console_game(false), m_is_finished(false), m_fps(fps),
 		m_window(sf::VideoMode(s_square_size* s_size, s_square_size* s_size), "Checkers", sf::Style::Default, m_settings),
 		m_selected(false), m_selected_piece(NULL), m_moving_piece(NULL), m_available_capture(false), m_last_capture_direction(-1), m_is(is), m_os(os),
+		m_log_file("log.txt", std::ios::app),
 		m_tiles(s_size, std::vector<sf::RectangleShape>(s_size, sf::RectangleShape())), m_clock(), m_event(), m_settings(), m_current_player(NULL)
 	{
 		assert(s_size % 2 == 0);
+		if (m_log_file.is_open())
+		{
+			std::clog.rdbuf(m_log_file.rdbuf());
+			m_log << "Log file: Checkers game (" << s_size << "x" << s_size << ")" << std::endl;
+			std::time_t current_time;
+			std::time(&current_time);
+			char buffer[26];
+			ctime_s(buffer, sizeof(buffer), &current_time);
+			m_log << buffer;
+		}
+		else
+		{
+#ifdef _DEBUG
+			m_os << "Log file not opened" << std::endl;
+#endif
+		}
 
+		// menu
 		//// create a font object
 		//sf::Font font;
 		//if (!font.loadFromFile("arial.ttf"))
@@ -96,10 +114,12 @@ namespace checkers
 		// fill the board with pieces
 #ifdef _DEBUG
 		//populate_board(4);
-		populate_board_debug();
-#else
-		populate_board(s_size / 2 - 1);
 		//populate_board_debug();
+		load_pieces_from_file("pieces.txt");
+#else
+		bool loaded_pieces = load_pieces_from_file("pieces.txt");
+		if (!loaded_pieces)
+			populate_board(s_size / 2 - 1);
 #endif
 
 		// SFML setup, using original methods in camelCase style instead of snake_case
@@ -140,7 +160,7 @@ namespace checkers
 
 		// evaluate available moves for the first player
 		int dummy = 0;
-		m_available_capture = evaluate(m_player_1->get_list(), m_board, &dummy, dummy, m_player_1, m_last_capture_direction, &m_to_delete_list, NULL);
+		m_available_capture = evaluate(m_current_player->get_list(), m_board, &dummy, dummy, m_current_player, m_last_capture_direction, &m_to_delete_list, NULL);
 #ifdef _DEBUG
 		m_os << "Game is evaluated" << std::endl;
 
@@ -319,7 +339,7 @@ namespace checkers
 	{
 		assert(m_board->size() == s_size);
 
-		add_new_piece(m_player_2->get_list(), m_board, m_player_2, new king(m_player_2->get_sign(), 7, 0, true, m_player_2));
+		/*add_new_piece(m_player_2->get_list(), m_board, m_player_2, new king(m_player_2->get_sign(), 7, 0, true, m_player_2));
 		add_new_piece(m_player_2->get_list(), m_board, m_player_2, 4, 5, true);
 
 		add_new_piece(m_player_1->get_list(), m_board, m_player_1, 1, 2, true);
@@ -327,13 +347,160 @@ namespace checkers
 		add_new_piece(m_player_1->get_list(), m_board, m_player_1, 5, 2, true);
 		add_new_piece(m_player_1->get_list(), m_board, m_player_1, 6, 5, true);
 		add_new_piece(m_player_1->get_list(), m_board, m_player_1, 3, 6, true);
-		add_new_piece(m_player_1->get_list(), m_board, m_player_1, 6, 7, true);
+		add_new_piece(m_player_1->get_list(), m_board, m_player_1, 6, 7, true);*/
 
 		// rows of the second player (upper)
 		//add_new_piece(m_player_2->get_list(), m_board, m_player_2, 1, 8, true);
 
 		// rows of the first player (lower)
 		//add_new_piece(m_player_1->get_list(), m_board, m_player_1, 5, 4, true);
+	}
+
+	bool game::load_pieces_from_file(std::string file_name)
+	{
+		assert(m_player_1 && m_player_2);
+		assert(m_player_1->get_list() && m_player_2->get_list());
+		assert(m_board);
+
+		std::ifstream file(file_name);
+		if (!file.is_open())
+			return false;
+
+		std::string line;
+		int line_index = 0;
+		std::queue<piece*> loaded_pieces;
+		if (std::getline(file, line))
+		{
+			if (line.empty() || line == "")
+				return false;
+			++line_index;
+			std::stringstream ss(line);
+			int turn;
+			if (!(ss >> turn))
+			{
+#ifdef _DEBUG
+				m_os << "Incorrect data at line: " << line_index << std::endl;
+#endif 
+				if (turn != 1 && turn != 2)
+				{
+#ifdef _DEBUG
+					m_os << "Wrong input data: player turn" << std::endl;
+#endif
+				}
+				else
+				{
+#ifdef _DEBUG
+					m_os << "Wrong dataset length: player turn" << std::endl;
+#endif
+				}
+				return false;
+			}
+			if (turn == 1)
+				m_current_player = m_player_1;
+			else if (turn == 2)
+				m_current_player = m_player_2;
+			else
+				return false;
+		}
+		while (std::getline(file, line))
+		{
+			++line_index;
+			std::stringstream ss(line);
+			int x = -1, y = -1;
+			int owner = -1;
+			int is_king = -1;
+			if (!(ss >> x >> y >> owner >> is_king))
+			{
+				/*std::string error("Incorrect data at line " + line_index) << std::endl;
+				throw std::runtime_error(error);*/
+#ifdef _DEBUG
+				m_os << "Incorrect data at line: " << line_index << std::endl;
+#endif 
+				if (x < 0 || y < 0 || x > s_size - 1 || y > s_size - 1 || (*m_board)[x][y] || owner != 1 || owner != 2 || is_king != 0 || is_king != 1)
+				{
+#ifdef _DEBUG
+					m_os << "Wrong input data" << std::endl;
+#endif 
+				}
+				else
+				{
+#ifdef _DEBUG
+					m_os << "Wrong dataset length"  << std::endl;
+#endif 
+				}
+				while (!loaded_pieces.empty())
+					loaded_pieces.pop();
+				return false;
+			}
+			if (is_king && owner == 1)
+				loaded_pieces.push(new king(m_player_1->get_sign(), x, y, true, m_player_1));
+			else if (is_king && owner == 2)
+				loaded_pieces.push(new king(m_player_2->get_sign(), x, y, true, m_player_2));
+			else if (!is_king && owner == 1)
+				loaded_pieces.push(new piece(m_player_1->get_sign(), x, y, true, m_player_1));
+			else if (!is_king && owner == 2)
+				loaded_pieces.push(new piece(m_player_2->get_sign(), x, y, true, m_player_2));
+			else
+			{
+				while (!loaded_pieces.empty())
+					loaded_pieces.pop();
+				return false;
+			}
+		}
+		if (line_index < 2)
+			return false;
+		while (!loaded_pieces.empty())
+		{
+			piece* p = loaded_pieces.front();
+			assert(!(*m_board)[p->get_x()][p->get_y()]);
+			if (dynamic_cast<king*>(p))
+				add_new_piece(p->get_owner()->get_list(), m_board, p->get_owner(), new king(p->get_sign(), p->get_x(), p->get_y(), true, p->get_owner()));
+			else
+				add_new_piece(p->get_owner()->get_list(), m_board, p->get_owner(), p->get_x(), p->get_y(), true);
+			loaded_pieces.pop();
+		}
+		file.close();
+		return true;
+	}
+
+	void game::save_to_file(std::string file_name)
+	{
+		if (m_player_1->get_list()->empty() || m_player_2->get_list()->empty())
+			return;
+#ifdef _DEBUG
+		m_os << "Saving game state..." << std::endl;
+#endif 
+		std::ofstream file(file_name, std::ios::out);
+		if (file.is_open())
+		{
+			if (m_current_player == m_player_1)
+				file << "1" << std::endl;
+			else
+				file << "2" << std::endl;
+			for_each(m_board->begin(), m_board->end(), [this, &file](std::vector<piece*>& row)
+				{
+					for_each(row.begin(), row.end(), [this, &file](piece* p)
+						{
+							if (p)
+							{
+								bool is_king = dynamic_cast<king*>(p);
+								if (p->get_owner() == m_player_1)
+									file << p->get_x() << " " << p->get_y() << " 1 " << is_king << std::endl;
+								else if (p->get_owner() == m_player_2)
+									file << p->get_x() << " " << p->get_y() << " 2 " << is_king << std::endl;
+							}
+						});
+				});
+#ifdef _DEBUG
+			m_os << "Saving game state complete" << std::endl;
+#endif
+		}
+		else
+		{
+#ifdef _DEBUG
+			m_os << "Failed to save game state" << std::endl;
+#endif
+		}
 	}
 
 	void game::add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, int x, int y, bool is_alive)
@@ -401,15 +568,16 @@ namespace checkers
 
 	void game::print_results(std::ostream& os)
 	{
+		os << "Results:" << std::endl;
 		if (!m_first_won && !m_second_won)
-			m_os << "game wasn't finished" << std::endl;
+			os << "Game wasn't finished" << std::endl;
 		else if (m_first_won && m_second_won)
-			m_os << "Draw" << std::endl;
+			os << "Draw" << std::endl;
 		else if (m_first_won)
-			m_os << "player: \"" << m_player_1->get_name() << "\" won!" << std::endl;
+			os << "Player: \"" << m_player_1->get_name() << "\" won!" << std::endl;
 		else
-			m_os << "player: \"" << m_player_2->get_name() << "\" won!" << std::endl;
-		m_os << "player " << m_player_1->get_name() << "'s score: " << m_player_2->get_captured_pieces() << "; player " << m_player_2->get_name() << "'s score: " << m_player_1->get_captured_pieces() << std::endl;
+			os << "Player: \"" << m_player_2->get_name() << "\" won!" << std::endl;
+		os << "Player \"" << m_player_1->get_name() << "\"'s score: " << m_player_2->get_captured_pieces() << "; Player \"" << m_player_2->get_name() << "\"'s score: " << m_player_1->get_captured_pieces() << std::endl;
 	}
 
 	void game::draw(sf::RenderWindow& window)
@@ -767,7 +935,7 @@ namespace checkers
 				if (m_event.type == sf::Event::MouseButtonPressed && m_event.mouseButton.button == sf::Mouse::Right)
 				{
 					// display debug info
-					debug_info();
+					debug_info(m_os);
 				}
 				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::E)
 				{
@@ -855,15 +1023,6 @@ namespace checkers
 				}
 #endif
 			}
-
-			//// end of the game
-			//if (m_first_won || m_second_won)
-			//{
-			//	//m_os << "Game is finished" << std::endl;
-			//	//break;
-			//	m_selected = false;
-			//	m_selected_piece = NULL;
-			//}
 
 			m_window.clear();
 			draw(m_window);
@@ -964,10 +1123,8 @@ namespace checkers
 			}
 
 			// print alive pieces
-			for (int i = 0; i < s_size; ++i)
-				for (int j = 0; j < s_size; ++j)
-					if ((*m_board)[i][j] != NULL)
-						(*m_board)[i][j]->draw(m_window);
+			for_each(m_player_1->get_list()->begin(), m_player_1->get_list()->end(), [this](piece* p) { p->draw(m_window); });
+			for_each(m_player_2->get_list()->begin(), m_player_2->get_list()->end(), [this](piece* p) { p->draw(m_window); });
 
 			// print pieces in multicapture
 			for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [this](piece* p) { p->draw(m_window); });
@@ -976,9 +1133,17 @@ namespace checkers
 			sf::Time elapsed_time = m_clock.restart();
 			if (elapsed_time.asSeconds() < m_frame_duration)
 				sf::sleep(sf::seconds(m_frame_duration - elapsed_time.asSeconds()));
+
 			m_window.display();
 		}
+		if (!m_first_won && !m_second_won) // save the game state, when game wasn't finished
+			save_to_file("pieces.txt");
+		else
+			std::ofstream file("pieces.txt", std::ios::out); // clear the pieces file to start from the beginning next time
 		print_results(m_os);
+
+		if (m_log_file.is_open())
+			print_results(m_log);
 	}
 
 	bool game::evaluate(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive, base_player* player, int last_capture_direction, std::list<piece*>* dead_list, piece* moving_piece) // add moving piece
@@ -994,7 +1159,7 @@ namespace checkers
 			if (dynamic_cast<king*>(moving_piece))
 				av_capture = evaluate_piece(dynamic_cast<king*>(moving_piece), list, board, counter, recursive, player, last_capture_direction, dead_list);
 			else
-				av_capture = evaluate_piece(moving_piece, list, board, counter, player);
+				av_capture = evaluate_piece(moving_piece, list, board, counter, recursive, player);
 		}
 		else
 		{
@@ -1003,10 +1168,17 @@ namespace checkers
 			{
 #ifdef _DEBUG
 				m_os << "Evaluating empty list" << std::endl;
+#else
+				// in release mode, evaluating an empty list is end-of-game 
+				if (player == m_player_1)
+					m_second_won = true;
+				else
+					m_first_won = true;
 #endif
 			}
 			else
 			{
+				// evaluate moves and captures for all of the pieces
 				for_each(list->begin(), list->end(), [this, &board, &list, &counter, &recursive, &av_capture, &player, &last_capture_direction, &dead_list](piece* p)
 					{
 						bool local_available = false;
@@ -1018,7 +1190,7 @@ namespace checkers
 						}
 						else
 						{
-							local_available = evaluate_piece(p, list, board, counter, player);
+							local_available = evaluate_piece(p, list, board, counter, recursive, player);
 							if (local_available)
 								av_capture = true;
 						}
@@ -1088,17 +1260,40 @@ namespace checkers
 							}
 						});
 				}
-			}
-		}
+
+				// check, if the are no moves at all
+				bool at_least_one_move = false;
+				all_of(list->begin(), list->end(), [&at_least_one_move](piece* p)
+					{
+						if (!p->get_av_list()->empty())
+						{
+							at_least_one_move = true;
+							return false;
+						}
+						return true;
+					});
+				if (!at_least_one_move)
+				{
 #ifdef _DEBUG
-		m_os << "Evaluation returns: ";
-		av_capture ? (m_os << "true") : (m_os << "false");
-		m_os << std::endl;
+					m_os << "There are no possible moves for current player: " << m_current_player->get_name() << std::endl;
+#else
+					if (player == m_player_1)
+						m_second_won = true;
+					else
+						m_first_won = true;
 #endif
-		return av_capture;
+				}
+			}
+#ifdef _DEBUG
+			m_os << "Evaluation returns: ";
+			av_capture ? (m_os << "true") : (m_os << "false");
+			m_os << std::endl;
+#endif
+			return av_capture;
+		}
 	}
 
-	bool game::evaluate_piece(piece* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, base_player* player)
+	bool game::evaluate_piece(piece* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive, base_player* player)
 	{
 		assert(dynamic_cast<piece*>(p));
 
@@ -1138,6 +1333,9 @@ namespace checkers
 		if (x - 2 >= 0 && y + 2 <= s_size - 1 && (*board)[x - 1][y + 1] != NULL && (*board)[x - 1][y + 1]->get_owner() == player->get_next_player() && (*board)[x - 2][y + 2] == NULL)
 			possible_capture_bottow_left = true;
 
+		int x_sign = 0;
+		int y_sign = 0;
+		int index = -1;
 
 		if (possible_capture_top_left || possible_capture_top_right || possible_capture_bottow_left || possible_capture_bottom_right)
 		{
@@ -1152,6 +1350,8 @@ namespace checkers
 
 			if (possible_capture_top_right)
 			{
+				last_capture_direction = 0;
+
 				//(*p).get_av_list()->push_back(new available_capture(x + 2, y - 2, x + 1, y - 1));
 				capture_counter[0] = 1; // change here to get from counter, then increment?
 
@@ -1169,7 +1369,7 @@ namespace checkers
 				copy_of_list.push_back(moving_piece);
 				(*copy_of_board)[x + 1][y - 1] = NULL;
 				moving_piece = (*copy_of_board)[x + 2][y - 2];
-				last_capture_direction = 0;
+				
 #ifdef _DEBUG
 				m_os << copy_of_board << std::endl;
 #endif
@@ -1178,63 +1378,32 @@ namespace checkers
 				{
 #ifdef _DEBUG
 					m_os << "---------------------------------------------------------------" << std::endl;
-					m_os << "counter null" << std::endl;
+					m_os << "recursive evaluation: outer call" << std::endl;
 #endif
-					int moves = 1;
-					evaluate(&copy_of_list, copy_of_board, &moves, 0, player, last_capture_direction, NULL, moving_piece);
-					capture_counter[0] = moves;
+					evaluate(&copy_of_list, copy_of_board, &(capture_counter[0]), 1, player, last_capture_direction, NULL, moving_piece);
 #ifdef _DEBUG
-					m_os << "moves counter (top right): " << moves << std::endl;
+					m_os << "moves counter (top right): " << capture_counter[0] << std::endl;
 #endif
 				}
 				else
 				{
 #ifdef _DEBUG
-					m_os << "---------------------------------------------------------------" << std::endl;
-					m_os << "counter not null" << std::endl;
+					m_os << "recursive evaluation: inner call; counter: " << (*counter) << std::endl;
 #endif
-					(*counter)++;
-					evaluate(&copy_of_list, copy_of_board, counter, 0, player, last_capture_direction, NULL, moving_piece);
+					evaluate(&copy_of_list, copy_of_board, counter, recursive + 1, player, last_capture_direction, NULL, moving_piece);
 				}
 			}
 
 			if (possible_capture_top_left)
 			{
-				//(*p).get_av_list()->push_back(new available_capture(x - 2, y - 2, x - 1, y - 1));
+				last_capture_direction = 1;
+
 				capture_counter[1] = 1;
 
 				// copy the board and make empty list for moved piece
 				std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, 0));
 				std::list<piece*> copy_of_list;
-
-				for (int i = 0; i < s_size; ++i)
-				{
-					for (int j = 0; j < s_size; ++j)
-					{
-						piece* p = (*board)[i][j];
-						if (p)
-						{
-							if (dynamic_cast<king*>(p))
-							{
-								if (p->get_owner() == player)
-									(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), player);
-								else if (p->get_owner() == player->get_next_player())
-									(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), player->get_next_player());
-								else
-									throw std::runtime_error("King evaluation: wrong membership");
-							}
-							else
-							{
-								if (p->get_owner() == player)
-									(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), player);
-								else if (p->get_owner() == player->get_next_player())
-									(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), player->get_next_player());
-								else
-									throw std::runtime_error("King evaluation: wrong membership");
-							}
-						}
-					}
-				}
+				copy_board(board, copy_of_board, player);
 
 				// make planned move
 				piece* moving_piece = (*copy_of_board)[x][y];
@@ -1245,7 +1414,7 @@ namespace checkers
 				copy_of_list.push_back(moving_piece);
 				(*copy_of_board)[x - 1][y - 1] = NULL;
 				moving_piece = (*copy_of_board)[x - 2][y - 2];
-				last_capture_direction = 1;
+				
 #ifdef _DEBUG
 				m_os << copy_of_board << std::endl;
 #endif
@@ -1254,67 +1423,32 @@ namespace checkers
 				if (*counter == NULL)
 				{
 #ifdef _DEBUG
-					m_os << "---------------------------------------------------------------" << std::endl;
-					m_os << "counter null" << std::endl;
+					m_os << "recursive evaluation: outer call" << std::endl;
 #endif
-
-					int moves = 1;
-					evaluate(&copy_of_list, copy_of_board, &moves, 0, player, last_capture_direction, NULL, moving_piece);
-					capture_counter[1] = moves;
-
+					evaluate(&copy_of_list, copy_of_board, &(capture_counter[1]), 1, player, last_capture_direction, NULL, moving_piece);
 #ifdef _DEBUG
-					m_os << "moves counter (top left): " << moves << std::endl;
+					m_os << "moves counter (top left): " << capture_counter[1] << std::endl;
 #endif
 				}
 				else
 				{
 #ifdef _DEBUG
-					m_os << "---------------------------------------------------------------" << std::endl;
-					m_os << "counter not null" << std::endl;
+					m_os << "recursive evaluation: inner call; counter: " << (*counter) << std::endl;
 #endif
-
-					(*counter)++;
-					evaluate(&copy_of_list, copy_of_board, counter, 0, player, last_capture_direction, NULL, moving_piece);
+					evaluate(&copy_of_list, copy_of_board, counter, recursive + 1, player, last_capture_direction, NULL, moving_piece);
 				}
 			}
 
 			if (possible_capture_bottom_right)
 			{
-				//(*p).get_av_list()->push_back(new available_capture(x + 2, y + 2, x + 1, y + 1));
+				last_capture_direction = 2;
+
 				capture_counter[2] = 1;
 
 				// copy the board and make empty list for moved piece
 				std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, 0));
 				std::list<piece*> copy_of_list;
-
-				for (int i = 0; i < s_size; ++i)
-				{
-					for (int j = 0; j < s_size; ++j)
-					{
-						piece* p = (*board)[i][j];
-						if (p)
-						{
-							if (dynamic_cast<king*>(p))
-							{
-								if (p->get_owner() == player)
-									(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), player);
-								else if (p->get_owner() == player->get_next_player())
-									(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), player->get_next_player());
-								else
-									throw std::runtime_error("King evaluation: wrong membership");
-							}
-							else
-							{
-								if (p->get_owner() == player)
-									(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), player);
-								else if (p->get_owner() == player->get_next_player())
-									(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), player->get_next_player());
-								else
-									throw std::runtime_error("King evaluation: wrong membership");
-							}
-						}
-					}
-				}
+				copy_board(board, copy_of_board, player);
 
 				// make planned move
 				piece* moving_piece = (*copy_of_board)[x][y];
@@ -1325,7 +1459,7 @@ namespace checkers
 				copy_of_list.push_back(moving_piece);
 				(*copy_of_board)[x + 1][y + 1] = NULL;
 				moving_piece = (*copy_of_board)[x + 2][y + 2];
-				last_capture_direction = 2;
+				
 #ifdef _DEBUG
 				m_os << copy_of_board << std::endl;
 #endif
@@ -1334,67 +1468,32 @@ namespace checkers
 				if (*counter == NULL)
 				{
 #ifdef _DEBUG
-					m_os << "---------------------------------------------------------------" << std::endl;
-					m_os << "counter null" << std::endl;
+					m_os << "recursive evaluation: outer call" << std::endl;
 #endif
-
-					int moves = 1;
-					evaluate(&copy_of_list, copy_of_board, &moves, 0, player, last_capture_direction, NULL, moving_piece);
-					capture_counter[2] = moves;
-
+					evaluate(&copy_of_list, copy_of_board, &(capture_counter[2]), 1, player, last_capture_direction, NULL, moving_piece);
 #ifdef _DEBUG	
-					m_os << "moves counter (bottom right): " << moves << std::endl;
+					m_os << "moves counter (bottom right): " << capture_counter[2] << std::endl;
 #endif
 				}
 				else
 				{
 #ifdef _DEBUG
-					m_os << "---------------------------------------------------------------" << std::endl;
 					m_os << "counter not null" << std::endl;
 #endif
-
-					(*counter)++;
-					evaluate(&copy_of_list, copy_of_board, counter, 0, player, last_capture_direction, NULL, moving_piece);
+					evaluate(&copy_of_list, copy_of_board, counter, recursive + 1, player, last_capture_direction, NULL, moving_piece);
 				}
 			}
 
 			if (possible_capture_bottow_left)
 			{
-				//(*p).get_av_list()->push_back(new available_capture(x - 2, y + 2, x - 1, y + 1));
+				last_capture_direction = 3;
+
 				capture_counter[3] = 1;
 
 				// copy the board and make empty list for moved piece
 				std::vector<std::vector<piece*>>* copy_of_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, 0));
 				std::list<piece*> copy_of_list;
-
-				for (int i = 0; i < s_size; ++i)
-				{
-					for (int j = 0; j < s_size; ++j)
-					{
-						piece* p = (*board)[i][j];
-						if (p)
-						{
-							if (dynamic_cast<king*>(p))
-							{
-								if (p->get_owner() == player)
-									(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), player);
-								else if (p->get_owner() == player->get_next_player())
-									(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), player->get_next_player());
-								else
-									throw std::runtime_error("King evaluation: wrong membership");
-							}
-							else
-							{
-								if (p->get_owner() == player)
-									(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), player);
-								else if (p->get_owner() == player->get_next_player())
-									(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), player->get_next_player());
-								else
-									throw std::runtime_error("King evaluation: wrong membership");
-							}
-						}
-					}
-				}
+				copy_board(board, copy_of_board, player);
 
 				// make planned move
 				piece* moving_piece = (*copy_of_board)[x][y];
@@ -1405,7 +1504,7 @@ namespace checkers
 				copy_of_list.push_back(moving_piece);
 				(*copy_of_board)[x - 1][y + 1] = NULL;
 				moving_piece = (*copy_of_board)[x - 2][y + 2];
-				last_capture_direction = 3;
+				
 #ifdef _DEBUG
 				m_os << copy_of_board << std::endl;
 #endif	
@@ -1414,27 +1513,19 @@ namespace checkers
 				if (*counter == NULL)
 				{
 #ifdef _DEBUG
-					m_os << "---------------------------------------------------------------" << std::endl;
-					m_os << "counter null" << std::endl;
+					m_os << "recursive evaluation: outer call" << std::endl;
 #endif
-
-					int moves = 1;
-					evaluate(&copy_of_list, copy_of_board, &moves, 0, player, last_capture_direction, NULL, moving_piece);
-					capture_counter[3] = moves;
-
+					evaluate(&copy_of_list, copy_of_board, &(capture_counter[3]), 1, player, last_capture_direction, NULL, moving_piece);
 #ifdef _DEBUG
-					m_os << "moves counter (bottom left): " << moves << std::endl;
+					m_os << "moves counter (bottom left): " << capture_counter[3] << std::endl;
 #endif
 				}
 				else
 				{
 #ifdef _DEBUG
-					m_os << "---------------------------------------------------------------" << std::endl;
-					m_os << "counter not null" << std::endl;
+					m_os << "recursive evaluation: inner call; counter: " << (*counter) << std::endl;
 #endif
-
-					(*counter)++;
-					evaluate(&copy_of_list, copy_of_board, counter, 0, player, last_capture_direction, NULL, moving_piece);
+					evaluate(&copy_of_list, copy_of_board, counter, recursive + 1, player, last_capture_direction, NULL, moving_piece);
 				}
 			} // all recursive function made
 
@@ -1491,13 +1582,12 @@ namespace checkers
 						throw std::exception("Evaluation error on piece " + p->get_sign());
 					}
 				}
-
-			// test code
-			if (*counter == NULL)
-				*counter = max;
 		}
 		else
 		{
+			if (recursive != 0 && recursive > *counter)
+				*counter = recursive;
+
 			if (*counter == NULL)
 			{
 				// different direction of ordinary move
@@ -2479,76 +2569,76 @@ namespace checkers
 		}
 	}
 
-	void game::debug_info(void)
+	void game::debug_info(std::ostream& os)
 	{
-		m_os << "Board:" << std::endl;
-		m_os << m_board << std::endl;
+		os << "Board:" << std::endl;
+		os << m_board << std::endl;
 
-		m_os << "console game: ";
-		m_console_game ? m_os << "true" << std::endl : m_os << "false" << std::endl;
+		os << "console game: ";
+		m_console_game ? os << "true" << std::endl : os << "false" << std::endl;
 
-		m_player_1 ? m_os << "player 1: " << m_player_1 : m_os << "not set" << std::endl;
+		m_player_1 ? os << "player 1: " << m_player_1 : os << "not set" << std::endl;
 
-		m_player_2 ? m_os << "player 2: " << m_player_2 : m_os << "not set" << std::endl;
+		m_player_2 ? os << "player 2: " << m_player_2 : os << "not set" << std::endl;
 
-		m_current_player ? m_os << "current player: " << m_current_player : m_os << "not set" << std::endl;
+		m_current_player ? os << "current player: " << m_current_player : os << "not set" << std::endl;
 
-		m_os << "available capture: ";
-		m_available_capture ? m_os << "true" << std::endl : m_os << "false" << std::endl;
+		os << "available capture: ";
+		m_available_capture ? os << "true" << std::endl : os << "false" << std::endl;
 
-		m_os << "last capture direction: ";
+		os << "last capture direction: ";
 		switch (m_last_capture_direction)
 		{
 		case 0:
-			m_os << "top right" << std::endl;
+			os << "top right" << std::endl;
 			break;
 		case 1:
-			m_os << "top left" << std::endl;
+			os << "top left" << std::endl;
 			break;
 		case 2:
-			m_os << "bottom right" << std::endl;
+			os << "bottom right" << std::endl;
 			break;
 		case 3:
-			m_os << "bottom left" << std::endl;
+			os << "bottom left" << std::endl;
 			break;
 		default:
-			m_os << "not set" << std::endl;
+			os << "not set" << std::endl;
 		}
 
-		m_os << "finished game: ";
-		m_is_finished ? m_os << "true" << std::endl : m_os << "false" << std::endl;
+		os << "finished game: ";
+		m_is_finished ? os << "true" << std::endl : os << "false" << std::endl;
 
-		m_os << "first won: ";
-		m_first_won ? m_os << "true" << std::endl : m_os << "false" << std::endl;
+		os << "first won: ";
+		m_first_won ? os << "true" << std::endl : os << "false" << std::endl;
 
-		m_os << "second won: ";
-		m_second_won ? m_os << "true" << std::endl : m_os << "false" << std::endl;
+		os << "second won: ";
+		m_second_won ? os << "true" << std::endl : os << "false" << std::endl;
 
-		m_os << "selected: ";
-		m_selected ? m_os << "true" << std::endl : m_os << "false" << std::endl;
+		os << "selected: ";
+		m_selected ? os << "true" << std::endl : os << "false" << std::endl;
 
-		m_os << "selected piece: ";
+		os << "selected piece: ";
 		if (m_selected_piece)
 		{
-			m_os << "sign: " << m_selected_piece->get_sign() << "; x: " << m_selected_piece->get_x() << "; y: " << m_selected_piece->get_y() << "; list of available moves: " << m_selected_piece->get_av_list()->size();
-			m_os << "; is king: ";
-			dynamic_cast<king*>(m_selected_piece) ? m_os << "true" << std::endl : m_os << "false" << std::endl;
+			os << "sign: " << m_selected_piece->get_sign() << "; x: " << m_selected_piece->get_x() << "; y: " << m_selected_piece->get_y() << "; list of available moves: " << m_selected_piece->get_av_list()->size();
+			os << "; is king: ";
+			dynamic_cast<king*>(m_selected_piece) ? os << "true" << std::endl : os << "false" << std::endl;
 		}
 		else
 		{
-			m_os << "null" << std::endl;
+			os << "null" << std::endl;
 		}
 
-		m_os << "moving piece: ";
+		os << "moving piece: ";
 		if (m_moving_piece)
 		{
-			m_os << "sign: " << m_moving_piece->get_sign() << "; x: " << m_moving_piece->get_x() << "; y: " << m_moving_piece->get_y() << "; list of available moves: " << m_moving_piece->get_av_list()->size();
-			m_os << "; is king: ";
-			dynamic_cast<king*>(m_moving_piece) ? m_os << "true" << std::endl : m_os << "false" << std::endl;
+			os << "sign: " << m_moving_piece->get_sign() << "; x: " << m_moving_piece->get_x() << "; y: " << m_moving_piece->get_y() << "; list of available moves: " << m_moving_piece->get_av_list()->size();
+			os << "; is king: ";
+			dynamic_cast<king*>(m_moving_piece) ? os << "true" << std::endl : os << "false" << std::endl;
 		}
 		else
 		{
-			m_os << "null" << std::endl;
+			os << "null" << std::endl;
 		}
 
 		std::tuple<int, int> coords = get_click_coordinates();
@@ -2557,18 +2647,16 @@ namespace checkers
 		if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1))
 		{
 			piece* hovered_piece = (*m_board)[x][y];
-			m_os << "hovered piece: ";
+			os << "hovered piece: ";
 			if (hovered_piece)
 			{
-				m_os << "sign: " << hovered_piece->get_sign() << "; x: " << hovered_piece->get_x() << "; y: " << hovered_piece->get_y() << "; list of available moves: " << hovered_piece->get_av_list()->size();
-				m_os << "; is king: ";
-				dynamic_cast<king*>(hovered_piece) ? m_os << "true" << std::endl : m_os << "false" << std::endl;
+				os << "sign: " << hovered_piece->get_sign() << "; x: " << hovered_piece->get_x() << "; y: " << hovered_piece->get_y() << "; list of available moves: " << hovered_piece->get_av_list()->size();
+				os << "; is king: ";
+				dynamic_cast<king*>(hovered_piece) ? os << "true" << std::endl : os << "false" << std::endl;
 			}
 			else
-				m_os << "null" << std::endl;
-
+				os << "null" << std::endl;
 		}
-
-		m_os << "fps: " << m_fps << std::endl;
+		os << "fps: " << m_fps << std::endl;
 	}
 }

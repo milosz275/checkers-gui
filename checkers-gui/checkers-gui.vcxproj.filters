@@ -39,6 +39,9 @@
     <ClInclude Include="include\king.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\dependencies.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\available_capture.cpp">
