@@ -101,13 +101,20 @@ namespace checkers
 		void draw_board(void);
 		//
 		void select_piece(void);
+		
 		//
 		void move_piece(piece* piece_to_move, std::vector<std::vector<piece*>>* board, int x, int y);
+		
+		//
+		void make_capture(std::vector<std::vector<piece*>>* board, piece* moving_piece, piece* delete_piece, int new_x, int new_y, std::list<piece*>* dead_list);
 		//
 		void delete_piece(piece* piece_to_delete, std::vector<std::vector<piece*>>* board, base_player* owner);
 		//
 		void check_game_completion(void);
 		
+		//
+		void copy_board(std::vector<std::vector<piece*>>* source_board, std::vector<std::vector<piece*>>* copy_of_board, base_player* owner);
+
 		//
 		void debug_info(void);
 
@@ -152,11 +159,11 @@ namespace checkers
 		void highlight_available(sf::RenderWindow& window, int x, int y);
 		
 		// evaluate possible moves of the given player, returns true if there is at least on possible capture
-		bool evaluate(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, base_player* player, int last_capture_direction, std::list<piece*>* dead_list, piece* moving_piece);
+		bool evaluate(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive, base_player* player, int last_capture_direction, std::list<piece*>* dead_list, piece* moving_piece);
 		// 
 		bool evaluate_piece(piece* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, base_player* player);
 		//
-		bool evaluate_piece(king* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, base_player* player, int last_capture_direction, std::list<piece*>* dead_list);
+		bool evaluate_piece(king* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive, base_player* player, int last_capture_direction, std::list<piece*>* dead_list);
 
 		// clears available moves list for every piece in pieces list (gets through lists in list)
 		void clear_list(std::list<piece*>* list);
