@@ -63,6 +63,8 @@ namespace checkers
 		int get_pieces(void);
 		// returns dead pieces
 		int get_captured_pieces(void);
+		// sets and returns dead pieces
+		int set_captured_pieces(int pieces);
 		// returns if the player can move again
 		bool get_combo(void);
 		// sets the combo flag and returns it

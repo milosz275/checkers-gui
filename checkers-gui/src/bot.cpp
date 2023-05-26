@@ -12,7 +12,7 @@ namespace checkers
 	{
 		assert(m_game->m_current_player == this);
 
-		if (m_game->m_selected_piece == NULL) // bot has not selected any piece yet
+		if (m_game->m_selected_piece == nullptr) // bot has not selected any piece yet
 		{
 			// best move evaluation
 			// for each piece and its move copy the board and lists and evaluate saving iterations and score after

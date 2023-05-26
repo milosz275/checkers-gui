@@ -1,7 +1,993 @@
-Log file: Checkers game (10x10
-Thu May 25 01:43:40 2023
 Log file: Checkers game (10x10)
-Thu May 25 01:51:54 2023
+Thu May 25 15:37:32 2023
+Deleted piece: x: 7; y: 4
+Moved piece: origin: x:6; y: 3; destination: x: 8; y: 5
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:8; y: 5; destination: x: 7; y: 4
+Deleted piece: x: 7; y: 4
+Moved piece: origin: x:6; y: 3; destination: x: 8; y: 5
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:9; y: 6; destination: x: 7; y: 4
+Moved piece: origin: x:9; y: 2; destination: x: 8; y: 3
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:7; y: 4; destination: x: 9; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:9; y: 2; destination: x: 8; y: 1
+Deleted piece: x: 8; y: 1
+Moved piece: origin: x:7; y: 0; destination: x: 9; y: 2
+Moved piece: origin: x:7; y: 6; destination: x: 6; y: 5
+Moved piece: origin: x:7; y: 2; destination: x: 8; y: 3
+Moved piece: origin: x:6; y: 5; destination: x: 7; y: 4
+Deleted piece: x: 7; y: 4
+Moved piece: origin: x:8; y: 3; destination: x: 6; y: 5
+Moved piece: origin: x:4; y: 7; destination: x: 5; y: 6
+Deleted piece: x: 5; y: 6
+Moved piece: origin: x:6; y: 5; destination: x: 4; y: 7
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:3; y: 8; destination: x: 5; y: 6
+Moved piece: origin: x:1; y: 4; destination: x: 2; y: 5
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:1; y: 6; destination: x: 3; y: 4
+Deleted piece: x: 3; y: 4
+Moved piece: origin: x:2; y: 3; destination: x: 4; y: 5
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 6; destination: x: 3; y: 4
+Game state saved to the log file
 Results:
 Game wasn't finished
-player Player1's score: 0; player Player2's score: 0
+Player "Player1"'s score: 6; Player "Player2"'s score: 5
+Log file: Checkers game (10x10)
+Fri May 26 15:34:37 2023
+Moved piece: origin: x:3; y: 2; destination: x: 4; y: 3
+Results:
+Game wasn't finished
+Player "Player1"'s score: 9; Player "Player2"'s score: 7
+Log file: Checkers game (10x10)
+Fri May 26 15:35:36 2023
+Results:
+Game wasn't finished
+Player "Player1"'s score: 9; Player "Player2"'s score: 7
+Log file: Checkers game (10x10)
+Fri May 26 16:17:35 2023
+Deleted piece: x: 4; y: 3
+Moved piece: origin: x:3; y: 4; destination: x: 5; y: 2
+Log file: Checkers game (10x10)
+Fri May 26 16:18:34 2023
+Manually re-evaluating the game
+Results:
+Game wasn't finished
+Player "Player1"'s score: 0; Player "Player2"'s score: 0
+Log file: Checkers game (10x10)
+Fri May 26 16:19:35 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually re-evaluating the game
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Manually adding piece to the first player at coordinates: x: 5; 8
+Manually adding piece to the second player at coordinates: x: 6; 7
+Manually re-evaluating the game
+Log file: Checkers game (10x10)
+Fri May 26 16:24:14 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the first player at coordinates: x: 6; 7
+Manually adding piece to the second player at coordinates: x: 7; 6
+Manually re-evaluating the game
+Manually adding piece to the first player at coordinates: x: 6; 3
+Manually adding piece to the second player at coordinates: x: 4; 3
+Manually re-evaluating the game
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Log file: Checkers game (10x10)
+Fri May 26 16:28:03 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually adding piece to the first player at coordinates: x: 6; 7
+Manually adding piece to the second player at coordinates: x: 7; 6
+Manually re-evaluating the game
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Log file: Checkers game (10x10)
+Fri May 26 16:31:37 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Log file: Checkers game (10x10)
+Fri May 26 16:36:10 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Log file: Checkers game (10x10)
+Fri May 26 16:39:38 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Log file: Checkers game (10x10)
+Fri May 26 16:40:51 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Manually switching game turn
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually adding piece to the second player at coordinates: x: 8; 1
+Manually re-evaluating the game
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Log file: Checkers game (10x10)
+Fri May 26 16:42:36 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Log file: Checkers game (10x10)
+Fri May 26 16:44:07 2023
+Manually adding piece to the first player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 5; 4
+Manually adding piece to the second player at coordinates: x: 6; 3
+Game state saved to the log file
+Results:
+Game wasn't finished
+Player "Player1"'s score: 0; Player "Player2"'s score: 0
+Log file: Checkers game (10x10)
+Fri May 26 16:44:16 2023
+Manually switching game turn
+Manually switching game turn
+Manually switching game turn
+Manually re-evaluating the game
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 3; y: 6
+Results:
+Player: "Player2" won!
+Player "Player1"'s score: 0; Player "Player2"'s score: 1
+Log file: Checkers game (10x10)
+Fri May 26 16:44:33 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Log file: Checkers game (10x10)
+Fri May 26 16:48:23 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Log file: Checkers game (10x10)
+Fri May 26 16:49:41 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Log file: Checkers game (10x10)
+Fri May 26 16:51:07 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 5; 4
+Manually adding piece to the second player at coordinates: x: 7; 2
+Manually adding piece to the first player at coordinates: x: 4; 5
+Manually re-evaluating the game
+Moved piece: origin: x:4; y: 5; destination: x: 6; y: 3
+Deleted piece: x: 5; y: 4
+Log file: Checkers game (10x10)
+Fri May 26 16:54:49 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Log file: Checkers game (10x10)
+Fri May 26 16:56:20 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Log file: Checkers game (10x10)
+Fri May 26 16:57:14 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Log file: Checkers game (10x10)
+Fri May 26 16:58:15 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Log file: Checkers game (10x10)
+Fri May 26 17:00:09 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Log file: Checkers game (10x10)
+Fri May 26 17:00:32 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Log file: Checkers game (10x10)
+Fri May 26 17:02:47 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Log file: Checkers game (10x10)
+Fri May 26 17:15:52 2023
+Manually adding piece to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Game state saved to the log file
+Results:
+Game wasn't finished
+Player "Player1"'s score: 0; Player "Player2"'s score: 0
+Log file: Checkers game (10x10)
+Fri May 26 17:17:53 2023
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Game state saved to the log file
+Results:
+Game wasn't finished
+Player "Player1"'s score: 0; Player "Player2"'s score: 0
+Log file: Checkers game (10x10)
+Fri May 26 17:18:52 2023
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Log file: Checkers game (10x10)
+Fri May 26 17:21:17 2023
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Log file: Checkers game (10x10)
+Fri May 26 17:24:19 2023
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Game state saved to the log file
+Results:
+Game wasn't finished
+Player "Player1"'s score: 0; Player "Player2"'s score: 0
+Log file: Checkers game (10x10)
+Fri May 26 17:27:43 2023
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Log file: Checkers game (10x10)
+Fri May 26 17:34:30 2023
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Manually adding piece to the second player at coordinates: x: 2; 5
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Manually adding piece to the first player at coordinates: x: 5; 8
+Manually adding piece to the second player at coordinates: x: 6; 7
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 8; destination: x: 7; y: 6
+Deleted piece: x: 6; y: 7
+Manually adding piece to the second player at coordinates: x: 8; 5
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 8; destination: x: 7; y: 6
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:7; y: 6; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 5
+Game state saved to the log file
+Results:
+Game wasn't finished
+Player "Player1"'s score: 0; Player "Player2"'s score: 0
+Log file: Checkers game (10x10)
+Fri May 26 17:36:42 2023
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 8; destination: x: 7; y: 6
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:7; y: 6; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 5
+Manually deleting piece at coordinates: x: 2; 5
+Deleted piece: x: 2; y: 5
+Manually deleting piece at coordinates: x: 3; 6
+Deleted piece: x: 3; y: 6
+Manually deleting piece at coordinates: x: 4; 5
+Deleted piece: x: 4; y: 5
+Manually deleting piece at coordinates: x: 6; 3
+Deleted piece: x: 6; y: 3
+Manually deleting piece at coordinates: x: 8; 5
+Deleted piece: x: 8; y: 5
+Manually deleting piece at coordinates: x: 6; 7
+Deleted piece: x: 6; y: 7
+Manually deleting piece at coordinates: x: 5; 8
+Deleted piece: x: 5; y: 8
+Manually adding king to the first player at coordinates: x: 3; 6
+Manually adding piece to the second player at coordinates: x: 4; 5
+Manually adding piece to the second player at coordinates: x: 6; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Manually adding piece to the second player at coordinates: x: 8; 5
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Manually adding piece to the second player at coordinates: x: 8; 3
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:9; y: 4; destination: x: 7; y: 6
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:9; y: 4; destination: x: 6; y: 7
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:9; y: 4; destination: x: 5; y: 8
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:9; y: 4; destination: x: 4; y: 9
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Manually adding piece to the second player at coordinates: x: 6; 7
+Manually adding piece to the second player at coordinates: x: 4; 7
+Manually adding piece to the second player at coordinates: x: 2; 5
+Manually adding piece to the second player at coordinates: x: 2; 3
+Manually adding piece to the second player at coordinates: x: 2; 1
+Manually adding piece to the second player at coordinates: x: 4; 1
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:9; y: 4; destination: x: 7; y: 6
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:7; y: 6; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 5; y: 8
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:5; y: 8; destination: x: 3; y: 6
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 1; y: 4
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 2
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:3; y: 2; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 6; destination: x: 0; y: 3
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:0; y: 3; destination: x: 3; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 0; destination: x: 5; y: 2
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 4; y: 9
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 6; destination: x: 1; y: 4
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 2
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:5; y: 0; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:9; y: 4; destination: x: 7; y: 6
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:7; y: 6; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 5; y: 8
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:5; y: 8; destination: x: 3; y: 6
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 4; y: 9
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:3; y: 2; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 6; destination: x: 0; y: 3
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:0; y: 3; destination: x: 3; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 0; destination: x: 5; y: 2
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:5; y: 2; destination: x: 7; y: 4
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:7; y: 4; destination: x: 9; y: 2
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:7; y: 4; destination: x: 9; y: 6
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:7; y: 4; destination: x: 3; y: 8
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:7; y: 4; destination: x: 2; y: 9
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 8
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:5; y: 8; destination: x: 7; y: 6
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:7; y: 6; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:9; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 5; y: 4
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:5; y: 4; destination: x: 3; y: 6
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 1; y: 4
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 2
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:3; y: 2; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 6; destination: x: 0; y: 3
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:0; y: 3; destination: x: 3; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 0; destination: x: 5; y: 2
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:5; y: 4; destination: x: 2; y: 7
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 8
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 0; y: 9
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:9; y: 4; destination: x: 6; y: 1
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:6; y: 1; destination: x: 1; y: 6
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:6; y: 1; destination: x: 0; y: 7
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:9; y: 4; destination: x: 5; y: 0
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:5; y: 0; destination: x: 3; y: 2
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:3; y: 2; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 2; destination: x: 1; y: 4
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 6
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 2; destination: x: 0; y: 5
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:7; y: 6; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 6; destination: x: 6; y: 9
+Deleted piece: x: 4; y: 7
+Manually switching game turn
+Manually switching game turn
+Log file: Checkers game (10x10)
+Fri May 26 17:39:59 2023
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 8; destination: x: 7; y: 6
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:7; y: 6; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 5
+Manually adding piece to the second player at coordinates: x: 8; 3
+Manually adding piece to the second player at coordinates: x: 4; 7
+Manually deleting piece at coordinates: x: 5; 8
+Deleted piece: x: 5; y: 8
+Manually adding piece to the second player at coordinates: x: 2; 3
+Manually adding piece to the second player at coordinates: x: 2; 1
+Manually adding piece to the second player at coordinates: x: 4; 1
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 2
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 2
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:5; y: 8; destination: x: 7; y: 6
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:7; y: 6; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 2
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Deleted piece: x: 4; y: 1
+Manually switching game turn
+Manually re-evaluating the game
+Manually switching game turn
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 2
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 2
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:5; y: 8; destination: x: 7; y: 6
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:7; y: 6; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 2
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Deleted piece: x: 4; y: 1
+Manually deleting piece at coordinates: x: 3; 6
+Deleted piece: x: 3; y: 6
+Manually adding king to the first player at coordinates: x: 3; 6
+Manually re-evaluating the game
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:9; y: 4; destination: x: 7; y: 6
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:7; y: 6; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 5; y: 8
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:5; y: 8; destination: x: 3; y: 6
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 1; y: 4
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 2
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:3; y: 2; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 6; destination: x: 0; y: 3
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:0; y: 3; destination: x: 3; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 0; destination: x: 5; y: 2
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 4; y: 9
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 6; destination: x: 1; y: 4
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 2
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:5; y: 0; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:9; y: 4; destination: x: 7; y: 6
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:7; y: 6; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 5; y: 8
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:5; y: 8; destination: x: 3; y: 6
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 4; y: 9
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:3; y: 2; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 6; destination: x: 0; y: 3
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:0; y: 3; destination: x: 3; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 0; destination: x: 5; y: 2
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:5; y: 2; destination: x: 7; y: 4
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:7; y: 4; destination: x: 9; y: 2
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:7; y: 4; destination: x: 9; y: 6
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:7; y: 4; destination: x: 3; y: 8
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:7; y: 4; destination: x: 2; y: 9
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 8
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:5; y: 8; destination: x: 7; y: 6
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:7; y: 6; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:9; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 5; y: 4
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:5; y: 4; destination: x: 3; y: 6
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 1; y: 4
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 2
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:3; y: 2; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 6; destination: x: 0; y: 3
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:0; y: 3; destination: x: 3; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 0; destination: x: 5; y: 2
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:5; y: 4; destination: x: 2; y: 7
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 8
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 0; y: 9
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:9; y: 4; destination: x: 6; y: 1
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:6; y: 1; destination: x: 1; y: 6
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:6; y: 1; destination: x: 0; y: 7
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:9; y: 4; destination: x: 5; y: 0
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:5; y: 0; destination: x: 3; y: 2
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:3; y: 2; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 2; destination: x: 1; y: 4
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 6
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 2; destination: x: 0; y: 5
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:7; y: 6; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:3; y: 6; destination: x: 6; y: 9
+Deleted piece: x: 4; y: 7
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 1; y: 4
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 2
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:5; y: 0; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:9; y: 4; destination: x: 7; y: 6
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:7; y: 6; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 5; y: 8
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:5; y: 8; destination: x: 3; y: 6
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 4; y: 9
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:3; y: 2; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 2
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:5; y: 0; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:9; y: 4; destination: x: 7; y: 6
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:7; y: 6; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 5; y: 8
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:5; y: 8; destination: x: 3; y: 6
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 4; y: 9
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:3; y: 2; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Deleted piece: x: 4; y: 1
+Moved piece: origin: x:3; y: 2; destination: x: 5; y: 0
+Moved piece: origin: x:5; y: 0; destination: x: 9; y: 4
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:9; y: 4; destination: x: 7; y: 6
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:7; y: 6; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 5; y: 8
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:5; y: 8; destination: x: 3; y: 6
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 4; y: 9
+Deleted piece: x: 6; y: 7
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:5; y: 0; destination: x: 9; y: 4
+Moved piece: origin: x:9; y: 4; destination: x: 7; y: 6
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:7; y: 6; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 5; y: 8
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:5; y: 8; destination: x: 3; y: 6
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 4; y: 9
+Deleted piece: x: 6; y: 7
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:9; y: 4; destination: x: 7; y: 6
+Moved piece: origin: x:7; y: 6; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 5; y: 8
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:5; y: 8; destination: x: 3; y: 6
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Moved piece: origin: x:7; y: 6; destination: x: 4; y: 9
+Deleted piece: x: 6; y: 7
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:7; y: 6; destination: x: 5; y: 8
+Moved piece: origin: x:5; y: 8; destination: x: 3; y: 6
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:5; y: 8; destination: x: 3; y: 6
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 8; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 9; y: 0
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 2; y: 1
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:7; y: 2; destination: x: 5; y: 4
+Moved piece: origin: x:3; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 3; y: 2
+Deleted piece: x: 4; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 2; y: 1
+Deleted piece: x: 4; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Deleted piece: x: 4; y: 3
+Deleted piece: x: 4; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 1; y: 0
+Results:
+Player: "Player1" won!
+Player "Player1"'s score: 10; Player "Player2"'s score: 0

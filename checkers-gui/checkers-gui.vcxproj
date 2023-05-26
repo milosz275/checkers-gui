@@ -167,7 +167,7 @@ xcopy /y /d "$(SolutionDir)dependecies\SFML\bin\sfml-audio-d-2.dll" "$(OutDir)"<
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>

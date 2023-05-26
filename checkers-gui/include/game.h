@@ -107,6 +107,9 @@ namespace checkers
 
 		// switches first_turn flag, indicating that it is move of the first player
 		void switch_turn(void);
+		//
+		int get_score(void);
+
 		// returns main game board
 		std::vector<std::vector<piece*>>* get_board(void);
 		

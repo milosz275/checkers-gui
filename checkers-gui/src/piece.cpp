@@ -73,10 +73,10 @@ namespace checkers
 
     std::ostream& operator<<(std::ostream& os, const piece* piece)
     {
-        if (piece == NULL)
-            return os << " ";
-        else
+        if (piece)
             return os << piece->m_sign;
+        else
+            return os << " ";
     }
 
     void piece::draw(sf::RenderWindow& window)
