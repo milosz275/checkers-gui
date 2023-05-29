@@ -4,7 +4,7 @@
 
 namespace checkers
 {
-	base_player::base_player(char sign, std::string name) : m_sign(std::toupper(sign)), m_name(name), m_captured_pieces(0), m_combo(false), m_next_player(nullptr), m_piece_list(nullptr), m_is_first(false)
+	base_player::base_player(char sign, std::string name) : m_sign(std::toupper(sign, std::locale())), m_name(name), m_captured_pieces(0), m_combo(false), m_next_player(nullptr), m_piece_list(nullptr), m_is_first(false)
 	{
 		assert(std::isalpha(sign, std::locale()));
 	}
@@ -37,7 +37,13 @@ namespace checkers
 
 	int base_player::get_captured_pieces(void) { return m_captured_pieces; }
 
-	int base_player::set_captured_pieces(int pieces) { assert(m_captured_pieces == 0); return m_captured_pieces = pieces; }
+	int base_player::set_captured_pieces(int pieces)
+	{
+#ifndef _DEBUG
+		assert(m_captured_pieces == 0);
+#endif
+		return m_captured_pieces = pieces;
+	}
 
 	void base_player::add_capture(void) { assert(m_piece_list->size() >= 0); m_captured_pieces++; }
 

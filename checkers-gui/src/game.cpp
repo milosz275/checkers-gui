@@ -7,10 +7,11 @@
 // TODO: move some methods into private
 // TODO: add seters with value check
 // TODO: add saving player scores in save and load from file
+//https://isocpp.org/wiki/faq/operator-overloading#matrix-subscript-op
 
 namespace checkers
 {
-	game::game(int fps, std::istream& is, std::ostream& os) : m_console_game(false), m_game_freeze(false), m_is_finished(false), m_fps(fps),
+	game::game(int fps, std::istream& is, std::ostream& os) : m_console_game(false), m_game_freeze(false), m_any_changes(true), m_is_finished(false), m_fps(fps),
 		m_window(sf::VideoMode(s_square_size* s_size, s_square_size* s_size), "Checkers", sf::Style::Default, m_settings),
 		m_selected(false), m_selected_piece(nullptr), m_moving_piece(nullptr), m_available_capture(false), m_last_capture_direction(-1), m_is(is), m_os(os),
 		m_log_file("log.txt", std::ios::app),
@@ -72,7 +73,7 @@ namespace checkers
 		//	m_player_2 = new bot('B', this);
 		//}
 
-		bool against_bot = false;
+		bool against_bot = true;
 
 		// simplified: set values
 		if (!m_console_game)
@@ -136,22 +137,6 @@ namespace checkers
 					});
 				++i;
 			});
-
-		//m_tile.setSize(sf::Vector2f(s_square_size, s_square_size));
-
-		/*for (int i = 0; i < s_size; ++i)
-		{
-			for (int j = 0; j < s_size; ++j)
-			{
-				m_tile.setPosition(sf::Vector2f(s_square_size * i, s_square_size * j));
-				if ((i + j) % 2 == 0)
-					m_tile.setFillColor(sf::Color(193, 173, 158, 255));
-				else
-					m_tile.setFillColor(sf::Color(133, 94, 66, 255));
-				window.draw(m_tile);
-			}
-		}*/
-
 
 		// evaluate available moves for the first player
 		int dummy = 0;
@@ -619,6 +604,7 @@ namespace checkers
 		else
 			(*board)[x][y] = new piece(player->get_sign(), x, y, based_on->is_alive(), player);
 		list->push_back((*board)[x][y]);
+		m_any_changes = true;
 	}
 
 	std::vector<std::vector<piece*>>* game::get_board(void) { assert(m_board); return m_board; }
@@ -706,17 +692,548 @@ namespace checkers
 
 	void game::handle_events(void)
 	{
-
+		while (m_window.pollEvent(m_event))
+		{
+			if (m_event.type == sf::Event::Closed || m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::Escape)
+			{
+				m_window.close();
+#ifdef _DEBUG
+				m_os << "Closing the game" << std::endl;
+				//save_pieces_to_file();
+#endif
+				break;
+			}
+#ifdef _DEBUG
+			if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::R)
+			{
+				m_os << "Reseted the game" << std::endl;
+				m_first_won = false;
+				m_second_won = false;
+				m_player_1->set_captured_pieces(0);
+				m_player_2->set_captured_pieces(0);
+				break;
+			}
+#endif
+			if ((m_player_1->get_pieces() == 0 || m_player_2->get_pieces() == 0) && (m_player_1->get_captured_pieces() > 0 || m_player_2->get_captured_pieces() > 0))
+			{
+				if (m_event.type == sf::Event::KeyPressed || m_event.type == sf::Event::MouseButtonPressed)
+					m_os << "Game was finished. Click Escape!" << std::endl;
+				break;
+			}
+			else if (m_game_freeze)
+			{
+				if (m_event.type == sf::Event::KeyPressed || m_event.type == sf::Event::MouseButtonPressed)
+				{
+					if (m_event.key.code == sf::Keyboard::X)
+					{
+						m_os << "Unfrozen the game." << std::endl;
+						m_game_freeze = false;
+					}
+					else
+						m_os << "Game is frozen" << std::endl;
+				}
+				break;
+			}
+			else if (m_event.type == sf::Event::MouseButtonPressed && m_event.mouseButton.button == sf::Mouse::Left || dynamic_cast<bot*>(m_current_player) || m_console_game)
+			{
+				if (!m_selected)
+				{
+					select_piece();
+					continue;
+				}
+				if (m_selected_piece)
+				{
+					move_selected_piece();
+					continue;
+				}
+			}
+#ifdef _DEBUG
+			if (m_event.type == sf::Event::MouseButtonPressed && m_event.mouseButton.button == sf::Mouse::Right)
+			{
+				// display debug info
+				debug_info(m_os);
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::E)
+			{
+				// re-evaluate the game
+				m_log << "Manually re-evaluating the game" << std::endl;
+				m_selected_piece = nullptr;
+				m_selected = false;
+				int dummy = 0;
+				m_available_capture = evaluate(m_current_player->get_list(), m_board, &dummy, dummy, m_current_player, m_last_capture_direction, &m_to_delete_list, m_moving_piece);
+				m_os << "Game re-evaluated" << std::endl;
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::T)
+			{
+				// write a separator
+				m_os << "--------------------------------------------------------------" << std::endl;
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::U && ((sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) || (sf::Keyboard::isKeyPressed(sf::Keyboard::RShift))))
+			{
+				// add new piece to the first player
+				std::tuple<int, int> coords = get_click_coordinates();
+				int x = std::get<0>(coords);
+				int y = std::get<1>(coords);
+				if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == nullptr)
+				{
+					m_log << "Manually adding king to the first player at coordinates: x: " << x << "; " << y << std::endl;
+					add_new_piece(&m_p_list_1, m_board, m_player_1, new king(m_player_1->get_sign(), x, y, true, m_player_1));
+				}
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::I && ((sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) || (sf::Keyboard::isKeyPressed(sf::Keyboard::RShift))))
+			{
+				// add new piece to the second player
+				std::tuple<int, int> coords = get_click_coordinates();
+				int x = std::get<0>(coords);
+				int y = std::get<1>(coords);
+				if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == nullptr)
+				{
+					m_log << "Manually adding king to the second player at coordinates: x: " << x << "; " << y << std::endl;
+					add_new_piece(&m_p_list_2, m_board, m_player_2, new king(m_player_2->get_sign(), x, y, true, m_player_2));
+					m_any_changes = true;
+				}
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::U)
+			{
+				// add new piece to the first player
+				std::tuple<int, int> coords = get_click_coordinates();
+				int x = std::get<0>(coords);
+				int y = std::get<1>(coords);
+				if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == nullptr)
+				{
+					m_log << "Manually adding piece to the first player at coordinates: x: " << x << "; " << y << std::endl;
+					add_new_piece(&m_p_list_1, m_board, m_player_1, x, y, true);
+					m_any_changes = true;
+				}
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::I)
+			{
+				// add new piece to the second player
+				std::tuple<int, int> coords = get_click_coordinates();
+				int x = std::get<0>(coords);
+				int y = std::get<1>(coords);
+				if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == nullptr)
+				{
+					m_log << "Manually adding piece to the second player at coordinates: x: " << x << "; " << y << std::endl;
+					add_new_piece(&m_p_list_2, m_board, m_player_2, x, y, true);
+					m_any_changes = true;
+				}
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::D)
+			{
+				// add new piece to the second player
+				std::tuple<int, int> coords = get_click_coordinates();
+				int x = std::get<0>(coords);
+				int y = std::get<1>(coords);
+				std::cout << "x: " << x << "; y: " << y << std::endl;
+				if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] != nullptr)
+				{
+					piece* p = (*m_board)[x][y];
+					if (p)
+					{
+						m_log << "Manually deleting piece at coordinates: x: " << x << "; " << y << std::endl;
+						delete_piece(p, m_board, p->get_owner());
+						m_any_changes = true;
+					}
+				}
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::L)
+			{
+				m_log << "Manually populating the board with normal setup" << std::endl;
+				populate_board(s_size / 2 - 1);
+				m_any_changes = true;
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::F)
+			{
+				// load pieces from file
+				m_log << "Manually loading gamestate from file" << std::endl;
+				load_pieces_from_file("pieces.txt");
+				m_any_changes = true;
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::J)
+			{
+				// save pieces to file
+				m_log << "Manually saving gamestate to file" << std::endl;
+				save_to_file("pieces.txt");
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::S)
+			{
+				m_log << "Manually switching game turn" << std::endl;
+				switch_turn();
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::R)
+			{
+				// refresh the board
+				m_os << "Refreshing the board." << std::endl;
+				m_any_changes = true;
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::X)
+			{
+				m_os << "Frozen the game." << std::endl;
+				m_game_freeze = true;
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed && (m_event.key.code == sf::Keyboard::LShift || m_event.key.code == sf::Keyboard::RShift))
+			{
+				break;
+			}
+			else if (m_event.type == sf::Event::KeyPressed)
+			{
+				m_os << "Key code: \'" << m_event.key.code << "\' is not programmed." << std::endl;
+				break;
+			}
+#endif
+			if (m_first_won || m_second_won)
+			{
+				m_os << "Game is finished. Click Escape to display the results" << std::endl;
+				m_selected = false;
+				m_selected_piece = nullptr;
+				m_game_freeze = true;
+				m_window.clear();
+				draw(m_window);
+				m_window.display();
+				break;
+			}
+		}
 	}
 
 	void game::draw_board(void)
 	{
+		assert(m_any_changes);
+		m_any_changes = false;
 
+		m_window.clear();
+		draw(m_window);
+
+		// highlight selected piece and its corresponding moves, when moves exist
+		if (m_selected_piece != nullptr)
+		{
+			highlight_selected(m_window, m_selected_piece->get_x(), m_selected_piece->get_y());
+			for_each(m_selected_piece->get_av_list()->begin(), m_selected_piece->get_av_list()->end(), [this](available_move* a) { highlight_available(m_window, a->get_x(), a->get_y()); });
+		}
+		
+		// print alive pieces
+		for_each(m_player_1->get_list()->begin(), m_player_1->get_list()->end(), [this](piece* p) { p->draw(m_window); });
+		for_each(m_player_2->get_list()->begin(), m_player_2->get_list()->end(), [this](piece* p) { p->draw(m_window); });
+
+		// print dead pieces in multicapture
+		for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [this](piece* p) { p->draw(m_window); });
+
+		// sleep according to fps
+		sf::Time elapsed_time = m_clock.restart();
+		if (elapsed_time.asSeconds() < m_frame_duration)
+			sf::sleep(sf::seconds(m_frame_duration - elapsed_time.asSeconds()));
+
+		m_window.display();
 	}
 
 	void game::select_piece(void)
 	{
+		// dereference old selected piece
+		m_selected = false;
+		m_selected_piece = nullptr;
 
+		// getting coords of the click after highlighting selected piece, ignore clicks outside
+		std::tuple<int, int> coordinates = get_coordinates();
+		int x = std::get<0>(coordinates);
+		int y = std::get<1>(coordinates);
+
+		if (x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1)
+			return;
+
+		//
+		if (!m_to_delete_list.empty() && (*m_board)[x][y] != m_moving_piece)
+		{
+#ifdef _DEBUG
+			if ((*m_board)[x][y])
+				m_os << "Multicapture: this isn't the moving piece." << std::endl;
+			else
+				m_os << "Multicapture: this is an empty space." << std::endl;
+#endif
+			return;
+		}
+
+		// check if the correspoding field contains a piece
+		if ((*m_board)[x][y] != nullptr)
+		{
+#ifdef _DEBUG
+			m_os << "x: " << x << "; y: " << y << "; piece: " << (*m_board)[x][y] << std::endl;
+#endif
+			// check if player owns this piece
+			if ((*m_board)[x][y]->get_owner() == m_current_player)
+			{
+#ifdef _DEBUG
+				m_os << "That piece belongs to you" << std::endl;
+#endif
+				bool found_capture = false;
+				if (!(*m_board)[x][y]->get_av_list()->empty())
+				{
+					// find at least one move that is a capture
+					all_of((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [&found_capture](available_move* a)
+					{
+						if (dynamic_cast<available_capture*>(a))
+						{
+							found_capture = true;
+							return false;
+						}
+						return true;
+					});
+#ifdef _DEBUG
+					for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [this](available_move* a)
+					{
+						m_os << "available: x: " << a->get_x() << "; y: " << a->get_y();
+						if (dynamic_cast<available_capture*>(a))
+							m_os << "; max captures: " << dynamic_cast<available_capture*>(a)->get_max_score();
+						m_os << std::endl;
+					});
+#endif
+				}
+				if ((found_capture && m_available_capture) || (!found_capture && !m_available_capture)) // this lets making only capture moves, comment out to enable testing - replace to xnor
+				{
+#ifdef _DEBUG
+					m_os << "Selecting" << std::endl;
+#endif
+					m_selected_piece = (*m_board)[x][y];
+					m_selected = true;
+					m_any_changes = true;
+					return;
+				}
+			}
+			else
+			{
+#ifdef _DEBUG
+				m_os << "That piece does not belong to you" << std::endl;
+#endif
+			}
+		}
+		else
+		{
+#ifdef _DEBUG
+			m_os << "x: " << x << "; y: " << y << std::endl;
+#endif
+		}
+	}
+
+	void game::move_selected_piece(void)
+	{
+		assert(m_selected_piece); // choice after highlighting
+
+		if (m_selected_piece->get_av_list()->empty())
+		{
+#ifdef _DEBUG
+			m_os << "Empty available list: deselecting" << std::endl;
+#endif
+			m_selected_piece = nullptr;
+			m_selected = false;
+			return;
+		}
+
+		// getting coords of the click after highlighting selected piece, ignore clicks outside
+		std::tuple<int, int> coordinates = get_coordinates();
+		int x = std::get<0>(coordinates);
+		int y = std::get<1>(coordinates);
+
+		if (x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1)
+		{
+			m_selected = false;
+			m_selected_piece = nullptr;
+			return;
+		}
+	
+			// find corresponding piece
+			bool is_found = false;
+			available_move* found_move = nullptr;
+
+			all_of(m_selected_piece->get_av_list()->begin(), m_selected_piece->get_av_list()->end(), [this, &x, &y, &is_found, &found_move](available_move* a)
+			{
+				// check if selected coords match any of possible moves
+				if (a->get_x() == x && a->get_y() == y)
+				{
+#ifdef _DEBUG
+					m_os << a->get_x() << " " << a->get_y() << std::endl;
+#endif		
+					found_move = a;
+					is_found = true;
+					return false;
+				}
+				return true;
+			});
+			if (!is_found) // deselection when wrong coords given
+			{
+				m_selected = false;
+				m_selected_piece = nullptr;
+			}
+			else // making a move
+			{
+				m_any_changes = true;
+				if (dynamic_cast<available_capture*>(found_move))
+				{
+					// mark found capture
+					available_capture* found_capture = dynamic_cast<available_capture*>(found_move);
+					int x_d = found_capture->get_x_d();
+					int y_d = found_capture->get_y_d();
+
+					// save capture direction: 0 - top right, 1 - top left, 2 - bottom right, 3 - bottom left
+					if (x_d > x && y_d < y)
+						m_last_capture_direction = 3;
+					else if (x_d < x && y_d < y)
+						m_last_capture_direction = 2;
+					else if (x_d > x && y_d > y)
+						m_last_capture_direction = 1;
+					else if (x_d < x && y_d > y)
+						m_last_capture_direction = 0;
+					else
+						throw std::runtime_error("Capturing in wrong direction");
+#ifdef _DEBUG
+					m_os << "/ saved last capture direction: ";
+					switch (m_last_capture_direction)
+					{
+					case 0:
+						m_os << "top right";
+						break;
+					case 1:
+						m_os << "top left";
+						break;
+					case 2:
+						m_os << "bottom right";
+						break;
+					case 3:
+						m_os << "bottom left";
+						break;
+					}
+					m_os << std::endl;
+					m_os << "Coords to delete: x: " << x_d << "; y: " << y_d << std::endl;
+#endif
+					// delete captured piece
+					piece* piece_to_delete = (*m_board)[x_d][y_d];
+					delete_piece(piece_to_delete, m_board, m_current_player->get_next_player());
+					m_current_player->get_next_player()->add_capture();
+
+					// check game completion
+					if (m_current_player->get_next_player()->get_list()->empty())
+					{
+						if (m_current_player->is_first())
+							m_first_won = true;
+						else
+							m_second_won = true;
+					}
+
+					// if there is no multicapture, set new moving piece
+					if (m_to_delete_list.empty())
+						m_moving_piece = m_selected_piece;
+
+					// create new piece which represents dead piece during multicapture, it is indifferent whether it was normal piece or king
+					m_to_delete_list.push_back(new piece(m_current_player->get_next_player()->get_sign(), x_d, y_d, false, m_current_player->get_next_player()));
+					m_current_player->set_combo(true);
+#ifdef _DEBUG
+					m_os << m_current_player->get_name() << " combo" << std::endl;
+#endif
+				}
+
+				// move the piece (piece, which is moving -> both capture and normal move), keep selected_piece pointer for the possible king
+				move_piece(m_selected_piece, m_board, x, y);
+				(*m_board)[x][y] = m_selected_piece;
+				m_selected = false;
+#ifdef _DEBUG
+				m_os << "List of pieces of first player" << std::endl;
+				print_pieces(&m_p_list_1);
+				m_os << "List of pieces of second player" << std::endl;
+				print_pieces(&m_p_list_2);
+#endif		
+				// tmp flag indicating, that the king check was made this round
+				bool made_king_check = false;
+				bool changed_to_king = false;
+
+				// switch turn, if no combo
+				if (!m_player_1->get_combo() && !m_player_2->get_combo())
+				{
+					// king function
+					if (!made_king_check)
+						changed_to_king = m_current_player->change_to_king(m_selected_piece, m_board);
+					made_king_check = true;
+#ifdef _DEBUG
+					if (changed_to_king)
+						m_os << m_current_player->get_name() << " changed his piece to king!" << std::endl;
+#endif
+					switch_turn();
+				}
+				else // section to test (fixes stuff)
+				{
+					clear_list(&m_p_list_1);
+					clear_list(&m_p_list_2);
+				}
+
+				// evaluate current player and check if there is more captures, if not, check for new kings
+				int counter = 0;
+				m_available_capture = evaluate(m_current_player->get_list(), m_board, &counter, counter, m_current_player, m_last_capture_direction, &m_to_delete_list, m_moving_piece);
+#ifdef _DEBUG
+				m_os << "main game loop: first evaluation counter: " << counter << std::endl;
+#endif
+				// second game completion check
+				if (check_game_completion_no_possible_moves(m_current_player->get_list()))
+				{
+					if (m_current_player->is_first())
+						m_second_won = true;
+					else
+						m_first_won = true;
+				}
+
+				// exit the combo, if no more captures
+				if (m_current_player->get_combo() && !m_available_capture)
+				{
+					m_moving_piece = nullptr;
+
+					// delete opponent's pieces of multi capture, clear failed list of possible moves, cancel combo, evaluate again
+					clear_to_delete_list(&m_to_delete_list, &m_p_list_1);
+					clear_to_delete_list(&m_to_delete_list, &m_p_list_2);
+
+					clear_list(&m_p_list_1);
+					clear_list(&m_p_list_2);
+					m_current_player->set_combo(false);
+					m_current_player->get_next_player()->set_combo(false);
+#ifdef _DEBUG
+					m_os << "Combo cancelled" << std::endl;
+#endif
+					// king function
+					if (!made_king_check)
+						changed_to_king = m_current_player->change_to_king(m_selected_piece, m_board);
+					made_king_check = true;
+#ifdef _DEBUG
+					if (changed_to_king)
+						m_os << m_current_player->get_name() << " changed his piece to king!" << std::endl;
+#endif
+					switch_turn();
+					m_available_capture = evaluate(m_current_player->get_list(), m_board, &counter, counter, m_current_player, m_last_capture_direction, &m_to_delete_list, m_moving_piece);
+#ifdef _DEBUG
+					m_os << "main game loop: second evaluation counter: " << counter << std::endl;
+#endif
+					// second game completion check
+					if (check_game_completion_no_possible_moves(m_current_player->get_list()))
+					{
+						if (m_current_player->is_first())
+							m_second_won = true;
+						else
+							m_first_won = true;
+					}
+				}
+				else // continue the combo
+					clear_list(m_current_player->get_next_player()->get_list());
+
+				m_selected_piece = nullptr;
+			}
 	}
 
 	void game::make_capture(std::vector<std::vector<piece*>>* board, piece* moving_piece, piece* deleted_piece, int new_x, int new_y, std::list<piece*>* dead_list)
@@ -836,532 +1353,20 @@ namespace checkers
 		}
 	}
 
-	void game::test_loop(void)
-	{
-		// main loop
-		while (m_window.isOpen())
-		{
-			while (m_window.pollEvent(m_event))
-			{
-				if (m_event.type == sf::Event::Closed)
-					m_window.close();
-			}
-			m_window.display();
-			m_window.clear();
-			draw(m_window);
-			sf::sleep(sf::seconds(m_frame_duration));
-		}
-	}
-
 	void game::loop(void)
 	{
 		// start frame clock
 		m_clock.restart();
 
 		// inform about game start
-		m_os << "Game started!" << std::endl;
+		m_os << "Game loop started!" << std::endl;
 
 		// main loop
 		while (m_window.isOpen())
 		{
-			while (m_window.pollEvent(m_event))
-			{
-				if (m_event.type == sf::Event::Closed || m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::Escape)
-				{
-					m_window.close();
-#ifdef _DEBUG
-					m_os << "Closing the game" << std::endl;
-					//save_pieces_to_file();
-#endif
-				}
-
-				if ((m_player_1->get_pieces() == 0 || m_player_2->get_pieces() == 0) && (m_player_1->get_captured_pieces() > 0 || m_player_2->get_captured_pieces() > 0))
-				{
-					m_window.clear();
-					draw(m_window);
-					for_each(m_player_1->get_list()->begin(), m_player_1->get_list()->end(), [this](piece* p) { p->draw(m_window); });
-					for_each(m_player_2->get_list()->begin(), m_player_2->get_list()->end(), [this](piece* p) { p->draw(m_window); });
-					for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [this](piece* p) { p->draw(m_window); });
-
-					if (m_event.type == sf::Event::KeyPressed || m_event.type == sf::Event::MouseButtonPressed)
-						m_os << "Game was finished. Click Escape!" << std::endl;
-
-					sf::Time elapsed_time = m_clock.restart();
-					if (elapsed_time.asSeconds() < m_frame_duration)
-						sf::sleep(sf::seconds(m_frame_duration - elapsed_time.asSeconds()));
-
-					m_window.display();
-					continue;
-				}
-
-				if (m_game_freeze)
-				{
-					m_window.clear();
-					draw(m_window);
-					for_each(m_player_1->get_list()->begin(), m_player_1->get_list()->end(), [this](piece* p) { p->draw(m_window); });
-					for_each(m_player_2->get_list()->begin(), m_player_2->get_list()->end(), [this](piece* p) { p->draw(m_window); });
-					for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [this](piece* p) { p->draw(m_window); });
-
-					if (m_event.type == sf::Event::KeyPressed || m_event.type == sf::Event::MouseButtonPressed)
-					{
-						if (m_event.key.code == sf::Keyboard::X)
-							m_game_freeze = false;
-						else
-							m_os << "Game is frozen" << std::endl;
-					}
-
-					sf::Time elapsed_time = m_clock.restart();
-					if (elapsed_time.asSeconds() < m_frame_duration)
-						sf::sleep(sf::seconds(m_frame_duration - elapsed_time.asSeconds()));
-
-					m_window.display();
-					continue;
-				}
-
-				if (m_event.type == sf::Event::MouseButtonPressed && m_event.mouseButton.button == sf::Mouse::Left || dynamic_cast<bot*>(m_current_player) || m_console_game)
-				{
-					if (m_selected_piece != nullptr) // choice after highlighting
-					{
-						// getting coords of the click after highlighting selected piece, ignore clicks outside
-						std::tuple<int, int> coordinates = get_coordinates();
-						int x = std::get<0>(coordinates);
-						int y = std::get<1>(coordinates);
-
-						if (x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1)
-							break;
-
-						// find corresponding piece
-						bool is_found = false;
-						available_move* found_move = nullptr;
-
-						all_of(m_selected_piece->get_av_list()->begin(), m_selected_piece->get_av_list()->end(), [this, &x, &y, &is_found, &found_move](available_move* a)
-							{
-								// check if selected coords match any of possible moves
-								if (a->get_x() == x && a->get_y() == y)
-								{
-#ifdef _DEBUG
-									m_os << a->get_x() << " " << a->get_y() << std::endl;
-#endif		
-									found_move = a;
-									is_found = true;
-									return false;
-								}
-								return true;
-							});
-						if (!is_found) // deselection when wrong coords given
-						{
-							m_selected = false;
-							m_selected_piece = nullptr;
-						}
-						else // making a move
-						{
-							if (dynamic_cast<available_capture*>(found_move))
-							{
-								// mark found capture
-								available_capture* found_capture = dynamic_cast<available_capture*>(found_move);
-								int x_d = found_capture->get_x_d();
-								int y_d = found_capture->get_y_d();
-
-								// save capture direction: 0 - top right, 1 - top left, 2 - bottom right, 3 - bottom left
-								if (x_d > x && y_d < y)
-									m_last_capture_direction = 3;
-								else if (x_d < x && y_d < y)
-									m_last_capture_direction = 2;
-								else if (x_d > x && y_d > y)
-									m_last_capture_direction = 1;
-								else if (x_d < x && y_d > y)
-									m_last_capture_direction = 0;
-								else
-									throw std::runtime_error("Capturing in wrong direction");
-#ifdef _DEBUG
-								m_os << "/ saved last capture direction: ";
-								switch (m_last_capture_direction)
-								{
-								case 0:
-									m_os << "top right";
-									break;
-								case 1:
-									m_os << "top left";
-									break;
-								case 2:
-									m_os << "bottom right";
-									break;
-								case 3:
-									m_os << "bottom left";
-									break;
-								}
-								m_os << std::endl;
-
-								m_os << "CONTROL" << std::endl;
-								m_os << "Coords to delete: x: " << x_d << "; y: " << y_d << std::endl;
-#endif
-								// delete captured piece
-								piece* piece_to_delete = (*m_board)[x_d][y_d];
-								delete_piece(piece_to_delete, m_board, m_current_player->get_next_player());
-								m_current_player->get_next_player()->add_capture();
-
-								// check game completion
-								if (m_current_player->get_next_player()->get_list()->empty())
-								{
-									if (m_current_player->is_first())
-										m_first_won = true;
-									else
-										m_second_won = true;
-								}
-
-								// if there is no multicapture, set new moving piece
-								if (m_to_delete_list.empty())
-									m_moving_piece = m_selected_piece;
-
-								// create new piece which represents dead piece during multicapture, it is indifferent whether it was normal piece or king
-								m_to_delete_list.push_back(new piece(m_current_player->get_next_player()->get_sign(), x_d, y_d, false, m_current_player->get_next_player()));
-								m_current_player->set_combo(true);
-#ifdef _DEBUG
-								m_os << m_current_player->get_name() << " combo" << std::endl;
-#endif
-							}
-
-							// move the piece (piece, which is moving -> both capture and normal move), keep selected_piece pointer for the possible king
-							move_piece(m_selected_piece, m_board, x, y);
-							(*m_board)[x][y] = m_selected_piece;
-							m_selected = false;
-#ifdef _DEBUG
-							m_os << "List of pieces of first player" << std::endl;
-							print_pieces(&m_p_list_1);
-							m_os << "List of pieces of second player" << std::endl;
-							print_pieces(&m_p_list_2);
-#endif		
-							// tmp flag indicating, that the king check was made this round
-							bool made_king_check = false;
-							bool changed_to_king = false;
-
-							// switch turn, if no combo
-							if (!m_player_1->get_combo() && !m_player_2->get_combo())
-							{
-								// king function
-								if (!made_king_check)
-									changed_to_king = m_current_player->change_to_king(m_selected_piece, m_board);
-								made_king_check = true;
-#ifdef _DEBUG
-								if (changed_to_king)
-									m_os << m_current_player->get_name() << " changed his piece to king!" << std::endl;
-#endif
-								switch_turn();
-							}
-							else // section to test (fixes stuff)
-							{
-								clear_list(&m_p_list_1);
-								clear_list(&m_p_list_2);
-							}
-
-							// evaluate current player and check if there is more captures, if not, check for new kings
-							int counter = 0;
-							m_available_capture = evaluate(m_current_player->get_list(), m_board, &counter, counter, m_current_player, m_last_capture_direction, &m_to_delete_list, m_moving_piece);
-#ifdef _DEBUG
-							m_os << "main game loop: first evaluation counter: " << counter << std::endl;
-#endif
-							// second game completion check
-							if (check_game_completion_no_possible_moves(m_current_player->get_list()))
-							{
-								if (m_current_player->is_first())
-									m_second_won = true;
-								else
-									m_first_won = true;
-							}
-
-							// exit the combo, if no more captures
-							if (m_current_player->get_combo() && !m_available_capture)
-							{
-								m_moving_piece = nullptr;
-
-								// delete opponent's pieces of multi capture, clear failed list of possible moves, cancel combo, evaluate again
-								clear_to_delete_list(&m_to_delete_list, &m_p_list_1);
-								clear_to_delete_list(&m_to_delete_list, &m_p_list_2);
-
-								clear_list(&m_p_list_1);
-								clear_list(&m_p_list_2);
-								m_current_player->set_combo(false);
-								m_current_player->get_next_player()->set_combo(false);
-#ifdef _DEBUG
-								m_os << "Combo cancelled" << std::endl;
-#endif
-								// king function
-								if (!made_king_check)
-									changed_to_king = m_current_player->change_to_king(m_selected_piece, m_board);
-								made_king_check = true;
-#ifdef _DEBUG
-								if (changed_to_king)
-									m_os << m_current_player->get_name() << " changed his piece to king!" << std::endl;
-#endif
-								switch_turn();
-								m_available_capture = evaluate(m_current_player->get_list(), m_board, &counter, counter, m_current_player, m_last_capture_direction, &m_to_delete_list, m_moving_piece);
-#ifdef _DEBUG
-								m_os << "main game loop: second evaluation counter: " << counter << std::endl;
-#endif
-								// second game completion check
-								if (check_game_completion_no_possible_moves(m_current_player->get_list()))
-								{
-									if (m_current_player->is_first())
-										m_second_won = true;
-									else
-										m_first_won = true;
-								}
-							}
-							else // continue the combo
-								clear_list(m_current_player->get_next_player()->get_list());
-
-							m_selected_piece = nullptr;
-						}
-					}
-					else
-						m_selected = !m_selected;
-				}
-#ifdef _DEBUG
-				if (m_event.type == sf::Event::MouseButtonPressed && m_event.mouseButton.button == sf::Mouse::Right)
-				{
-					// display debug info
-					debug_info(m_os);
-				}
-				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::E)
-				{
-					// re-evaluate the game
-					m_log << "Manually re-evaluating the game" << std::endl;
-					m_selected_piece = nullptr;
-					m_selected = false;
-					int dummy = 0;
-					m_available_capture = evaluate(m_current_player->get_list(), m_board, &dummy, dummy, m_current_player, m_last_capture_direction, &m_to_delete_list, m_moving_piece);
-					m_os << "Game re-evaluated" << std::endl;
-				}
-				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::T)
-				{
-					// write a separator
-					m_os << "--------------------------------------------------------------" << std::endl;
-				}
-				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::U && ((sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) || (sf::Keyboard::isKeyPressed(sf::Keyboard::RShift))))
-				{
-					// add new piece to the first player
-					std::tuple<int, int> coords = get_click_coordinates();
-					int x = std::get<0>(coords);
-					int y = std::get<1>(coords);
-					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == nullptr)
-					{
-						m_log << "Manually adding king to the first player at coordinates: x: " << x << "; " << y << std::endl;
-						add_new_piece(&m_p_list_1, m_board, m_player_1, new king(m_player_1->get_sign(), x, y, true, m_player_1));
-					}
-				}
-				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::I && ((sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) || (sf::Keyboard::isKeyPressed(sf::Keyboard::RShift))))
-				{
-					// add new piece to the second player
-					std::tuple<int, int> coords = get_click_coordinates();
-					int x = std::get<0>(coords);
-					int y = std::get<1>(coords);
-					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == nullptr)
-					{
-						m_log << "Manually adding king to the second player at coordinates: x: " << x << "; " << y << std::endl;
-						add_new_piece(&m_p_list_2, m_board, m_player_2, new king(m_player_2->get_sign(), x, y, true, m_player_2));
-					}
-				}
-				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::U)
-				{
-					// add new piece to the first player
-					std::tuple<int, int> coords = get_click_coordinates();
-					int x = std::get<0>(coords);
-					int y = std::get<1>(coords);
-					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == nullptr)
-					{
-						m_log << "Manually adding piece to the first player at coordinates: x: " << x << "; " << y << std::endl;
-						add_new_piece(&m_p_list_1, m_board, m_player_1, x, y, true);
-					}
-				}
-				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::I)
-				{
-					// add new piece to the second player
-					std::tuple<int, int> coords = get_click_coordinates();
-					int x = std::get<0>(coords);
-					int y = std::get<1>(coords);
-					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == nullptr)
-					{
-						m_log << "Manually adding piece to the second player at coordinates: x: " << x << "; " << y << std::endl;
-						add_new_piece(&m_p_list_2, m_board, m_player_2, x, y, true);
-					}
-				}
-				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::D)
-				{
-					// add new piece to the second player
-					std::tuple<int, int> coords = get_click_coordinates();
-					int x = std::get<0>(coords);
-					int y = std::get<1>(coords);
-					std::cout << "x: " << x << "; y: " << y << std::endl;
-					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] != nullptr)
-					{
-						piece* p = (*m_board)[x][y];
-						if (p)
-						{
-							m_log << "Manually deleting piece at coordinates: x: " << x << "; " << y << std::endl;
-							delete_piece(p, m_board, p->get_owner());
-						}
-					}
-				}
-				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::L)
-				{
-					populate_board(s_size / 2 - 1);
-				}
-				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::F)
-				{
-					// load pieces from file
-					load_pieces_from_file("pieces.txt");
-				}
-				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::J)
-				{
-					// load pieces from file
-					save_to_file("pieces.txt");
-				}
-				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::S)
-				{
-					m_log << "Manually switching game turn" << std::endl;
-					switch_turn();
-				}
-				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::X)
-				{
-					m_game_freeze = true;
-				}
-				else if (m_event.type == sf::Event::KeyPressed && (m_event.key.code == sf::Keyboard::LShift || m_event.key.code == sf::Keyboard::RShift))
-				{
-					continue;
-				}
-				else if (m_event.type == sf::Event::KeyPressed)
-				{
-					m_os << "Key code: \'" << m_event.key.code << "\' is not programmed." << std::endl;
-				}
-#endif
-
-
-				if (m_first_won || m_second_won)
-				{
-					m_os << "Game is finished. Click Escape to display the results" << std::endl;
-					m_selected = false;
-					m_selected_piece = nullptr;
-					m_game_freeze = true;
-					m_window.clear();
-					draw(m_window);
-					m_window.display();
-					continue;
-				}
-			}
-
-			
-
-			m_window.clear();
-			draw(m_window);
-
-			// first choice, nothing is already highlighted
-			if (m_selected)
-			{
-				m_selected_piece = nullptr;
-
-				// getting coords of the click after highlighting selected piece, ignore clicks outside
-				std::tuple<int, int> coordinates = get_coordinates();
-				int x = std::get<0>(coordinates);
-				int y = std::get<1>(coordinates);
-
-				if (x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1)
-					continue;
-
-				//
-				if (!m_to_delete_list.empty() && (*m_board)[x][y] != m_moving_piece)
-				{
-#ifdef _DEBUG
-					if ((*m_board)[x][y])
-						m_os << "Multicapture: this isn't the moving piece." << std::endl;
-					else
-						m_os << "Multicapture: this is an empty space." << std::endl;
-#endif
-					m_selected = false;
-					m_selected_piece = nullptr;
-					continue;
-				}
-
-				// check if the correspoding field contains a piece
-				if ((*m_board)[x][y] != nullptr)
-				{
-#ifdef _DEBUG
-					m_os << "x: " << x << "; y: " << y << "; piece: " << (*m_board)[x][y] << std::endl;
-#endif
-					// check if player owns this piece
-					if ((*m_board)[x][y]->get_owner() == m_current_player)
-					{
-#ifdef _DEBUG
-						m_os << "That piece belongs to you" << std::endl;
-#endif
-						bool found_capture = false;
-						if (!(*m_board)[x][y]->get_av_list()->empty())
-						{
-							// find at least one move that is a capture
-							all_of((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [&found_capture](available_move* a)
-								{
-									if (dynamic_cast<available_capture*>(a))
-									{
-										found_capture = true;
-										return false;
-									}
-									return true;
-								});
-#ifdef _DEBUG
-							for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [this](available_move* a)
-								{
-									m_os << "available: x: " << a->get_x() << "; y: " << a->get_y();
-									if (dynamic_cast<available_capture*>(a))
-										m_os << "; max captures: " << dynamic_cast<available_capture*>(a)->get_max_score();
-									m_os << std::endl;
-								});
-#endif
-						}
-						if ((found_capture && m_available_capture) || (!found_capture && !m_available_capture)) // this lets making only capture moves, comment out to enable testing - replace to xnor
-							m_selected_piece = (*m_board)[x][y];
-					}
-					else
-					{
-#ifdef _DEBUG
-						m_os << "That piece does not belong to you" << std::endl;
-#endif
-					}
-				}
-				else
-				{
-#ifdef _DEBUG
-					m_os << "x: " << x << "; y: " << y << std::endl;
-#endif
-
-					m_selected_piece = nullptr;
-				}
-				m_selected = false;
-			}
-
-			// highlight selected piece and its corresponding moves, when moves exist
-			if (m_selected_piece != nullptr)
-			{
-				if (!(m_selected_piece->get_av_list()->empty()))
-				{
-					highlight_selected(m_window, m_selected_piece->get_x(), m_selected_piece->get_y());
-					for_each(m_selected_piece->get_av_list()->begin(), m_selected_piece->get_av_list()->end(), [this](available_move* a) { highlight_available(m_window, a->get_x(), a->get_y()); });
-				}
-				else
-					m_selected_piece = nullptr;
-			}
-
-			// print alive pieces
-			for_each(m_player_1->get_list()->begin(), m_player_1->get_list()->end(), [this](piece* p) { p->draw(m_window); });
-			for_each(m_player_2->get_list()->begin(), m_player_2->get_list()->end(), [this](piece* p) { p->draw(m_window); });
-
-			// print pieces in multicapture
-			for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [this](piece* p) { p->draw(m_window); });
-
-			// sleep time complementary to the frame time
-			sf::Time elapsed_time = m_clock.restart();
-			if (elapsed_time.asSeconds() < m_frame_duration)
-				sf::sleep(sf::seconds(m_frame_duration - elapsed_time.asSeconds()));
-
-			m_window.display();
+			handle_events();
+			if (m_any_changes)
+				draw_board();
 		}
 		if (!m_first_won && !m_second_won) // save the game state, when game wasn't finished
 			save_to_file("pieces.txt");
@@ -1524,29 +1529,6 @@ namespace checkers
 							}
 						});
 				}
-
-//				// check, if the are no moves at all
-//				bool at_least_one_move = false;
-//				all_of(list->begin(), list->end(), [&at_least_one_move](piece* p)
-//					{
-//						if (!p->get_av_list()->empty())
-//						{
-//							at_least_one_move = true;
-//							return false;
-//						}
-//						return true;
-//					});
-//				if (!at_least_one_move)
-//				{
-//#ifdef _DEBUG
-//					m_os << "There are no possible moves for current player: " << m_current_player->get_name() << std::endl;
-////#else
-////					if (player == m_player_1)
-////						m_second_won = true;
-////					else
-////						m_first_won = true;
-//#endif
-//				}
 			}
 #ifdef _DEBUG
 			m_os << "Evaluation returns: ";

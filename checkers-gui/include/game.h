@@ -24,7 +24,7 @@ namespace checkers
 		//
 		bool m_game_freeze;
 		//
-		
+		bool m_any_changes;
 		// indicates if the players should use stream to choose pieces and moves
 		bool m_console_game;
 		// player 1
@@ -78,23 +78,15 @@ namespace checkers
 		// SFML event
 		sf::Event m_event;
 
-	public:
-		// create the game of given size and target frames per second
-		game(int fps = 16, std::istream& is = std::cin, std::ostream& os = std::cout);
-		// copies the game (without GUI)
-		game(const game& game);
-		// deletes the game
-		~game();
-
+	protected:
 		
-
-		// todo
 		void handle_events(void);
 		//
 		void draw_board(void);
 		//
 		void select_piece(void);
-		
+		//
+		void move_selected_piece(void);
 		//
 		void move_piece(piece* piece_to_move, std::vector<std::vector<piece*>>* board, int x, int y);
 		
@@ -150,10 +142,8 @@ namespace checkers
 		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, int x, int y, bool is_alive);
 		// adds new piece to the specific piece list, board and player based on given piece from other board
 		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, piece* based_on);
-		//
-		void test_loop(void);
-		// executes the game
-		void loop(void);
+
+		
 		// prints result to the given stream
 		void print_results(std::ostream& os);
 		// prints alive pieces to the given stream
@@ -178,6 +168,16 @@ namespace checkers
 		void clear_to_delete_list(std::list<piece*>* del_list, std::list<piece*>* src_list);
 		// deletes given piece from given list
 		void delete_from_list(std::list<piece*>* list, piece* piece_to_delete);
+
+	public:
+		// create the game of given size and target frames per second
+		game(int fps = 16, std::istream& is = std::cin, std::ostream& os = std::cout);
+		// copies the game (without GUI)
+		game(const game& game);
+		// deletes the game
+		~game();
+		// executes the game
+		void loop(void);
 
 		friend std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);
 		friend class bot;

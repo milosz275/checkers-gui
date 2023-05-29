@@ -3,7 +3,7 @@
 
 namespace checkers
 {
-    piece::piece(char sign, int x, int y, bool is_alive, base_player* owner) : m_sign(std::toupper(sign)), m_x(x), m_y(y), m_is_alive(is_alive), m_owner(owner), m_av_list(new std::list<available_move*>), m_shape(s_radius)
+    piece::piece(char sign, int x, int y, bool is_alive, base_player* owner) : m_sign(std::toupper(sign, std::locale())), m_x(x), m_y(y), m_is_alive(is_alive), m_owner(owner), m_av_list(new std::list<available_move*>), m_shape(s_radius)
     {
         // owner cannot be empty
         assert(m_owner); 
@@ -29,24 +29,6 @@ namespace checkers
             else
                 throw std::runtime_error("Dead piece creation: sign not supported");
         }
-
-        /*switch (m_sign)
-        {
-        case 'W':
-            m_shape.setFillColor(sf::Color(217, 216, 216, 255));
-            break;
-        case 'B':
-            m_shape.setFillColor(sf::Color(26, 23, 22, 255));
-            break;
-        case 'w':
-            m_shape.setFillColor(sf::Color(187, 186, 186, 255));
-            break;
-        case 'b':
-            m_shape.setFillColor(sf::Color(59, 59, 59, 255));
-            break;
-        default:
-            throw std::runtime_error("Wrong piece sign");
-        }*/
     }
 
     piece::piece(const piece& piece) : m_sign(piece.m_sign), m_x(piece.m_x), m_y(piece.m_y), m_is_alive(piece.m_is_alive), m_owner(nullptr), m_av_list(new std::list<available_move*>), m_shape(s_radius) {}
