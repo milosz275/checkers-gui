@@ -21,6 +21,10 @@ namespace checkers
 	{
 		// main game board
 		std::vector<std::vector<piece*>>* m_board;
+		//
+		bool m_game_freeze;
+		//
+		
 		// indicates if the players should use stream to choose pieces and moves
 		bool m_console_game;
 		// player 1
@@ -82,6 +86,8 @@ namespace checkers
 		// deletes the game
 		~game();
 
+		
+
 		// todo
 		void handle_events(void);
 		//
@@ -97,7 +103,9 @@ namespace checkers
 		//
 		void delete_piece(piece* piece_to_delete, std::vector<std::vector<piece*>>* board, base_player* owner);
 		//
-		void check_game_completion(void);
+		bool check_game_completion_no_pieces(void);
+		//
+		bool check_game_completion_no_possible_moves(std::list<piece*>* list);
 		
 		//
 		void copy_board(std::vector<std::vector<piece*>>* source_board, std::vector<std::vector<piece*>>* copy_of_board, base_player* owner);
@@ -109,6 +117,11 @@ namespace checkers
 		void switch_turn(void);
 		//
 		int get_score(void);
+
+		//
+		base_player* get_player_1(void);
+		//
+		base_player* get_player_2(void);
 
 		// returns main game board
 		std::vector<std::vector<piece*>>* get_board(void);

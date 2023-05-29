@@ -20,8 +20,6 @@ namespace checkers
 		char m_sign;
 		// nickname of the player
 		std::string m_name;
-		// count of pieces of the player
-		int m_pieces;
 		// count of pieces which has been already taken
 		int m_captured_pieces;
 		// flag indicating the right to move again after capture
@@ -57,8 +55,6 @@ namespace checkers
 		std::list<piece*>* get_list(void);
 		// sets and returns the list of possible moves of the player
 		std::list<piece*>* set_list(std::list<piece*>* piece_list);
-		// increases piece count by x
-		void add_piece(int count = 1);
 		// returns living pieces 
 		int get_pieces(void);
 		// returns dead pieces
@@ -70,7 +66,7 @@ namespace checkers
 		// sets the combo flag and returns it
 		bool set_combo(bool combo);
 		// decreases pieces count, increases captured pieces count
-		void make_capture(void);
+		void add_capture(void);
 		// checks if the target piece could change into king and does it, if yes
 		bool change_to_king(piece* target, std::vector<std::vector<piece*>>* board);
 		// prints pieces of the player

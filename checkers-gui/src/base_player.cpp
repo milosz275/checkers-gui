@@ -4,12 +4,12 @@
 
 namespace checkers
 {
-	base_player::base_player(char sign, std::string name) : m_sign(std::toupper(sign)), m_name(name), m_pieces(0), m_captured_pieces(0), m_combo(false), m_next_player(nullptr), m_piece_list(nullptr), m_is_first(false)
+	base_player::base_player(char sign, std::string name) : m_sign(std::toupper(sign)), m_name(name), m_captured_pieces(0), m_combo(false), m_next_player(nullptr), m_piece_list(nullptr), m_is_first(false)
 	{
 		assert(std::isalpha(sign, std::locale()));
 	}
 
-	base_player::base_player(const base_player& player) : m_sign(player.m_sign), m_name(player.m_name), m_pieces(player.m_pieces), m_captured_pieces(player.m_combo), m_combo(player.m_combo), m_next_player(nullptr), m_piece_list(nullptr), m_is_first(player.m_is_first) {}
+	base_player::base_player(const base_player& player) : m_sign(player.m_sign), m_name(player.m_name), m_captured_pieces(player.m_combo), m_combo(player.m_combo), m_next_player(nullptr), m_piece_list(nullptr), m_is_first(player.m_is_first) {}
 
 	base_player::~base_player() {}
 
@@ -33,17 +33,15 @@ namespace checkers
 
 	bool base_player::set_combo(bool combo) { return m_combo = combo; }
 
-	void base_player::add_piece(int count) { m_pieces += count; }
-
-	int base_player::get_pieces(void) { return m_pieces; }
+	int base_player::get_pieces(void) { return m_piece_list->size(); }
 
 	int base_player::get_captured_pieces(void) { return m_captured_pieces; }
 
 	int base_player::set_captured_pieces(int pieces) { assert(m_captured_pieces == 0); return m_captured_pieces = pieces; }
 
-	void base_player::make_capture(void) { assert(m_pieces > 0); m_pieces--; m_captured_pieces++; }
+	void base_player::add_capture(void) { assert(m_piece_list->size() >= 0); m_captured_pieces++; }
 
-	void base_player::print_player(std::ostream& os) { os << m_name << "; sign: " << m_sign << "; pieces: " << m_pieces << "; captured pieces: " << m_captured_pieces << std::endl; }
+	void base_player::print_player(std::ostream& os) { os << m_name << "; sign: " << m_sign << "; pieces: " << m_piece_list->size() << "; captured pieces: " << m_captured_pieces << std::endl; }
 
 	bool base_player::change_to_king(piece* target, std::vector<std::vector<piece*>>* board) // std::list<piece*>* list
 	{
@@ -88,7 +86,7 @@ namespace checkers
 
 	std::ostream& operator<<(std::ostream& os, const base_player* player)
 	{
-		os << "name: " << player->m_name << "; sign: " << player->m_sign << "; alive pieces: " << player->m_pieces << "(" << player->m_piece_list->size() << ")" << "; dead pieces: " << player->m_captured_pieces;
+		os << "name: " << player->m_name << "; sign: " << player->m_sign << "; alive pieces: " << player->m_piece_list->size() << "(" << player->m_piece_list->size() << ")" << "; dead pieces: " << player->m_captured_pieces;
 		os << "; combo: ";
 		player->m_combo ? os << "true" : os << "false";
 		os << "; is first player: ";

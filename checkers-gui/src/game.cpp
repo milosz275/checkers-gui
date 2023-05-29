@@ -10,7 +10,7 @@
 
 namespace checkers
 {
-	game::game(int fps, std::istream& is, std::ostream& os) : m_console_game(false), m_is_finished(false), m_fps(fps),
+	game::game(int fps, std::istream& is, std::ostream& os) : m_console_game(false), m_game_freeze(false), m_is_finished(false), m_fps(fps),
 		m_window(sf::VideoMode(s_square_size* s_size, s_square_size* s_size), "Checkers", sf::Style::Default, m_settings),
 		m_selected(false), m_selected_piece(nullptr), m_moving_piece(nullptr), m_available_capture(false), m_last_capture_direction(-1), m_is(is), m_os(os),
 		m_log_file("log.txt", std::ios::app),
@@ -72,20 +72,25 @@ namespace checkers
 		//	m_player_2 = new bot('B', this);
 		//}
 
+		bool against_bot = false;
+
 		// simplified: set values
 		if (!m_console_game)
 		{
 			auto get_coords = std::bind(&game::get_click_coordinates, this);
 			m_player_1 = new player('W', "Player1", get_coords);
-			m_player_2 = new player('B', "Player2", get_coords);
+			if (!against_bot)
+				m_player_2 = new player('B', "Player2", get_coords);
 		}
 		else
 		{
 			auto get_coords = std::bind(&game::get_coordinates_from_stream, this);
 			m_player_1 = new player('W', "Player1", get_coords);
-			m_player_2 = new player('B', "Player2", get_coords);
+			if (!against_bot)
+				m_player_2 = new player('B', "Player2", get_coords);
 		}
-		//m_player_2 = new bot('B', this);
+		if (against_bot)
+			m_player_2 = new bot('B', this);
 
 		// set play order and evaluation direction
 		m_player_1->set_first(true);
@@ -169,21 +174,14 @@ namespace checkers
 		// copy player 1
 		if (dynamic_cast<player*>(game.m_player_1))
 			m_player_1 = new player(*dynamic_cast<player*>(game.m_player_1));
-		else if (dynamic_cast<bot*>(game.m_player_1))
-			m_player_1 = new bot(*dynamic_cast<bot*>(game.m_player_1));
 		else
-			m_player_1 = nullptr;
+			m_player_1 = new bot(*dynamic_cast<bot*>(game.m_player_1));
 
 		// copy player 2
 		if (dynamic_cast<player*>(game.m_player_2))
 			m_player_2 = new player(*dynamic_cast<player*>(game.m_player_2));
-		else if (dynamic_cast<bot*>(game.m_player_2))
-			m_player_2 = new bot(*dynamic_cast<bot*>(game.m_player_2));
 		else
-			m_player_2 = nullptr;
-
-		assert(m_player_1 != nullptr);
-		assert(m_player_2 != nullptr);
+			m_player_2 = new bot(*dynamic_cast<bot*>(game.m_player_2));
 
 		// establish current player
 		m_current_player = game.m_current_player == game.m_player_1 ? m_player_1 : m_player_2;
@@ -196,38 +194,42 @@ namespace checkers
 		m_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, nullptr));
 		std::vector<std::vector<piece*>>* original_board = game.m_board;
 
+		m_player_1->set_list(&m_p_list_1);
+		m_player_2->set_list(&m_p_list_2);
+
 		for (int i = 0; i < s_size; ++i)
 			for (int j = 0; j < s_size; ++j)
 			{
-				if ((*original_board)[i][j] != nullptr)
+				piece* p = (*original_board)[i][j];
+				if (p)
 				{
-					piece* p = (*original_board)[i][j];
 					if (dynamic_cast<king*>(p))
 					{
 						if (p->get_owner() == game.m_player_1)
-							add_new_piece(&m_p_list_1, m_board, m_player_1, p);
+							add_new_piece(m_player_1->get_list(), m_board, m_player_1, i, j, true);
 						else if (p->get_owner() == game.m_player_2)
-							add_new_piece(&m_p_list_2, m_board, m_player_2, p);
+							add_new_piece(m_player_2->get_list(), m_board, m_player_2, i, j, true);
 						else
-							throw std::runtime_error("Copying the board: king piece: player signs not matching");
+							throw std::runtime_error("Copying the board: king piece: piece ownership not matching");
 					}
 					else
 					{
 						if (p->get_owner() == game.m_player_1)
-							add_new_piece(&m_p_list_1, m_board, m_player_1, p);
+							add_new_piece(m_player_1->get_list(), m_board, m_player_1, i, j, true);
 						else if (p->get_owner() == game.m_player_2)
-							add_new_piece(&m_p_list_2, m_board, m_player_2, p);
+							add_new_piece(m_player_2->get_list(), m_board, m_player_2, i, j, true);
 						else
-							throw std::runtime_error("Copying the board: normal piece: player signs not matching");
+							throw std::runtime_error("Copying the board: normal piece: piece ownership not matching");
 					}
-
 				}
 			}
-		m_player_1->set_list(&m_p_list_1);
-		m_player_2->set_list(&m_p_list_2);
+		
 #ifdef _DEBUG
 		m_os << "Board after copying: " << std::endl;
 		m_os << m_board << std::endl;
+
+		for_each(m_p_list_1.begin(), m_p_list_1.end(), [this](piece* p) { assert(p->get_owner() == m_player_1); });
+		for_each(m_p_list_2.begin(), m_p_list_2.end(), [this](piece* p) { assert(p->get_owner() == m_player_2); });
 
 		m_os << "List of pieces of first player" << std::endl;
 		print_pieces(&m_p_list_1);
@@ -240,19 +242,29 @@ namespace checkers
 		for_each(game.m_to_delete_list.begin(), game.m_to_delete_list.end(), [this](piece* p)
 			{
 				if (dynamic_cast<king*>(p))
-					m_to_delete_list.push_back(new king(*dynamic_cast<king*>(p)));
+				{
+					if (p->get_owner()->is_first())
+						m_to_delete_list.push_back(new king(p->get_sign(), p->get_x(), p->get_y(), false, m_player_1));
+					else
+						m_to_delete_list.push_back(new king(p->get_sign(), p->get_x(), p->get_y(), false, m_player_2));
+				}
 				else
-					m_to_delete_list.push_back(new piece(*p));
+				{
+					if (p->get_owner()->is_first())
+						m_to_delete_list.push_back(new piece(p->get_sign(), p->get_x(), p->get_y(), false, m_player_1));
+					else
+						m_to_delete_list.push_back(new piece(p->get_sign(), p->get_x(), p->get_y(), false, m_player_2));
+				}
 			});
 
 		// recreate moving piece
-		if (game.m_moving_piece == nullptr)
+		if (!(game.m_moving_piece))
 			m_moving_piece = nullptr;
 		else
 			m_moving_piece = (*m_board)[game.m_moving_piece->get_x()][game.m_moving_piece->get_y()];
 
 		// check if the source game was normal
-		assert(m_to_delete_list.empty() && m_moving_piece == nullptr || !m_to_delete_list.empty() && m_moving_piece != nullptr);
+		assert(m_to_delete_list.empty() && (!m_moving_piece) || !m_to_delete_list.empty() && m_moving_piece);
 
 		// other fields
 		m_last_capture_direction = game.m_last_capture_direction;
@@ -264,8 +276,8 @@ namespace checkers
 		m_selected_piece = nullptr;
 
 		// evaluate available moves for the current player
-		int dummy = 0;
-		m_available_capture = evaluate(m_current_player->get_list(), m_board, &dummy, dummy, m_current_player, m_last_capture_direction, &m_to_delete_list, m_moving_piece);
+		int counter = 0;
+		m_available_capture = evaluate(m_current_player->get_list(), m_board, &counter, counter, m_current_player, m_last_capture_direction, &m_to_delete_list, m_moving_piece);
 #ifdef _DEBUG
 		m_os << "Game copy evaluated" << std::endl;
 #endif
@@ -310,6 +322,10 @@ namespace checkers
 	{
 		return m_p_list_1.size() - m_p_list_2.size();
 	}
+
+	base_player* game::get_player_1(void) { return m_player_1; }
+
+	base_player* game::get_player_2(void) { return m_player_2; }
 
 	void game::populate_board(int rows)
 	{
@@ -578,11 +594,11 @@ namespace checkers
 
 	void game::add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, int x, int y, bool is_alive)
 	{
-		assert((*board)[x][y] == nullptr);
+		if ((*board)[x][y])
+			return;
 		piece* p = new piece(player->get_sign(), x, y, is_alive, player);
 		(*board)[x][y] = p;
 		list->push_back(p);
-		player->add_piece();
 		bool king = player->change_to_king(p, board);
 #ifdef _DEBUG
 		if (king)
@@ -596,18 +612,24 @@ namespace checkers
 	{
 		int x = based_on->get_x();
 		int y = based_on->get_y();
-		assert((*board)[x][y] == nullptr);
+		if ((*board)[x][y])
+			return;
 		if (dynamic_cast<king*>(based_on))
 			(*board)[x][y] = new king(player->get_sign(), x, y, based_on->is_alive(), player);
 		else
 			(*board)[x][y] = new piece(player->get_sign(), x, y, based_on->is_alive(), player);
 		list->push_back((*board)[x][y]);
-		player->add_piece();
 	}
 
-	std::vector<std::vector<piece*>>* game::get_board(void) { assert(m_board != nullptr); return m_board; }
+	std::vector<std::vector<piece*>>* game::get_board(void) { assert(m_board); return m_board; }
 
-	std::tuple<int, int> game::get_coordinates(void) { return m_current_player->get_coordinates(); }
+	std::tuple<int, int> game::get_coordinates(void)
+	{	
+		m_game_freeze = true;
+		std::tuple<int, int> coords = m_current_player->get_coordinates();
+		m_game_freeze = false;
+		return coords;
+	}
 
 	std::tuple<int, int> game::get_click_coordinates(void)
 	{
@@ -714,12 +736,13 @@ namespace checkers
 	void game::move_piece(piece* piece_to_move, std::vector<std::vector<piece*>>* board, int new_x, int new_y)
 	{
 		assert(board && piece_to_move);
-		assert((*board)[new_x][new_y] == nullptr);
+		assert(!((*board)[new_x][new_y]));
 
 		int old_x = piece_to_move->get_x();
 		int old_y = piece_to_move->get_y();
 
 		assert((*board)[old_x][old_y] == piece_to_move);
+
 
 		(*board)[old_x][old_y] = nullptr;
 		piece_to_move->set_x(new_x);
@@ -743,12 +766,29 @@ namespace checkers
 		m_log << "Deleted piece: x: " << x << "; y: " << y << std::endl;
 	}
 
-	void game::check_game_completion(void)
+	bool game::check_game_completion_no_pieces(void)
 	{
 
+		return false;
 	}
 
-	void game::copy_board(std::vector<std::vector<piece*>>* source_board, std::vector<std::vector<piece*>>* copy_of_board, base_player* owner)
+	bool game::check_game_completion_no_possible_moves(std::list<piece*>* list)
+	{
+		// check, if the are no moves at all
+		bool at_least_one_move = false;
+		all_of(list->begin(), list->end(), [&at_least_one_move](piece* p)
+			{
+				if (!p->get_av_list()->empty())
+				{
+					at_least_one_move = true;
+					return false;
+				}
+				return true;
+			});
+		return !at_least_one_move;
+	}
+
+	void game::copy_board(std::vector<std::vector<piece*>>* source_board, std::vector<std::vector<piece*>>* copy_of_board, base_player* owner) // TODO: first: == owner; second: == is_first_player
 	{
 		for (int i = 0; i < s_size; ++i)
 		{
@@ -759,19 +799,37 @@ namespace checkers
 				{
 					if (dynamic_cast<king*>(p))
 					{
-						assert(p->get_owner() == owner || p->get_owner() == owner->get_next_player());
-						if (p->get_owner() == owner)
-							(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner);
+						if (p->get_owner() == owner || p->get_owner() == owner->get_next_player())
+						{
+							if (p->get_owner() == owner)
+								(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner);
+							else
+								(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner->get_next_player());
+						}
 						else
-							(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner->get_next_player());
+						{
+							if (p->get_owner()->is_first() && owner->is_first())
+								(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner);
+							else
+								(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner->get_next_player());
+						}
 					}
 					else
 					{
-						assert(p->get_owner() == owner || p->get_owner() == owner->get_next_player());
-						if (p->get_owner() == owner)
-							(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner);
+						if (p->get_owner() == owner || p->get_owner() == owner->get_next_player())
+						{
+							if (p->get_owner() == owner)
+								(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner);
+							else
+								(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner->get_next_player());
+						}
 						else
-							(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner->get_next_player());
+						{
+							if (p->get_owner()->is_first() && owner->is_first())
+								(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner);
+							else
+								(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner->get_next_player());
+						}
 					}
 				}
 			}
@@ -817,13 +875,51 @@ namespace checkers
 #endif
 				}
 
-				if (m_event.type == sf::Event::MouseButtonPressed && m_event.mouseButton.button == sf::Mouse::Left || dynamic_cast<bot*>(m_current_player) || m_console_game)
+				if ((m_player_1->get_pieces() == 0 || m_player_2->get_pieces() == 0) && (m_player_1->get_captured_pieces() > 0 || m_player_2->get_captured_pieces() > 0))
 				{
-					if (m_player_1->get_pieces() == 0 || m_player_2->get_pieces() == 0)
+					m_window.clear();
+					draw(m_window);
+					for_each(m_player_1->get_list()->begin(), m_player_1->get_list()->end(), [this](piece* p) { p->draw(m_window); });
+					for_each(m_player_2->get_list()->begin(), m_player_2->get_list()->end(), [this](piece* p) { p->draw(m_window); });
+					for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [this](piece* p) { p->draw(m_window); });
+
+					if (m_event.type == sf::Event::KeyPressed || m_event.type == sf::Event::MouseButtonPressed)
+						m_os << "Game was finished. Click Escape!" << std::endl;
+
+					sf::Time elapsed_time = m_clock.restart();
+					if (elapsed_time.asSeconds() < m_frame_duration)
+						sf::sleep(sf::seconds(m_frame_duration - elapsed_time.asSeconds()));
+
+					m_window.display();
+					continue;
+				}
+
+				if (m_game_freeze)
+				{
+					m_window.clear();
+					draw(m_window);
+					for_each(m_player_1->get_list()->begin(), m_player_1->get_list()->end(), [this](piece* p) { p->draw(m_window); });
+					for_each(m_player_2->get_list()->begin(), m_player_2->get_list()->end(), [this](piece* p) { p->draw(m_window); });
+					for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [this](piece* p) { p->draw(m_window); });
+
+					if (m_event.type == sf::Event::KeyPressed || m_event.type == sf::Event::MouseButtonPressed)
 					{
-						m_os << "Game is finished. Click Escape to display the results" << std::endl;
+						if (m_event.key.code == sf::Keyboard::X)
+							m_game_freeze = false;
+						else
+							m_os << "Game is frozen" << std::endl;
 					}
 
+					sf::Time elapsed_time = m_clock.restart();
+					if (elapsed_time.asSeconds() < m_frame_duration)
+						sf::sleep(sf::seconds(m_frame_duration - elapsed_time.asSeconds()));
+
+					m_window.display();
+					continue;
+				}
+
+				if (m_event.type == sf::Event::MouseButtonPressed && m_event.mouseButton.button == sf::Mouse::Left || dynamic_cast<bot*>(m_current_player) || m_console_game)
+				{
 					if (m_selected_piece != nullptr) // choice after highlighting
 					{
 						// getting coords of the click after highlighting selected piece, ignore clicks outside
@@ -902,7 +998,7 @@ namespace checkers
 								// delete captured piece
 								piece* piece_to_delete = (*m_board)[x_d][y_d];
 								delete_piece(piece_to_delete, m_board, m_current_player->get_next_player());
-								m_current_player->get_next_player()->make_capture();
+								m_current_player->get_next_player()->add_capture();
 
 								// check game completion
 								if (m_current_player->get_next_player()->get_list()->empty())
@@ -962,8 +1058,17 @@ namespace checkers
 							int counter = 0;
 							m_available_capture = evaluate(m_current_player->get_list(), m_board, &counter, counter, m_current_player, m_last_capture_direction, &m_to_delete_list, m_moving_piece);
 #ifdef _DEBUG
-							m_os << "loop: first evaluation counter: " << counter << std::endl;
+							m_os << "main game loop: first evaluation counter: " << counter << std::endl;
 #endif
+							// second game completion check
+							if (check_game_completion_no_possible_moves(m_current_player->get_list()))
+							{
+								if (m_current_player->is_first())
+									m_second_won = true;
+								else
+									m_first_won = true;
+							}
+
 							// exit the combo, if no more captures
 							if (m_current_player->get_combo() && !m_available_capture)
 							{
@@ -991,8 +1096,16 @@ namespace checkers
 								switch_turn();
 								m_available_capture = evaluate(m_current_player->get_list(), m_board, &counter, counter, m_current_player, m_last_capture_direction, &m_to_delete_list, m_moving_piece);
 #ifdef _DEBUG
-								m_os << "loop: second evaluation counter: " << counter << std::endl;
+								m_os << "main game loop: second evaluation counter: " << counter << std::endl;
 #endif
+								// second game completion check
+								if (check_game_completion_no_possible_moves(m_current_player->get_list()))
+								{
+									if (m_current_player->is_first())
+										m_second_won = true;
+									else
+										m_first_won = true;
+								}
 							}
 							else // continue the combo
 								clear_list(m_current_player->get_next_player()->get_list());
@@ -1108,6 +1221,10 @@ namespace checkers
 					m_log << "Manually switching game turn" << std::endl;
 					switch_turn();
 				}
+				else if (m_event.type == sf::Event::KeyPressed && m_event.key.code == sf::Keyboard::X)
+				{
+					m_game_freeze = true;
+				}
 				else if (m_event.type == sf::Event::KeyPressed && (m_event.key.code == sf::Keyboard::LShift || m_event.key.code == sf::Keyboard::RShift))
 				{
 					continue;
@@ -1117,7 +1234,22 @@ namespace checkers
 					m_os << "Key code: \'" << m_event.key.code << "\' is not programmed." << std::endl;
 				}
 #endif
+
+
+				if (m_first_won || m_second_won)
+				{
+					m_os << "Game is finished. Click Escape to display the results" << std::endl;
+					m_selected = false;
+					m_selected_piece = nullptr;
+					m_game_freeze = true;
+					m_window.clear();
+					draw(m_window);
+					m_window.display();
+					continue;
+				}
 			}
+
+			
 
 			m_window.clear();
 			draw(m_window);
@@ -1319,6 +1451,34 @@ namespace checkers
 							return false;
 						return true;
 					});
+
+				// delete normal moves
+				if (pieces_with_captures >= 1)
+				{
+					// delete possible captures with score lower than max
+					for_each(list->begin(), list->end(), [this](piece* p)
+						{
+							std::list<available_move*> to_delete;
+							for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [this, &to_delete, &p](available_move* a)
+								{
+									if (!dynamic_cast<available_capture*>(a))
+									{
+										to_delete.push_back(a);
+#ifdef _DEBUG
+										m_os << "deleting move: x: " << a->get_x() << "; y: " << a->get_y() << std::endl;
+#endif
+									}
+								});
+							while (!to_delete.empty())
+							{
+								available_move* a = to_delete.front();
+								p->get_av_list()->remove(a);
+								to_delete.pop_front();
+							}
+						});
+				}
+
+				// delete captures, that are lower in multicapture count
 				if (pieces_with_captures >= 2)
 				{
 					// find maximal capture counter over all captures
@@ -1365,28 +1525,28 @@ namespace checkers
 						});
 				}
 
-				// check, if the are no moves at all
-				bool at_least_one_move = false;
-				all_of(list->begin(), list->end(), [&at_least_one_move](piece* p)
-					{
-						if (!p->get_av_list()->empty())
-						{
-							at_least_one_move = true;
-							return false;
-						}
-						return true;
-					});
-				if (!at_least_one_move)
-				{
-#ifdef _DEBUG
-					m_os << "There are no possible moves for current player: " << m_current_player->get_name() << std::endl;
-#else
-					if (player == m_player_1)
-						m_second_won = true;
-					else
-						m_first_won = true;
-#endif
-				}
+//				// check, if the are no moves at all
+//				bool at_least_one_move = false;
+//				all_of(list->begin(), list->end(), [&at_least_one_move](piece* p)
+//					{
+//						if (!p->get_av_list()->empty())
+//						{
+//							at_least_one_move = true;
+//							return false;
+//						}
+//						return true;
+//					});
+//				if (!at_least_one_move)
+//				{
+//#ifdef _DEBUG
+//					m_os << "There are no possible moves for current player: " << m_current_player->get_name() << std::endl;
+////#else
+////					if (player == m_player_1)
+////						m_second_won = true;
+////					else
+////						m_first_won = true;
+//#endif
+//				}
 			}
 #ifdef _DEBUG
 			m_os << "Evaluation returns: ";
