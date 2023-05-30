@@ -25,9 +25,12 @@
     <ClInclude Include="include\bot.h" />
     <ClInclude Include="include\dependencies.h" />
     <ClInclude Include="include\game.h" />
+    <ClInclude Include="include\global_variables.h" />
     <ClInclude Include="include\king.h" />
     <ClInclude Include="include\piece.h" />
     <ClInclude Include="include\player.h" />
+    <ClInclude Include="include\sfml.h" />
+    <ClInclude Include="include\gui.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\available_capture.cpp" />
@@ -39,6 +42,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\piece.cpp" />
     <ClCompile Include="src\player.cpp" />
+    <ClCompile Include="src\gui.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

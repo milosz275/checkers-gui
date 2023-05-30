@@ -18,11 +18,7 @@
 #include "include/bot.h"
 #include "include/piece.h"
 #include "include/available_capture.h"
+#include "include/gui.h"
 
-#include <SFML/System.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include <SFML/Network.hpp>
 
 #endif

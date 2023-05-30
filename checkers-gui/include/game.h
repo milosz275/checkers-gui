@@ -2,18 +2,11 @@
 #define GAME_H
 
 #include "dependencies.h"
+#include "global_variables.h"
+#include "sfml.h"
 
 namespace checkers
 {
-	// board size
-	static const int s_size = 10;
-	// map containing letters and their corresponding integers
-	static std::map<char, int> s_coords{ {'a', 1}, {'b', 2}, {'c', 3}, {'d', 4}, {'e', 5}, {'f', 6}, {'g', 7}, {'h', 8}, {'i', 9}, {'j', 10} };
-	// square/tile size
-	static const float s_square_size = 100.0;
-	// radius of one piece
-	static const float s_radius = s_square_size / 2.5;
-
 	// declare to avoid compile conflict
 	class king;
 
@@ -22,9 +15,13 @@ namespace checkers
 		// main game board
 		std::vector<std::vector<piece*>>* m_board;
 		//
+		gui* m_gui;
+		//
 		bool m_game_freeze;
 		//
 		bool m_any_changes;
+		//
+		//bool m_signaled_bot;
 		// indicates if the players should use stream to choose pieces and moves
 		bool m_console_game;
 		// player 1
@@ -57,8 +54,6 @@ namespace checkers
 		int m_last_capture_direction;
 		// frames per second in the game
 		const int m_fps;
-		// fraction of second that is time of one frame
-		float m_frame_duration = 1.0f / m_fps;
 		// default input stream
 		std::istream& m_is = std::cin;
 		// default output stream
@@ -67,22 +62,11 @@ namespace checkers
 		std::ostream& m_log = std::clog;
 		//
 		std::ofstream m_log_file;
-		// SFML object drawing checkerboard
-		std::vector<std::vector<sf::RectangleShape>> m_tiles;
-		// SFML clock
-		sf::Clock m_clock;
-		// SFML settings
-		sf::ContextSettings m_settings;
-		// SFML window
-		sf::RenderWindow m_window;
-		// SFML event
-		sf::Event m_event;
+		
 
 	protected:
 		
 		void handle_events(void);
-		//
-		void draw_board(void);
 		//
 		void select_piece(void);
 		//
@@ -107,6 +91,8 @@ namespace checkers
 
 		// switches first_turn flag, indicating that it is move of the first player
 		void switch_turn(void);
+		//
+		void signal_the_bot(void);
 		//
 		int get_score(void);
 
@@ -148,12 +134,7 @@ namespace checkers
 		void print_results(std::ostream& os);
 		// prints alive pieces to the given stream
 		void print_pieces(std::list<piece*>* list);
-		// draws main game board in the given window
-		void draw(sf::RenderWindow& window);
-		// highlights selected piece of given coords (brown)
-		void highlight_selected(sf::RenderWindow& window, int x, int y);
-		// higlight selected piece of given coords (green)
-		void highlight_available(sf::RenderWindow& window, int x, int y);
+
 		
 		// evaluate possible moves of the given player, returns true if there is at least on possible capture
 		bool evaluate(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive, base_player* player, int last_capture_direction, std::list<piece*>* dead_list, piece* moving_piece);
@@ -171,7 +152,7 @@ namespace checkers
 
 	public:
 		// create the game of given size and target frames per second
-		game(int fps = 16, std::istream& is = std::cin, std::ostream& os = std::cout);
+		game(int fps = 60, std::istream& is = std::cin, std::ostream& os = std::cout);
 		// copies the game (without GUI)
 		game(const game& game);
 		// deletes the game
