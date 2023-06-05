@@ -295,14 +295,19 @@ namespace checkers
 		}
 	}
 
-	int game::get_score(void)
-	{
-		return m_p_list_1.size() - m_p_list_2.size();
-	}
+	int game::get_score(void) { return m_p_list_1.size() - m_p_list_2.size(); }
 
-	base_player* game::get_player_1(void) { return m_player_1; }
+	bool game::get_completion(void) { return (m_first_won || m_second_won); }
 
-	base_player* game::get_player_2(void) { return m_player_2; }
+	bool game::get_game_freeze(void) { return m_game_freeze; }
+
+	const base_player* game::get_player_1(void) { return m_player_1; }
+
+	const base_player* game::get_player_2(void) { return m_player_2; }
+
+	const base_player* game::get_current_player(void) { return m_current_player; }
+
+	const piece* game::get_selected_piece(void) { return m_selected_piece; }
 
 	void game::populate_board(int rows)
 	{
@@ -600,6 +605,8 @@ namespace checkers
 	}
 
 	std::vector<std::vector<piece*>>* game::get_board(void) { assert(m_board); return m_board; }
+
+	std::list<piece*>* game::get_to_delete_list(void) { return &m_to_delete_list; }
 
 	std::tuple<int, int> game::get_coordinates(void)
 	{	

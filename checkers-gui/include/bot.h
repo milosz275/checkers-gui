@@ -33,7 +33,11 @@ namespace checkers
 		//
 		std::tuple<int, int> get_coordinates(void);
 		//
-		int minimax(game* game, int depth, int alpha, int beta, int is_maximizing);
+		std::tuple<int, int> find_best_move(game* game_copy);
+		//
+		void add_to_game_copy_list(std::list<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>>& list_of_games, game* game_copy, std::pair<int, int>* source_coords, std::pair<int, int>* destination_coords);
+		//
+		int minimax(game* game_copy, int depth, int alpha, int beta, int is_maximizing);
 	};
 }
 

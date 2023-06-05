@@ -93,16 +93,7 @@ namespace checkers
 		void switch_turn(void);
 		//
 		void signal_the_bot(void);
-		//
-		int get_score(void);
-
-		//
-		base_player* get_player_1(void);
-		//
-		base_player* get_player_2(void);
-
-		// returns main game board
-		std::vector<std::vector<piece*>>* get_board(void);
+		
 		
 		////
 		//std::vector<std::vector<piece*>>* copy_board(std::vector<std::vector<piece*>>* source_board);
@@ -159,11 +150,29 @@ namespace checkers
 		~game();
 		// executes the game
 		void loop(void);
-
+		//
+		int get_score(void);
+		//
+		bool get_completion(void);
+		//
+		bool get_game_freeze(void);
+		//
+		const base_player* get_player_1(void);
+		//
+		const base_player* get_player_2(void);
+		//
+		const base_player* get_current_player(void);
+		//
+		const piece* get_selected_piece(void);
+		// returns main game board
+		std::vector<std::vector<piece*>>* get_board(void);
+		//
+		std::list<piece*>* get_to_delete_list(void);
+		// returns board to the stream
 		friend std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);
+		//
 		friend class bot;
 	};
-	// returns board to the stream
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);
 }
 
