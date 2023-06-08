@@ -26,7 +26,6 @@ namespace checkers
 		sf::RenderWindow m_window;
 		// SFML event
 		sf::Event m_event;
-
 	protected:
 		//
 		void draw(void);
@@ -44,6 +43,8 @@ namespace checkers
 		sf::Window& get_window(void);
 		//
 		sf::Clock& get_clock(void);
+		//
+		std::pair<int, int> get_click_coordinates(void);
 		//
 		void draw_board(std::list<piece*>& list_1, std::list<piece*>& list_2, std::list<piece*>& dead_list, piece* selected_piece);
 	};

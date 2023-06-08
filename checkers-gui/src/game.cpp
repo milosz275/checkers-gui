@@ -10,12 +10,12 @@
 
 namespace checkers
 {
-	game::game(int fps, std::istream& is, std::ostream& os) : m_console_game(false), m_game_freeze(false), m_any_changes(true),
+	game::game(int fps, std::istream& is, std::ostream& os) : m_gui(new gui(fps)), m_event_handler(new event_handler(this)), m_console_game(false), m_game_freeze(false), m_any_changes(true),
 		//m_signaled_bot(false),
 		m_is_finished(false), m_fps(fps),
 		m_selected(false), m_selected_piece(nullptr), m_moving_piece(nullptr), m_available_capture(false), m_last_capture_direction(-1), m_is(is), m_os(os),
 		m_log_file("log.txt", std::ios::app),
-		m_current_player(nullptr), m_gui(new gui(fps))
+		m_current_player(nullptr)
 	{
 		assert(s_size % 2 == 0);
 		assert(m_fps > 0);
@@ -239,6 +239,7 @@ namespace checkers
 		m_second_won = game.m_second_won;
 		m_selected_piece = nullptr;
 		m_gui = nullptr;
+		m_event_handler = new event_handler(this);
 
 		// evaluate available moves for the current player
 		int counter = 0;
@@ -608,21 +609,17 @@ namespace checkers
 
 	std::list<piece*>* game::get_to_delete_list(void) { return &m_to_delete_list; }
 
-	std::tuple<int, int> game::get_coordinates(void)
+	std::pair<int, int> game::get_coordinates(void)
 	{	
 		m_game_freeze = true;
-		std::tuple<int, int> coords = m_current_player->get_coordinates();
+		std::pair<int, int> coords = m_current_player->get_coordinates();
 		m_game_freeze = false;
 		return coords;
 	}
 
-	std::tuple<int, int> game::get_click_coordinates(void)
+	std::pair<int, int> game::get_click_coordinates(void)
 	{
-		sf::Window& window = m_gui->get_window();
-		int x = sf::Mouse::getPosition(window).x / (window.getSize().x / s_size);
-		int y = sf::Mouse::getPosition(window).y / (window.getSize().y / s_size);
-
-		return std::make_tuple(x, y);
+		return m_gui->get_click_coordinates();
 	}
 
 	int get_int_from_stream(std::istream& is)
@@ -632,7 +629,7 @@ namespace checkers
 		return integer;
 	}
 
-	std::tuple<int, int> game::get_coordinates_from_stream(void)
+	std::pair<int, int> game::get_coordinates_from_stream(void)
 	{
 		// change to string, add checks if it is a number etc.
 		int x = 0;
@@ -651,7 +648,7 @@ namespace checkers
 		--x;
 		--y;
 
-		return std::make_tuple(x, y);
+		return std::make_pair(x, y);
 	}
 
 	void game::print_results(std::ostream& os)
@@ -668,235 +665,6 @@ namespace checkers
 		os << "Player \"" << m_player_1->get_name() << "\"'s score: " << m_player_2->get_captured_pieces() << "; Player \"" << m_player_2->get_name() << "\"'s score: " << m_player_1->get_captured_pieces() << std::endl;
 	}
 
-	void game::handle_events(void)
-	{
-		//while (m_window.pollEvent(m_event))
-		sf::Window& window = m_gui->get_window();
-		sf::Event& event = m_gui->get_event();
-		while (window.pollEvent(event) || (bool)dynamic_cast<bot*>(m_current_player))
-		{
-			if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
-			{
-				window.close();
-#ifdef _DEBUG
-				m_os << "Closing the game" << std::endl;
-				//save_pieces_to_file();
-#endif
-				break;
-			}
-#ifdef _DEBUG
-			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R)
-			{
-				m_os << "Reseted the game" << std::endl;
-				m_first_won = false;
-				m_second_won = false;
-				m_player_1->set_captured_pieces(0);
-				m_player_2->set_captured_pieces(0);
-				break;
-			}
-#endif
-			if ((m_player_1->get_pieces() == 0 || m_player_2->get_pieces() == 0) && (m_player_1->get_captured_pieces() > 0 || m_player_2->get_captured_pieces() > 0))
-			{
-				//m_signaled_bot = false;
-				if (event.type == sf::Event::KeyPressed || event.type == sf::Event::MouseButtonPressed)
-				{
-					m_os << "Game was finished. Click Escape!" << std::endl;
-				}
-				break;
-			}
-			else if (m_game_freeze)
-			{
-				if (event.type == sf::Event::KeyPressed || event.type == sf::Event::MouseButtonPressed)
-				{
-					if (event.key.code == sf::Keyboard::X)
-					{
-						m_os << "Unfrozen the game." << std::endl;
-						m_game_freeze = false;
-					}
-					else
-						m_os << "Game is frozen" << std::endl;
-					debug_info(m_os);
-				}
-				break;
-			}
-			else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left || (bool)dynamic_cast<bot*>(m_current_player) || m_console_game)
-			{
-				//m_signaled_bot = false;
-				if (!m_selected)
-				{
-					select_piece();
-					break;
-				}
-				if (m_selected_piece)
-				{
-					move_selected_piece();
-					break;
-				}
-			}
-#ifdef _DEBUG
-			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right)
-			{
-				// display debug info
-				debug_info(m_os);
-				break;
-			}
-			else if (event.type == sf::Event::KeyPressed)
-			{
-				if (event.key.code == sf::Keyboard::E)
-				{
-					// re-evaluate the game
-					m_log << "Manually re-evaluating the game" << std::endl;
-					m_selected_piece = nullptr;
-					m_selected = false;
-					int dummy = 0;
-					m_available_capture = evaluate(m_current_player->get_list(), m_board, &dummy, dummy, m_current_player, m_last_capture_direction, &m_to_delete_list, m_moving_piece);
-					m_os << "Game re-evaluated" << std::endl;
-					break;
-				}
-				else if (event.key.code == sf::Keyboard::T)
-				{
-					// write a separator
-					m_os << "--------------------------------------------------------------" << std::endl;
-					break;
-				}
-				else if (event.key.code == sf::Keyboard::U && ((sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) || (sf::Keyboard::isKeyPressed(sf::Keyboard::RShift))))
-				{
-					// add new piece to the first player
-					std::tuple<int, int> coords = get_click_coordinates();
-					int x = std::get<0>(coords);
-					int y = std::get<1>(coords);
-					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == nullptr)
-					{
-						m_log << "Manually adding king to the first player at coordinates: x: " << x << "; " << y << std::endl;
-						add_new_piece(&m_p_list_1, m_board, m_player_1, new king(m_player_1->get_sign(), x, y, true, m_player_1));
-					}
-					break;
-				}
-				else if (event.key.code == sf::Keyboard::I && ((sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)) || (sf::Keyboard::isKeyPressed(sf::Keyboard::RShift))))
-				{
-					// add new piece to the second player
-					std::tuple<int, int> coords = get_click_coordinates();
-					int x = std::get<0>(coords);
-					int y = std::get<1>(coords);
-					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == nullptr)
-					{
-						m_log << "Manually adding king to the second player at coordinates: x: " << x << "; " << y << std::endl;
-						add_new_piece(&m_p_list_2, m_board, m_player_2, new king(m_player_2->get_sign(), x, y, true, m_player_2));
-						m_any_changes = true;
-					}
-					break;
-				}
-				else if (event.key.code == sf::Keyboard::U)
-				{
-					// add new piece to the first player
-					std::tuple<int, int> coords = get_click_coordinates();
-					int x = std::get<0>(coords);
-					int y = std::get<1>(coords);
-					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == nullptr)
-					{
-						m_log << "Manually adding piece to the first player at coordinates: x: " << x << "; " << y << std::endl;
-						add_new_piece(&m_p_list_1, m_board, m_player_1, x, y, true);
-						m_any_changes = true;
-					}
-					break;
-				}
-				else if (event.key.code == sf::Keyboard::I)
-				{
-					// add new piece to the second player
-					std::tuple<int, int> coords = get_click_coordinates();
-					int x = std::get<0>(coords);
-					int y = std::get<1>(coords);
-					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] == nullptr)
-					{
-						m_log << "Manually adding piece to the second player at coordinates: x: " << x << "; " << y << std::endl;
-						add_new_piece(&m_p_list_2, m_board, m_player_2, x, y, true);
-						m_any_changes = true;
-					}
-					break;
-				}
-				else if (event.key.code == sf::Keyboard::D)
-				{
-					// add new piece to the second player
-					std::tuple<int, int> coords = get_click_coordinates();
-					int x = std::get<0>(coords);
-					int y = std::get<1>(coords);
-					std::cout << "x: " << x << "; y: " << y << std::endl;
-					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_board)[x][y] != nullptr)
-					{
-						piece* p = (*m_board)[x][y];
-						if (p)
-						{
-							m_log << "Manually deleting piece at coordinates: x: " << x << "; " << y << std::endl;
-							delete_piece(p, m_board, p->get_owner());
-							m_any_changes = true;
-						}
-					}
-					break;
-				}
-				else if (event.key.code == sf::Keyboard::L)
-				{
-					m_log << "Manually populating the board with normal setup" << std::endl;
-					populate_board(s_size / 2 - 1);
-					m_any_changes = true;
-					break;
-				}
-				else if (event.key.code == sf::Keyboard::F)
-				{
-					// load pieces from file
-					m_log << "Manually loading gamestate from file" << std::endl;
-					load_pieces_from_file("pieces.txt");
-					m_any_changes = true;
-					break;
-				}
-				else if (event.key.code == sf::Keyboard::J)
-				{
-					// save pieces to file
-					m_log << "Manually saving gamestate to file" << std::endl;
-					save_to_file("pieces.txt");
-					break;
-				}
-				else if (event.key.code == sf::Keyboard::S)
-				{
-					m_log << "Manually switching game turn" << std::endl;
-					switch_turn();
-					break;
-				}
-				else if (event.key.code == sf::Keyboard::R)
-				{
-					// refresh the board
-					m_os << "Refreshing the board." << std::endl;
-					m_any_changes = true;
-					break;
-				}
-				else if (event.key.code == sf::Keyboard::X)
-				{
-					m_os << "Frozen the game." << std::endl;
-					m_game_freeze = true;
-					break;
-				}
-				else if (event.key.code == sf::Keyboard::LShift || event.key.code == sf::Keyboard::RShift)
-				{
-					break;
-				}
-				else
-				{
-					m_os << "Key code: \'" << event.key.code << "\' is not programmed." << std::endl;
-					break;
-				}
-			}
-#endif
-			if (m_first_won || m_second_won)
-			{
-				m_os << "Game is finished. Click Escape to display the results" << std::endl;
-				m_selected = false;
-				m_selected_piece = nullptr;
-				m_game_freeze = true;
-				m_gui->draw_board(*m_player_1->get_list(), *m_player_2->get_list(), m_to_delete_list, m_selected_piece);
-				break;
-			}
-		}
-	}
-
 	void game::select_piece(void)
 	{
 		// dereference old selected piece
@@ -904,7 +672,7 @@ namespace checkers
 		m_selected_piece = nullptr;
 
 		// getting coords of the click after highlighting selected piece, ignore clicks outside
-		std::tuple<int, int> coordinates = get_coordinates();
+		std::pair<int, int> coordinates = get_coordinates();
 		int x = std::get<0>(coordinates);
 		int y = std::get<1>(coordinates);
 
@@ -1001,7 +769,7 @@ namespace checkers
 		}
 
 		// getting coords of the click after highlighting selected piece, ignore clicks outside
-		std::tuple<int, int> coordinates = get_coordinates();
+		std::pair<int, int> coordinates = get_coordinates();
 		int x = std::get<0>(coordinates);
 		int y = std::get<1>(coordinates);
 
@@ -1326,7 +1094,7 @@ namespace checkers
 		// main loop
 		while (m_gui->get_window().isOpen())
 		{
-			handle_events();
+			m_event_handler->handle_events();
 			if (m_any_changes)
 			{
 				m_any_changes = false;
@@ -2856,7 +2624,7 @@ namespace checkers
 			os << "nullptr" << std::endl;
 		}
 
-		std::tuple<int, int> coords = get_click_coordinates();
+		std::pair<int, int> coords = get_click_coordinates();
 		int x = std::get<0>(coords);
 		int y = std::get<1>(coords);
 		if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1))

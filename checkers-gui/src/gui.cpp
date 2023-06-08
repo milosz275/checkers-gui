@@ -92,4 +92,11 @@ namespace checkers
 	sf::Window& gui::get_window(void) { return m_window; }
 
 	sf::Clock& gui::get_clock(void) { return m_clock; }
+
+	std::pair<int, int> gui::get_click_coordinates(void)
+	{
+		int x = sf::Mouse::getPosition(m_window).x / (m_window.getSize().x / s_size);
+		int y = sf::Mouse::getPosition(m_window).y / (m_window.getSize().y / s_size);
+		return std::make_pair(x, y);
+	}
 }

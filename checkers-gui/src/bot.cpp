@@ -2,13 +2,13 @@
 
 namespace checkers
 {
-	bot::bot(char sign, const game* game) : base_player(sign, "Bot") { m_game = game; m_depth = 1; m_x = -1; m_y = -1; m_counter_select = 0; m_counter_move = 0;  }
+	bot::bot(char sign, const game* game) : base_player(sign, "Bot") { m_game = game; m_depth = 1; m_counter_select = 0; m_counter_move = 0; m_saved_move = std::pair<int, int>(std::make_pair(-1, -1)); }
 
-	bot::bot(const bot& bot) : base_player(bot) { m_game = bot.m_game; m_depth = bot.m_depth; m_x = bot.m_x; m_y = bot.m_y; m_counter_select = bot.m_counter_select; m_counter_move = bot.m_counter_move; }
+	bot::bot(const bot& bot) : base_player(bot) { m_game = bot.m_game; m_depth = bot.m_depth; m_saved_move = bot.m_saved_move; m_counter_select = bot.m_counter_select; m_counter_move = bot.m_counter_move; }
 
 	bot::~bot() {}
 
-	std::tuple<int, int> bot::get_coordinates(void)
+	std::pair<int, int> bot::get_coordinates(void)
 	{
 		assert(m_game->m_current_player == this);
 		assert(m_game->m_game_freeze);
@@ -46,10 +46,10 @@ namespace checkers
 			assert(at_least_one_move_available);
 
 			// delegate finding coords through game copy to another method
-			std::tuple<int, int> best_move = find_best_move(&game_copy);
+			std::pair<int, int> best_move = find_best_move(&game_copy);
 			
 			std::cout << "bot: best found move from: x: " << std::get<0>(best_move) << "; y: " << std::get<1>(best_move) << std::endl;
-			std::cout << "saved to move to: x: " << m_x << "; y: " << m_y << std::endl;
+			std::cout << "saved to move to: x: " << std::get<0>(m_saved_move) << "; y: " << std::get<1>(m_saved_move) << std::endl;
 			return best_move;
 		}
 		else // bot selected the piece and makes planned move
@@ -66,12 +66,13 @@ namespace checkers
 #ifdef _DEBUG
 			m_game->m_os << "Bot is making planned move" << std::endl;
 #endif
-			return std::make_tuple(m_x, m_y);
+			return m_saved_move;
 			}
 	}
 
-	std::tuple<int, int> bot::find_best_move(game* game_copy)
+	std::pair<int, int> bot::find_best_move(game* game_copy)
 	{
+		//return std::make_tuple(1, 1);
 		// in this method, all the data is assumed to be correct
 		bool is_first = this->is_first();
 		bool at_least_one_capture_available = game_copy->m_available_capture;
@@ -131,10 +132,22 @@ namespace checkers
 		}
 
 		// now, list of games includes all game states after one round
-		for_each(list_of_games.begin(), list_of_games.end(), [](game* g)
+		std::pair<int, int> best_move;
+		int best_score = std::numeric_limits<int>::min();
+		for_each(list_of_games.begin(), list_of_games.end(), [this, i = 0, &best_score, &best_move](std::tuple<game*, std::pair<int, int>, std::pair<int, int>>& game_and_coords) mutable
 			{
-				// in previous step,
+				// 
+				game* g = std::get<0>(game_and_coords);
+				
+				int local_score = g->get_score();
+				if (local_score > best_score)
+				{
+					best_score = local_score;
+					best_move = std::get<1>(game_and_coords);
+					m_saved_move = std::get<2>(game_and_coords);
+				}
 			});
+		return best_move;
 	}
 	
 	void bot::add_to_game_copy_list(std::list<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>>& list_of_games, game* game_copy, std::pair<int, int>* source_coords, std::pair<int, int>* destination_coords)
@@ -165,18 +178,38 @@ namespace checkers
 							int old_x = p->get_x();
 							int old_y = p->get_y();
 							piece* moving_piece = (*board)[old_x][old_y];
-							piece* to_delete_piece = (*board)[b->get_x_d()][b->get_y_d()];
+							local_copy->m_moving_piece = moving_piece;
 							int new_x = b->get_x();
 							int new_y = b->get_y();
+
+							int deleted_x = b->get_x_d();
+							int deleted_y = b->get_y_d();
+							//std::cout << board << std::endl;
+							// save capture direction: 0 - top right, 1 - top left, 2 - bottom right, 3 - bottom left
+							if (deleted_x > new_x && deleted_y < new_y)
+								local_copy->m_last_capture_direction = 3;
+							else if (deleted_x < new_x && deleted_y < new_y)
+								local_copy->m_last_capture_direction = 2;
+							else if (deleted_x > new_x && deleted_y > new_y)
+								local_copy->m_last_capture_direction = 1;
+							else if (deleted_x < new_x && deleted_y > new_y)
+								local_copy->m_last_capture_direction = 0;
+							else
+								throw std::runtime_error("Capturing in wrong direction");
+							
+							piece* to_delete_piece = (*board)[b->get_x_d()][b->get_y_d()];
+						
 							std::list<piece*>* to_delete_list = local_copy->get_to_delete_list();
 							local_copy->make_capture(board, moving_piece, to_delete_piece, new_x, new_y, to_delete_list);
+							int dummy = 0;
+							local_copy->m_available_capture = local_copy->evaluate(local_copy->m_current_player->get_list(), local_copy->m_board, &dummy, dummy, local_copy->m_current_player, local_copy->m_last_capture_direction, &local_copy->m_to_delete_list, local_copy->m_moving_piece);
 
 							bool changed_argument = false;
 							if (!source_coords)
 							{
 								changed_argument = true;
-								source_coords = new std::pair(std::make_pair(old_x, old_y));
-								destination_coords = new std::pair(std::make_pair(new_x, new_y));
+								source_coords = new std::pair<int, int>(std::make_pair(old_x, old_y));
+								destination_coords = new std::pair<int, int>(std::make_pair(new_x, new_y));
 							}
 
 							// recursively go through all captures
@@ -193,6 +226,7 @@ namespace checkers
 		}
 		else
 		{
+			game_copy->m_moving_piece = nullptr;
 			list_of_games.push_back(std::make_tuple(game_copy, *source_coords, *destination_coords));
 		}
 	}

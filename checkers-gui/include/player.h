@@ -10,16 +10,16 @@ namespace checkers
 	class player : public base_player
 	{
 		// pointer to game get_coordinates function
-		std::function<std::tuple<int, int>()> m_get_coordinates_from_game;
+		std::function<std::pair<int, int>()> m_get_coordinates_from_game;
 	public:
 		// creates the player of given sign and name
-		player(char sign, std::string name, std::function<std::tuple<int, int>()> get_coords);
+		player(char sign, std::string name, std::function<std::pair<int, int>()> get_coords);
 		// copies the player
 		player(const player& player);
 		// deletes the player
 		~player();
 		//
-		std::tuple<int, int> get_coordinates(void);
+		std::pair<int, int> get_coordinates(void);
 	};
 }
 

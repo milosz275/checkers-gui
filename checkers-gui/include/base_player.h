@@ -38,7 +38,7 @@ namespace checkers
 		// deletes player
 		virtual ~base_player();
 		// loads coordinates
-		virtual std::tuple<int, int> get_coordinates(void) = 0;
+		virtual std::pair<int, int> get_coordinates(void) = 0;
 		// returns player's sign
 		char get_sign(void);
 		// returns player nickname

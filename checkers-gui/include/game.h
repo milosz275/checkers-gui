@@ -3,7 +3,6 @@
 
 #include "dependencies.h"
 #include "global_variables.h"
-#include "sfml.h"
 
 namespace checkers
 {
@@ -16,6 +15,8 @@ namespace checkers
 		std::vector<std::vector<piece*>>* m_board;
 		//
 		gui* m_gui;
+		//
+		event_handler* m_event_handler;
 		//
 		bool m_game_freeze;
 		//
@@ -66,7 +67,6 @@ namespace checkers
 
 	protected:
 		
-		void handle_events(void);
 		//
 		void select_piece(void);
 		//
@@ -100,13 +100,13 @@ namespace checkers
 
 		
 		// gets move coordinates from the current player
-		std::tuple<int, int> get_coordinates(void);
+		std::pair<int, int> get_coordinates(void);
 		// gets coordinates of click in the window
-		std::tuple<int, int> get_click_coordinates(void);
+		std::pair<int, int> get_click_coordinates(void);
 		
 		
 		// gets coordinates from game's input stream
-		std::tuple<int, int> get_coordinates_from_stream(void);
+		std::pair<int, int> get_coordinates_from_stream(void);
 		// populates the board with pieces for each player
 		void populate_board(int rows);
 		// populates the board for testing purposes
@@ -171,6 +171,7 @@ namespace checkers
 		// returns board to the stream
 		friend std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);
 		//
+		friend class event_handler;
 		friend class bot;
 	};
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);

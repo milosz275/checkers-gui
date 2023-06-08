@@ -19,6 +19,7 @@
 #include "include/piece.h"
 #include "include/available_capture.h"
 #include "include/gui.h"
+#include "include/event_handler.h"
 
 
 #endif

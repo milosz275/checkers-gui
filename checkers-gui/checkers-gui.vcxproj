@@ -24,6 +24,7 @@
     <ClInclude Include="include\base_player.h" />
     <ClInclude Include="include\bot.h" />
     <ClInclude Include="include\dependencies.h" />
+    <ClInclude Include="include\event_handler.h" />
     <ClInclude Include="include\game.h" />
     <ClInclude Include="include\global_variables.h" />
     <ClInclude Include="include\king.h" />
@@ -37,6 +38,7 @@
     <ClCompile Include="src\available_move.cpp" />
     <ClCompile Include="src\base_player.cpp" />
     <ClCompile Include="src\bot.cpp" />
+    <ClCompile Include="src\event_handler.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\king.cpp" />
     <ClCompile Include="src\main.cpp" />
