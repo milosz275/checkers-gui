@@ -10,7 +10,7 @@
 
 namespace checkers
 {
-	game::game(int fps, std::istream& is, std::ostream& os) : m_gui(new gui(fps)), m_event_handler(new event_handler(this)), m_console_game(false), m_game_freeze(false), m_any_changes(true),
+	game::game(int fps, std::istream& is, std::ostream& os) : m_gui(new gui(fps)), m_event_handler(new event_handler(this)), m_gamestate(new gamestate()), m_console_game(false), m_game_freeze(false), m_any_changes(true),
 		//m_signaled_bot(false),
 		m_is_finished(false), m_fps(fps),
 		m_selected(false), m_selected_piece(nullptr), m_moving_piece(nullptr), m_available_capture(false), m_last_capture_direction(-1), m_is(is), m_os(os),

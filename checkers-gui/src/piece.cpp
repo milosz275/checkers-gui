@@ -51,6 +51,8 @@ namespace checkers
 
     base_player* piece::set_owner(base_player* owner) { assert(!m_owner); return m_owner = owner; }
 
+    sf::CircleShape& piece::get_shape(void) { return m_shape; }
+
     std::list<available_move*>* piece::get_av_list(void) { return m_av_list; }
 
     std::ostream& operator<<(std::ostream& os, const piece* piece)

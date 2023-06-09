@@ -6,9 +6,7 @@
 
 namespace checkers
 {
-	// declare to avoid compile conflict
 	class king;
-
 	class game
 	{
 		// main game board
@@ -17,6 +15,8 @@ namespace checkers
 		gui* m_gui;
 		//
 		event_handler* m_event_handler;
+		//
+		gamestate* m_gamestate;
 		//
 		bool m_game_freeze;
 		//
@@ -78,62 +78,46 @@ namespace checkers
 		void make_capture(std::vector<std::vector<piece*>>* board, piece* moving_piece, piece* delete_piece, int new_x, int new_y, std::list<piece*>* dead_list);
 		//
 		void delete_piece(piece* piece_to_delete, std::vector<std::vector<piece*>>* board, base_player* owner);
-		//
+		// OLD - delete; check game completion respecting amount of pieces in the piece lists
 		bool check_game_completion_no_pieces(void);
-		//
+		// check game completion respecting list with pieces and its evaluated possible moves
 		bool check_game_completion_no_possible_moves(std::list<piece*>* list);
-		
-		//
+		// copy pieces from one board to another
 		void copy_board(std::vector<std::vector<piece*>>* source_board, std::vector<std::vector<piece*>>* copy_of_board, base_player* owner);
-
-		//
+		// print basic info about the game
 		void debug_info(std::ostream& os);
-
 		// switches first_turn flag, indicating that it is move of the first player
 		void switch_turn(void);
-		//
+		// OLD - delete; turn on the flag for the bot
 		void signal_the_bot(void);
-		
-		
-		////
-		//std::vector<std::vector<piece*>>* copy_board(std::vector<std::vector<piece*>>* source_board);
-
-		
 		// gets move coordinates from the current player
 		std::pair<int, int> get_coordinates(void);
-		// gets coordinates of click in the window
+		// gets coordinates of click through the gui
 		std::pair<int, int> get_click_coordinates(void);
-		
-		
 		// gets coordinates from game's input stream
 		std::pair<int, int> get_coordinates_from_stream(void);
 		// populates the board with pieces for each player
 		void populate_board(int rows);
 		// populates the board for testing purposes
 		void populate_board_debug(void);
-		//
+		// load pieces from file of a given name
 		bool load_pieces_from_file(const std::string file_name);
-		//
+		// save pieces to file of a given name
 		void save_to_file(std::string file_name);
 		// adds new piece to the specific piece list, board and player at wanted coords
 		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, int x, int y, bool is_alive);
 		// adds new piece to the specific piece list, board and player based on given piece from other board
 		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, piece* based_on);
-
-		
 		// prints result to the given stream
 		void print_results(std::ostream& os);
 		// prints alive pieces to the given stream
 		void print_pieces(std::list<piece*>* list);
-
-		
-		// evaluate possible moves of the given player, returns true if there is at least on possible capture
+		// evaluate all possible moves of the given player, returns true if there is at least on possible capture
 		bool evaluate(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive, base_player* player, int last_capture_direction, std::list<piece*>* dead_list, piece* moving_piece);
-		// 
+		// evaluate possible moves of one piece
 		bool evaluate_piece(piece* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive, base_player* player);
-		//
+		// evaluate possible moves of one king
 		bool evaluate_piece(king* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive, base_player* player, int last_capture_direction, std::list<piece*>* dead_list);
-
 		// clears available moves list for every piece in pieces list (gets through lists in list)
 		void clear_list(std::list<piece*>* list);
 		// clears list of dead pieces printed in multicapture
@@ -172,6 +156,7 @@ namespace checkers
 		friend std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);
 		//
 		friend class event_handler;
+		friend class gamestate;
 		friend class bot;
 	};
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);

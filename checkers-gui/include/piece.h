@@ -53,12 +53,16 @@ namespace checkers
 		base_player* get_owner(void);
 		// sets and returns the piece's owner
 		base_player* set_owner(base_player* owner);
+		//
+		sf::CircleShape& get_shape(void);
 		// lets to print the piece in given stream
 		friend std::ostream& operator<<(std::ostream& os, const piece* piece);
 		// returns the list of all evaluated moves
 		std::list<available_move*>* get_av_list(void);
 		// draws the piece to the window
 		void draw(sf::RenderWindow& window);
+
+		friend class gui;
 	};
 
 	std::ostream& operator<<(std::ostream& os, const piece* piece);

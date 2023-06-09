@@ -73,6 +73,9 @@ namespace checkers
 		void print_player(std::ostream& os = std::cout);
 
 		friend std::ostream& operator<<(std::ostream& os, const base_player* player);
+#ifdef _DEBUG
+		friend class bot;
+#endif
 	};
 
 	std::ostream& operator<<(std::ostream& os, const base_player* player);

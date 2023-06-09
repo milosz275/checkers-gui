@@ -64,9 +64,26 @@ namespace checkers
 				throw std::runtime_error("Bot is stuck in a move loop");
 			}
 #ifdef _DEBUG
-			m_game->m_os << "Bot is making planned move" << std::endl;
+			m_game->m_os << "Bot is making planned move: x: " << std::get<0>(m_saved_move) << "; y: " << std::get<1>(m_saved_move) << std::endl;
+			bool there_is_that_move = false;
+			all_of(m_piece_list->begin(), m_piece_list->end(), [this, &there_is_that_move](piece* p)
+				{
+					all_of(p->get_av_list()->begin(), p->get_av_list()->end(), [this, &there_is_that_move](available_move* a)
+						{
+							if (a->get_x() == std::get<0>(m_saved_move) && a->get_y() == std::get<1>(m_saved_move))
+							{
+								there_is_that_move = true;
+								return false;
+							}
+						});
+					if (there_is_that_move)
+						return false;
+				});
+			assert(there_is_that_move);
 #endif
-			return m_saved_move;
+			std::pair<int, int> move = m_saved_move;
+			m_saved_move = std::make_pair(-1, -1);
+			return move;
 			}
 	}
 
