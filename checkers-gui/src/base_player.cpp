@@ -83,8 +83,8 @@ namespace checkers
 		int y = target->get_y();
 		(*board)[x][y] = nullptr;
 		target->get_owner()->get_list()->remove(target);
-
-		(*board)[x][y] = new king(get_sign(), x, y, true, this);
+		
+		(*board)[x][y] = new king(get_sign(), x, y, true, this, target->get_gui());
 		target->get_owner()->get_list()->push_back((*board)[x][y]);
 
 		return true;

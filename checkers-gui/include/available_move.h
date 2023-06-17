@@ -6,14 +6,15 @@
 
 namespace checkers
 {
+	class piece;
 	class available_move
 	{
 		// x coordinate of available move
 		int m_x;
 		// y coordinate of available move
 		int m_y;
-		//
-		//piece* moving_piece;
+		////
+		//piece* m_piece = nullptr;
 	public:
 		// creates available move
 		available_move(int x, int y);
@@ -23,6 +24,8 @@ namespace checkers
 		int get_x(void);
 		// returns y coordinate of available move
 		int get_y(void);
+		////
+		//piece* get_piece(void);
 	};
 }
 

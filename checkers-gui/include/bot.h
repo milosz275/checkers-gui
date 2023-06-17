@@ -31,11 +31,12 @@ namespace checkers
 		//
 		std::pair<int, int> get_coordinates(void);
 		//
-		std::pair<int, int> find_best_move(game* game_copy);
+		std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> find_best_move(game* game_copy, int depth, int alpha, int beta, bool maximizing_player);
+		//std::pair<int, int> find_best_move(game* game_copy, std::pair<int, int>& saved_move, int depth);
 		//
 		void add_to_game_copy_list(std::list<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>>& list_of_games, game* game_copy, std::pair<int, int>* source_coords, std::pair<int, int>* destination_coords);
 		//
-		int minimax(game* game_copy, int depth, int alpha, int beta, int is_maximizing);
+		//int minimax(game* game_copy, int depth, int alpha, int beta, int is_maximizing);
 	};
 }
 

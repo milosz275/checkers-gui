@@ -16,7 +16,7 @@ namespace checkers
 		//
 		event_handler* m_event_handler;
 		//
-		gamestate* m_gamestate;
+		game_state* m_game_state;
 		//
 		bool m_game_freeze;
 		//
@@ -63,10 +63,7 @@ namespace checkers
 		std::ostream& m_log = std::clog;
 		//
 		std::ofstream m_log_file;
-		
-
 	protected:
-		
 		//
 		void select_piece(void);
 		//
@@ -105,9 +102,11 @@ namespace checkers
 		// save pieces to file of a given name
 		void save_to_file(std::string file_name);
 		// adds new piece to the specific piece list, board and player at wanted coords
-		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, int x, int y, bool is_alive);
-		// adds new piece to the specific piece list, board and player based on given piece from other board
-		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, piece* based_on);
+		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, int x, int y, bool is_alive, gui* ui = nullptr);
+		//
+		void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, int x, int y, bool is_alive, bool force_king, gui* ui = nullptr);
+		//// adds new piece to the specific piece list, board and player based on given piece from other board
+		//void add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, piece* based_on);
 		// prints result to the given stream
 		void print_results(std::ostream& os);
 		// prints alive pieces to the given stream
@@ -125,6 +124,9 @@ namespace checkers
 		// deletes given piece from given list
 		void delete_from_list(std::list<piece*>* list, piece* piece_to_delete);
 
+		std::list<available_move*>& get_available_moves(void);
+
+		bool is_game_over(void);
 	public:
 		// create the game of given size and target frames per second
 		game(int fps = 60, std::istream& is = std::cin, std::ostream& os = std::cout);
@@ -141,6 +143,8 @@ namespace checkers
 		//
 		bool get_game_freeze(void);
 		//
+		bool get_available_capture(void);
+		//
 		const base_player* get_player_1(void);
 		//
 		const base_player* get_player_2(void);
@@ -148,6 +152,8 @@ namespace checkers
 		const base_player* get_current_player(void);
 		//
 		const piece* get_selected_piece(void);
+		//
+		std::list<piece*>* get_pieces(void);
 		// returns main game board
 		std::vector<std::vector<piece*>>* get_board(void);
 		//

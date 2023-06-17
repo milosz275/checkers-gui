@@ -2,7 +2,7 @@
 
 namespace checkers
 {
-	bot::bot(char sign, const game* game) : base_player(sign, "Bot") { m_game = game; m_depth = 1; m_counter_select = 0; m_counter_move = 0; m_saved_move = std::pair<int, int>(std::make_pair(-1, -1)); }
+	bot::bot(char sign, const game* game) : base_player(sign, "Bot Stefan") { m_game = game; m_depth = 2; m_counter_select = 0; m_counter_move = 0; m_saved_move = std::pair<int, int>(std::make_pair(-1, -1)); }
 
 	bot::bot(const bot& bot) : base_player(bot) { m_game = bot.m_game; m_depth = bot.m_depth; m_saved_move = bot.m_saved_move; m_counter_select = bot.m_counter_select; m_counter_move = bot.m_counter_move; }
 
@@ -45,12 +45,22 @@ namespace checkers
 				});
 			assert(at_least_one_move_available);
 
-			// delegate finding coords through game copy to another method
-			std::pair<int, int> best_move = find_best_move(&game_copy);
+			std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> best_moves = find_best_move(&game_copy, m_depth, s_min_score, s_max_score, true);
+
+			if (!best_moves.empty())
+			{
+				// select randomly
+				std::tuple<game*, std::pair<int, int>, std::pair<int, int>> chosen_move = best_moves[rand() % best_moves.size()];
+				std::pair<int, int> selected_coords = std::get<1>(chosen_move);
+				std::pair<int, int> saved_coords = std::get<2>(chosen_move);
+				m_saved_move = saved_coords;
 			
-			std::cout << "bot: best found move from: x: " << std::get<0>(best_move) << "; y: " << std::get<1>(best_move) << std::endl;
-			std::cout << "saved to move to: x: " << std::get<0>(m_saved_move) << "; y: " << std::get<1>(m_saved_move) << std::endl;
-			return best_move;
+				std::cout << "bot: best found move from: x: " << selected_coords.first << "; y: " << selected_coords.second << std::endl;
+				std::cout << "saved to move to: x: " << m_saved_move.first << "; y: " << m_saved_move.second << std::endl;
+				return std::make_pair(selected_coords.first, selected_coords.second);;
+			}
+			else
+				return std::make_pair(-1, -1);
 		}
 		else // bot selected the piece and makes planned move
 		{
@@ -66,18 +76,15 @@ namespace checkers
 #ifdef _DEBUG
 			m_game->m_os << "Bot is making planned move: x: " << std::get<0>(m_saved_move) << "; y: " << std::get<1>(m_saved_move) << std::endl;
 			bool there_is_that_move = false;
-			all_of(m_piece_list->begin(), m_piece_list->end(), [this, &there_is_that_move](piece* p)
+			for_each(m_piece_list->begin(), m_piece_list->end(), [this, &there_is_that_move](piece* p)
 				{
-					all_of(p->get_av_list()->begin(), p->get_av_list()->end(), [this, &there_is_that_move](available_move* a)
+					for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [this, &there_is_that_move](available_move* a)
 						{
 							if (a->get_x() == std::get<0>(m_saved_move) && a->get_y() == std::get<1>(m_saved_move))
 							{
 								there_is_that_move = true;
-								return false;
 							}
 						});
-					if (there_is_that_move)
-						return false;
 				});
 			assert(there_is_that_move);
 #endif
@@ -87,86 +94,287 @@ namespace checkers
 			}
 	}
 
-	std::pair<int, int> bot::find_best_move(game* game_copy)
-	{
-		//return std::make_tuple(1, 1);
-		// in this method, all the data is assumed to be correct
-		bool is_first = this->is_first();
-		bool at_least_one_capture_available = game_copy->m_available_capture;
-		std::list<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> list_of_games;
+	//std::pair<int, int> bot::find_best_move(game* game_copy, std::pair<int, int>& saved_move, int depth)
+	//{
+	//	//return std::make_tuple(1, 1);
+	//	// in this method, all the data is assumed to be correct
+	//	bool is_first = this->is_first();
+	//	bool at_least_one_capture_available = game_copy->m_available_capture;
+	//	std::list<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> list_of_games;
 
-		// make sure evaluation was conducted properly
-		if (at_least_one_capture_available)
+	//	// make sure evaluation was conducted properly
+	//	if (at_least_one_capture_available)
+	//	{
+	//		int* highest_capture = nullptr;
+	//		for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [&highest_capture](piece* p)
+	//			{
+	//				for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [&highest_capture](available_move* a)
+	//					{
+	//						assert(dynamic_cast<available_capture*>(a));
+	//						if (highest_capture)
+	//							assert(dynamic_cast<available_capture*>(a)->get_max_score() == *highest_capture);
+	//						else
+	//							highest_capture = new int(dynamic_cast<available_capture*>(a)->get_max_score());
+	//							
+	//					});
+	//			});
+	//	}
+	//	else
+	//	{
+	//		for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [](piece* p)
+	//			{
+	//				for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [](available_move* a)
+	//					{
+	//						assert(dynamic_cast<available_move*>(a));
+	//					});
+	//			});
+	//	}
+
+	//	// fill in the game list
+	//	if (at_least_one_capture_available)
+	//	{
+	//		// recursively go through multicaptures and add the game copy at the end
+	//		add_to_game_copy_list(list_of_games, game_copy, nullptr, nullptr);
+	//	}
+	//	else
+	//	{
+	//		for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [&game_copy, &list_of_games](piece* p)
+	//			{
+	//				for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [&game_copy, &list_of_games, &p](available_move* a)
+	//					{
+	//						game* local_copy = new game(*game_copy);
+	//						std::vector<std::vector<piece*>>* board = local_copy->get_board();
+	//						int old_x = p->get_x();
+	//						int old_y = p->get_y();
+	//						piece* moving_piece = (*board)[old_x][old_y];
+	//						int new_x = a->get_x();
+	//						int new_y = a->get_y();
+	//						local_copy->move_piece(moving_piece, board, new_x, new_y);
+	//						list_of_games.push_back(std::make_tuple(local_copy, std::make_pair(old_x, old_y), std::make_pair(new_x, new_y)));
+	//					});
+	//			});
+	//	}
+
+	//	// go recursively into created game using minimax algorithm
+	//	for_each(list_of_games.begin(), list_of_games.end(), [this, i = 0](std::tuple<game*, std::pair<int, int>, std::pair<int, int>>& game_and_coords) mutable
+	//	{
+	//		// 
+	//		game* g = std::get<0>(game_and_coords);
+
+	//		// minimax with games list reference, switch turn, count down the depth, use find_best_move with flag is recursive
+	//	});
+
+	//	// now, list of games includes all game states after one round
+	//	std::pair<int, int> best_move;
+	//	int best_score = std::numeric_limits<int>::min();
+	//	for_each(list_of_games.begin(), list_of_games.end(), [this, saved_move, i = 0, &best_score, &best_move](std::tuple<game*, std::pair<int, int>, std::pair<int, int>>& game_and_coords) mutable
+	//		{
+	//			// 
+	//			game* g = std::get<0>(game_and_coords);
+	//			
+	//			int local_score = g->get_score();
+	//			if (local_score > best_score)
+	//			{
+	//				best_score = local_score;
+	//				best_move = std::get<1>(game_and_coords);
+	//				saved_move = std::get<2>(game_and_coords);
+	//			}
+	//		});
+	//	return best_move;
+	//}
+	
+
+
+
+
+
+
+
+
+
+	//std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> bot::find_best_move(game* game_copy, int depth, int alpha, int beta, bool maximizing_player)
+	//{
+	//	if (depth == 0 || game_copy->is_game_over())
+	//	{
+	//		// return empty vector
+	//		return {};
+	//	}
+
+	//	std::list<available_move*> available_moves = game_copy->get_available_moves();
+	//	std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> best_moves;
+	//	int best_score = maximizing_player ? s_min_score : s_max_score;
+
+	//	for (available_move* move : available_moves)
+	//	{
+	//		game* next_game = new game(*game_copy);
+	//		next_game->make_move(move);
+
+	//		// Recursively evaluate the next move with alpha-beta pruning
+	//		std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> next_moves = find_best_move(next_game, depth - 1, alpha, beta, !maximizing_player);
+
+	//		int score = next_game->evaluate_game();
+
+	//		// Update the best score and moves based on the current player
+	//		if (maximizing_player && score > best_score)
+	//		{
+	//			best_score = score;
+	//			best_moves.clear();
+	//			for (const auto& next_move : next_moves)
+	//			{
+	//				best_moves.push_back(next_move);
+	//			}
+	//			best_moves.push_back(std::make_tuple(game_copy, move, std::make_pair(move.first + 1, move.second + 1)));
+
+	//			alpha = std::max(alpha, best_score);
+	//			if (beta <= alpha)
+	//				break;
+	//		}
+	//		else if (!maximizing_player && score < best_score)
+	//		{
+	//			best_score = score;
+	//			best_moves.clear();
+	//			for (const auto& next_move : next_moves)
+	//			{
+	//				best_moves.push_back(next_move);
+	//			}
+	//			best_moves.push_back(std::make_tuple(game_copy, move, std::make_pair(move.first + 1, move.second + 1)));
+
+	//			beta = std::min(beta, best_score);
+	//			if (beta <= alpha)
+	//				break;
+	//		}
+	//		else if (score == best_score)
+	//		{
+	//			for (const auto& next_move : next_moves)
+	//			{
+	//				best_moves.push_back(next_move);
+	//			}
+	//			best_moves.push_back(std::make_tuple(game_copy, move, std::make_pair(move.first + 1, move.second + 1)));
+	//		}
+
+	//		delete next_game;
+	//	}
+
+	//	return best_moves;
+	//}
+
+	std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> bot::find_best_move(game* current_game, int depth, int alpha, int beta, bool maximizing_player)
+	{
+		if (depth == 0 || current_game->get_completion())
 		{
-			int* highest_capture = nullptr;
-			for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [&highest_capture](piece* p)
-				{
-					for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [&highest_capture](available_move* a)
-						{
-							assert(dynamic_cast<available_capture*>(a));
-							if (highest_capture)
-								assert(dynamic_cast<available_capture*>(a)->get_max_score() == *highest_capture);
-							else
-								highest_capture = new int(dynamic_cast<available_capture*>(a)->get_max_score());
-								
-						});
-				});
+			std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> result;
+			result.emplace_back(current_game, std::make_pair(-1, -1), std::make_pair(-1, -1));
+			return result;
 		}
-		else
+		else if (depth < m_depth)
 		{
-			for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [](piece* p)
-				{
-					for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [](available_move* a)
-						{
-							assert(dynamic_cast<available_move*>(a));
-						});
-				});
+			current_game->switch_turn();
+			current_game->clear_list(&current_game->m_p_list_1);
+			current_game->clear_list(&current_game->m_p_list_2);
+			int dummy = 0;
+			current_game->m_available_capture = current_game->evaluate(current_game->m_current_player->get_list(), current_game->m_board, &dummy, dummy, current_game->m_current_player, current_game->m_last_capture_direction, &current_game->m_to_delete_list, nullptr);
 		}
+
+		std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> best_moves;
+		bool is_first = this->is_first();
+		bool at_least_one_capture_available = current_game->get_available_capture();
+		std::list<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> list_of_games;
 
 		// fill in the game list
 		if (at_least_one_capture_available)
 		{
 			// recursively go through multicaptures and add the game copy at the end
-			add_to_game_copy_list(list_of_games, game_copy, nullptr, nullptr);
+			add_to_game_copy_list(list_of_games, current_game, nullptr, nullptr);
 		}
 		else
 		{
-			for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [&game_copy, &list_of_games](piece* p)
+			current_game->m_moving_piece = nullptr;
+			for_each(current_game->m_current_player->get_list()->begin(), current_game->m_current_player->get_list()->end(), [&current_game, &list_of_games](piece* p)
 				{
-					for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [&game_copy, &list_of_games, &p](available_move* a)
+					for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [&current_game, &list_of_games, &p](available_move* a)
 						{
-							game* local_copy = new game(*game_copy);
-							std::vector<std::vector<piece*>>* board = local_copy->get_board();
+							game* game_copy = new game(*current_game);
+							std::vector<std::vector<piece*>>* board = game_copy->get_board();
 							int old_x = p->get_x();
 							int old_y = p->get_y();
 							piece* moving_piece = (*board)[old_x][old_y];
 							int new_x = a->get_x();
 							int new_y = a->get_y();
-							local_copy->move_piece(moving_piece, board, new_x, new_y);
-							list_of_games.push_back(std::make_tuple(local_copy, std::make_pair(old_x, old_y), std::make_pair(new_x, new_y)));
+							game_copy->move_piece(moving_piece, board, new_x, new_y);
+							list_of_games.push_back(std::make_tuple(game_copy, std::make_pair(old_x, old_y), std::make_pair(new_x, new_y)));
 						});
 				});
 		}
 
-		// now, list of games includes all game states after one round
-		std::pair<int, int> best_move;
-		int best_score = std::numeric_limits<int>::min();
-		for_each(list_of_games.begin(), list_of_games.end(), [this, i = 0, &best_score, &best_move](std::tuple<game*, std::pair<int, int>, std::pair<int, int>>& game_and_coords) mutable
-			{
-				// 
-				game* g = std::get<0>(game_and_coords);
-				
-				int local_score = g->get_score();
-				if (local_score > best_score)
+		if (maximizing_player)
+		{
+			int max_score = s_min_score;
+
+			// iterate over all generated games
+			all_of(list_of_games.begin(), list_of_games.end(), [this, &max_score, &depth, &alpha, &beta, &best_moves](std::tuple<game*, std::pair<int, int>, std::pair<int, int>>& game_and_coords)
 				{
-					best_score = local_score;
-					best_move = std::get<1>(game_and_coords);
-					m_saved_move = std::get<2>(game_and_coords);
-				}
-			});
-		return best_move;
+					game* game_copy = std::get<0>(game_and_coords);
+
+					std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> next_moves = find_best_move(game_copy, depth - 1, alpha, beta, false);
+
+					int score = game_copy->get_score();
+
+					if (score > max_score)
+					{
+						max_score = score;
+						best_moves.clear();
+						best_moves.emplace_back(game_copy, std::get<1>(game_and_coords), std::get<2>(game_and_coords));
+					}
+					else if (score == max_score)
+					{
+						best_moves.emplace_back(game_copy, std::get<1>(game_and_coords), std::get<2>(game_and_coords));
+					}
+
+					// beta cutoff
+					alpha = std::max(alpha, max_score);
+					if (beta <= alpha)
+					{
+						//delete game_copy;
+						return false; 
+					}
+				});
+		}
+		else
+		{
+			int min_score = s_max_score;
+
+			// iterate over all generated games
+			all_of(list_of_games.begin(), list_of_games.end(), [this, &min_score, &depth, &alpha, &beta, &best_moves](std::tuple<game*, std::pair<int, int>, std::pair<int, int>>& game_and_coords)
+				{
+					game* game_copy = std::get<0>(game_and_coords);
+
+					std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> next_moves = find_best_move(game_copy, depth - 1, alpha, beta, false);
+
+					int score = game_copy->get_score();
+
+					if (score < min_score)
+					{
+						min_score = score;
+						best_moves.clear();
+						best_moves.emplace_back(game_copy, std::get<1>(game_and_coords), std::get<2>(game_and_coords));
+					}
+					else if (score == min_score)
+					{
+						best_moves.emplace_back(game_copy, std::get<1>(game_and_coords), std::get<2>(game_and_coords));
+					}
+
+					// alpha cutoff
+					beta = std::min(beta, min_score);
+					if (beta <= alpha)
+					{
+						//delete game_copy;
+						return false;
+					}
+				});
+		}
+		return best_moves;
 	}
-	
+
 	void bot::add_to_game_copy_list(std::list<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>>& list_of_games, game* game_copy, std::pair<int, int>* source_coords, std::pair<int, int>* destination_coords)
 	{
 		// make checks
@@ -243,6 +451,8 @@ namespace checkers
 		}
 		else
 		{
+			game_copy->clear_to_delete_list(&game_copy->m_to_delete_list, &game_copy->m_p_list_1);
+			game_copy->clear_to_delete_list(&game_copy->m_to_delete_list, &game_copy->m_p_list_2);
 			game_copy->m_moving_piece = nullptr;
 			list_of_games.push_back(std::make_tuple(game_copy, *source_coords, *destination_coords));
 		}

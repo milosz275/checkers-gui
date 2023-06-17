@@ -54,7 +54,7 @@
     <ClInclude Include="include\event_handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\gamestate.h">
+    <ClInclude Include="include\game_state.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -92,7 +92,7 @@
     <ClCompile Include="src\event_handler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\gamestate.cpp">
+    <ClCompile Include="src\game_state.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

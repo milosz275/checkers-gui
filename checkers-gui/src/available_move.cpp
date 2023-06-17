@@ -9,4 +9,6 @@ namespace checkers
 	int available_move::get_x(void) { return m_x; }
 
 	int available_move::get_y(void) { return m_y; }
+
+	//piece* available_move::get_piece(void) { return m_piece; }
 }

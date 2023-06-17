@@ -13,6 +13,7 @@
 
 namespace checkers
 {
+	class gui;
 	class piece
 	{
 	protected:
@@ -25,18 +26,24 @@ namespace checkers
 		// list containing all evaluated possible moves for the piece
 		std::list<available_move*>* m_av_list;
 		// object that is printed in the window
-		sf::CircleShape m_shape;
+		sf::CircleShape* m_shape = nullptr;
 		// pointer to the piece's owner
 		base_player* m_owner;
-
+		//
 		bool m_is_alive;
+		//
+		gui* m_gui = nullptr;
 	public:
 		// creates the piece of given sign and coordinates
 		piece(char sign, int x, int y, bool is_alive, base_player* owner);
+		//
+		piece(char sign, int x, int y, bool is_alive, base_player* owner, gui* gui);
 		// copies the piece
 		piece(const piece& piece);
 		// deletes the piece
 		virtual ~piece();
+
+		virtual void setup_shape(void);
 		// returns x coordinate of the piece
 		int get_x(void);
 		// returns y coordinate of the piece
@@ -59,8 +66,10 @@ namespace checkers
 		friend std::ostream& operator<<(std::ostream& os, const piece* piece);
 		// returns the list of all evaluated moves
 		std::list<available_move*>* get_av_list(void);
+		//
+		gui* get_gui(void);
 		// draws the piece to the window
-		void draw(sf::RenderWindow& window);
+		void draw(void);
 
 		friend class gui;
 	};

@@ -61,6 +61,11 @@ namespace checkers
 				}
 				break;
 			}
+			else if (event.type == sf::Event::Resized)
+			{
+				m_game_pointer->m_any_changes = true;
+				os << "test" << std::endl;
+			}
 			else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left || (bool)dynamic_cast<bot*>(m_game_pointer->m_current_player) || m_game_pointer->m_console_game)
 			{
 				//m_signaled_bot = false;
@@ -110,7 +115,7 @@ namespace checkers
 					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_game_pointer->m_board)[x][y] == nullptr)
 					{
 						log << "Manually adding king to the first player at coordinates: x: " << x << "; " << y << std::endl;
-						m_game_pointer->add_new_piece(&m_game_pointer->m_p_list_1, m_game_pointer->m_board, m_game_pointer->m_player_1, new king(m_game_pointer->m_player_1->get_sign(), x, y, true, m_game_pointer->m_player_1));
+						m_game_pointer->add_new_piece(&m_game_pointer->m_p_list_1, m_game_pointer->m_board, m_game_pointer->m_player_1, x, y, true, true, m_game_pointer->m_gui);
 					}
 					break;
 				}
@@ -123,7 +128,7 @@ namespace checkers
 					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_game_pointer->m_board)[x][y] == nullptr)
 					{
 						log << "Manually adding king to the second player at coordinates: x: " << x << "; " << y << std::endl;
-						m_game_pointer->add_new_piece(&m_game_pointer->m_p_list_2, m_game_pointer->m_board, m_game_pointer->m_player_2, new king(m_game_pointer->m_player_2->get_sign(), x, y, true, m_game_pointer->m_player_2));
+						m_game_pointer->add_new_piece(&m_game_pointer->m_p_list_2, m_game_pointer->m_board, m_game_pointer->m_player_2, x, y, true, true, m_game_pointer->m_gui);
 						m_game_pointer->m_any_changes = true;
 					}
 					break;
@@ -137,7 +142,7 @@ namespace checkers
 					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_game_pointer->m_board)[x][y] == nullptr)
 					{
 						log << "Manually adding piece to the first player at coordinates: x: " << x << "; " << y << std::endl;
-						m_game_pointer->add_new_piece(&m_game_pointer->m_p_list_1, m_game_pointer->m_board, m_game_pointer->m_player_1, x, y, true);
+						m_game_pointer->add_new_piece(&m_game_pointer->m_p_list_1, m_game_pointer->m_board, m_game_pointer->m_player_1, x, y, true, m_game_pointer->m_gui);
 						m_game_pointer->m_any_changes = true;
 					}
 					break;
@@ -151,7 +156,7 @@ namespace checkers
 					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_game_pointer->m_board)[x][y] == nullptr)
 					{
 						log << "Manually adding piece to the second player at coordinates: x: " << x << "; " << y << std::endl;
-						m_game_pointer->add_new_piece(&m_game_pointer->m_p_list_2, m_game_pointer->m_board, m_game_pointer->m_player_2, x, y, true);
+						m_game_pointer->add_new_piece(&m_game_pointer->m_p_list_2, m_game_pointer->m_board, m_game_pointer->m_player_2, x, y, true, m_game_pointer->m_gui);
 						m_game_pointer->m_any_changes = true;
 					}
 					break;

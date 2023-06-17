@@ -20,6 +20,6 @@
 #include "include/available_capture.h"
 #include "include/gui.h"
 #include "include/event_handler.h"
-#include "include/gamestate.h"
+#include "include/game_state.h"
 
 #endif
