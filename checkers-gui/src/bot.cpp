@@ -10,8 +10,10 @@ namespace checkers
 
 	std::pair<int, int> bot::get_coordinates(void)
 	{
-		assert(m_game->m_current_player == this);
-		assert(m_game->m_game_freeze);
+		//assert(m_game->m_game_state->get_current_player() == this);
+		assert(m_game->m_game_state->get_current_player() == this);
+		//assert(m_game->m_game_freeze);
+		assert(m_game->m_game_state->get_game_freeze());
 
 		if (!(m_game->m_selected_piece)) // bot has not selected any piece yet
 		{
@@ -33,7 +35,7 @@ namespace checkers
 			// check if there is at least one move available
 			bool at_least_one_move_available = false;
 			int piece_index = 0;
-			all_of(game_copy.m_current_player->get_list()->begin(), game_copy.m_current_player->get_list()->end(), [&at_least_one_move_available, &piece_index](piece* p)
+			all_of(game_copy.m_game_state->get_current_player()->get_list()->begin(), game_copy.m_game_state->get_current_player()->get_list()->end(), [&at_least_one_move_available, &piece_index](piece* p)
 				{
 					if (!(p->get_av_list()->empty()))
 					{
@@ -106,7 +108,7 @@ namespace checkers
 	//	if (at_least_one_capture_available)
 	//	{
 	//		int* highest_capture = nullptr;
-	//		for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [&highest_capture](piece* p)
+	//		for_each(game_copy->m_game_state->get_current_player()->get_list()->begin(), game_copy->m_game_state->get_current_player()->get_list()->end(), [&highest_capture](piece* p)
 	//			{
 	//				for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [&highest_capture](available_move* a)
 	//					{
@@ -121,7 +123,7 @@ namespace checkers
 	//	}
 	//	else
 	//	{
-	//		for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [](piece* p)
+	//		for_each(game_copy->m_game_state->get_current_player()->get_list()->begin(), game_copy->m_game_state->get_current_player()->get_list()->end(), [](piece* p)
 	//			{
 	//				for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [](available_move* a)
 	//					{
@@ -138,7 +140,7 @@ namespace checkers
 	//	}
 	//	else
 	//	{
-	//		for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [&game_copy, &list_of_games](piece* p)
+	//		for_each(game_copy->m_game_state->get_current_player()->get_list()->begin(), game_copy->m_game_state->get_current_player()->get_list()->end(), [&game_copy, &list_of_games](piece* p)
 	//			{
 	//				for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [&game_copy, &list_of_games, &p](available_move* a)
 	//					{
@@ -272,7 +274,7 @@ namespace checkers
 			current_game->clear_list(&current_game->m_p_list_1);
 			current_game->clear_list(&current_game->m_p_list_2);
 			int dummy = 0;
-			current_game->m_available_capture = current_game->evaluate(current_game->m_current_player->get_list(), current_game->m_board, &dummy, dummy, current_game->m_current_player, current_game->m_last_capture_direction, &current_game->m_to_delete_list, nullptr);
+			current_game->m_available_capture = current_game->evaluate(current_game->m_game_state->get_current_player()->get_list(), current_game->m_board, &dummy, dummy, current_game->m_game_state->get_current_player(), current_game->m_last_capture_direction, &current_game->m_to_delete_list, nullptr);
 		}
 
 		std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> best_moves;
@@ -289,7 +291,7 @@ namespace checkers
 		else
 		{
 			current_game->m_moving_piece = nullptr;
-			for_each(current_game->m_current_player->get_list()->begin(), current_game->m_current_player->get_list()->end(), [&current_game, &list_of_games](piece* p)
+			for_each(current_game->m_game_state->get_current_player()->get_list()->begin(), current_game->m_game_state->get_current_player()->get_list()->end(), [&current_game, &list_of_games](piece* p)
 				{
 					for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [&current_game, &list_of_games, &p](available_move* a)
 						{
@@ -381,7 +383,7 @@ namespace checkers
 		bool at_least_one_capture_available = game_copy->m_available_capture;
 		if (at_least_one_capture_available)
 		{
-			for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [](piece* p)
+			for_each(game_copy->m_game_state->get_current_player()->get_list()->begin(), game_copy->m_game_state->get_current_player()->get_list()->end(), [](piece* p)
 				{
 					for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [](available_move* a)
 						{
@@ -393,7 +395,7 @@ namespace checkers
 		// make game copies	
 		if (at_least_one_capture_available)
 		{
-			for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [&source_coords, &destination_coords, &game_copy, &list_of_games, this](piece* p)
+			for_each(game_copy->m_game_state->get_current_player()->get_list()->begin(), game_copy->m_game_state->get_current_player()->get_list()->end(), [&source_coords, &destination_coords, &game_copy, &list_of_games, this](piece* p)
 				{
 					for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [&source_coords, &destination_coords, &game_copy, &p, &list_of_games, this](available_move* a)
 						{
@@ -427,7 +429,7 @@ namespace checkers
 							std::list<piece*>* to_delete_list = local_copy->get_to_delete_list();
 							local_copy->make_capture(board, moving_piece, to_delete_piece, new_x, new_y, to_delete_list);
 							int dummy = 0;
-							local_copy->m_available_capture = local_copy->evaluate(local_copy->m_current_player->get_list(), local_copy->m_board, &dummy, dummy, local_copy->m_current_player, local_copy->m_last_capture_direction, &local_copy->m_to_delete_list, local_copy->m_moving_piece);
+							local_copy->m_available_capture = local_copy->evaluate(local_copy->m_game_state->get_current_player()->get_list(), local_copy->m_board, &dummy, dummy, local_copy->m_game_state->get_current_player(), local_copy->m_last_capture_direction, &local_copy->m_to_delete_list, local_copy->m_moving_piece);
 
 							bool changed_argument = false;
 							if (!source_coords)
@@ -464,7 +466,7 @@ namespace checkers
 	//	bool at_least_one_capture_available = game_copy->m_available_capture;
 	//	if (at_least_one_capture_available)
 	//	{
-	//		for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [](piece* p)
+	//		for_each(game_copy->m_game_state->get_current_player()->get_list()->begin(), game_copy->m_game_state->get_current_player()->get_list()->end(), [](piece* p)
 	//			{
 	//				for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [](available_move* a)
 	//					{
@@ -474,7 +476,7 @@ namespace checkers
 	//	}
 	//	else
 	//	{
-	//		for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [](piece* p)
+	//		for_each(game_copy->m_game_state->get_current_player()->get_list()->begin(), game_copy->m_game_state->get_current_player()->get_list()->end(), [](piece* p)
 	//			{
 	//				for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [](available_move* a)
 	//					{
@@ -486,7 +488,7 @@ namespace checkers
 	//	// make game copies	
 	//	if (at_least_one_capture_available)
 	//	{
-	//		for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [&game_copy, &list_of_games, this](piece* p)
+	//		for_each(game_copy->m_game_state->get_current_player()->get_list()->begin(), game_copy->m_game_state->get_current_player()->get_list()->end(), [&game_copy, &list_of_games, this](piece* p)
 	//			{
 	//				for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [&game_copy, &p, &list_of_games, this](available_move* a)
 	//					{
@@ -508,7 +510,7 @@ namespace checkers
 	//	}
 	//	else 
 	//	{
-	//		for_each(game_copy->m_current_player->get_list()->begin(), game_copy->m_current_player->get_list()->end(), [&game_copy, &list_of_games](piece* p)
+	//		for_each(game_copy->m_game_state->get_current_player()->get_list()->begin(), game_copy->m_game_state->get_current_player()->get_list()->end(), [&game_copy, &list_of_games](piece* p)
 	//			{
 	//				for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [&game_copy, &list_of_games, &p](available_move* a)
 	//					{
@@ -534,7 +536,7 @@ namespace checkers
 	/*
 	std::tuple<int, int> bot::get_coordinates(void)
 	{
-		assert(m_game->m_current_player == this);
+		assert(m_game->m_game_state->get_current_player() == this);
 		assert(m_game->m_game_freeze);
 
 		bool is_first = this->is_first();
@@ -559,7 +561,7 @@ namespace checkers
 			// check if there is at least one move available
 			bool at_least_one_move_available = false;
 			int piece_index = 0;
-			all_of(local_game.m_current_player->get_list()->begin(), local_game.m_current_player->get_list()->end(), [&at_least_one_move_available, &piece_index](piece* p)
+			all_of(local_game.m_game_state->get_current_player()->get_list()->begin(), local_game.m_game_state->get_current_player()->get_list()->end(), [&at_least_one_move_available, &piece_index](piece* p)
 				{
 					if (!(p->get_av_list()->empty()))
 					{
@@ -582,7 +584,7 @@ namespace checkers
 			while (at_least_one_capture_available)
 			{
 				// for every available move or capture of every piece of current player
-				for_each(std::next(local_game.m_current_player->get_list()->begin(), piece_index), local_game.m_current_player->get_list()->end(), [this, &local_game, &best_move, &best_score, &alpha, &beta, at_least_one_capture_available, &is_first](piece* p)
+				for_each(std::next(local_game.m_game_state->get_current_player()->get_list()->begin(), piece_index), local_game.m_game_state->get_current_player()->get_list()->end(), [this, &local_game, &best_move, &best_score, &alpha, &beta, at_least_one_capture_available, &is_first](piece* p)
 					{
 						for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [this, &local_game, p, &best_move, &best_score, &alpha, &beta, &at_least_one_capture_available, &is_first](available_move* move)
 							{
@@ -664,7 +666,7 @@ namespace checkers
 			}
 
 			// go through possible moves, for every available move or capture of every piece of current player
-			for_each(std::next(local_game.m_current_player->get_list()->begin(), piece_index), local_game.m_current_player->get_list()->end(), [this, &local_game, &best_move, &best_score, &alpha, &beta, at_least_one_capture_available, &is_first](piece* p)
+			for_each(std::next(local_game.m_game_state->get_current_player()->get_list()->begin(), piece_index), local_game.m_game_state->get_current_player()->get_list()->end(), [this, &local_game, &best_move, &best_score, &alpha, &beta, at_least_one_capture_available, &is_first](piece* p)
 				{
 					for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [this, &local_game, p, &best_move, &best_score, &alpha, &beta, &at_least_one_capture_available, &is_first](available_move* move)
 						{
@@ -781,7 +783,7 @@ namespace checkers
 	*/
 //	std::tuple<int, int> bot::get_coordinates(void)
 //	{
-//		assert(m_game->m_current_player == this);
+//		assert(m_game->m_game_state->get_current_player() == this);
 //		assert(m_game->m_game_freeze);
 //
 //		bool is_first = this->is_first();
@@ -806,7 +808,7 @@ namespace checkers
 //			// check if there is at least one move available
 //			bool at_least_one_move_available = false;
 //			int piece_index = 0;
-//			all_of(local_game.m_current_player->get_list()->begin(), local_game.m_current_player->get_list()->end(), [&at_least_one_move_available, &piece_index](piece* p)
+//			all_of(local_game.m_game_state->get_current_player()->get_list()->begin(), local_game.m_game_state->get_current_player()->get_list()->end(), [&at_least_one_move_available, &piece_index](piece* p)
 //				{
 //					if (!(p->get_av_list()->empty()))
 //					{
@@ -827,7 +829,7 @@ namespace checkers
 //			bool at_least_one_capture_available = m_game->m_available_capture;
 //
 //			// for every available move or capture of every piece of current player
-//			for_each(std::next(local_game.m_current_player->get_list()->begin(), piece_index), local_game.m_current_player->get_list()->end(), [this, &local_game, &best_move, &best_score, &alpha, &beta, at_least_one_capture_available, &is_first](piece* p)
+//			for_each(std::next(local_game.m_game_state->get_current_player()->get_list()->begin(), piece_index), local_game.m_game_state->get_current_player()->get_list()->end(), [this, &local_game, &best_move, &best_score, &alpha, &beta, at_least_one_capture_available, &is_first](piece* p)
 //				{
 //					for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [this, &local_game, p, &best_move, &best_score, &alpha, &beta, &at_least_one_capture_available, &is_first](available_move* move)
 //						{
@@ -940,14 +942,14 @@ namespace checkers
 //			// copy the game once again and make move not considering who the current player is
 //			bool at_least_one_capture_available = input_game->m_available_capture;
 //			bool is_first = true;
-//			if (input_game->m_current_player == input_game->m_player_2)
+//			if (input_game->m_game_state->get_current_player() == input_game->m_player_2)
 //				is_first = false;
 //
 //			if (is_maximizing)
 //			{
 //				int max_score = std::numeric_limits<int>::min();
 //				// for every available move or capture of every piece of current player
-//				for_each(input_game->m_current_player->get_list()->begin(), input_game->m_current_player->get_list()->end(), [this, &input_game, &max_score, &alpha, &beta, at_least_one_capture_available, &is_first](piece* p)
+//				for_each(input_game->m_game_state->get_current_player()->get_list()->begin(), input_game->m_game_state->get_current_player()->get_list()->end(), [this, &input_game, &max_score, &alpha, &beta, at_least_one_capture_available, &is_first](piece* p)
 //					{
 //						for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [this, &input_game, p, &max_score, &alpha, &beta, &at_least_one_capture_available, &is_first](available_move* move)
 //							{
@@ -1052,7 +1054,7 @@ namespace checkers
 	// oldest take
 //	std::tuple<int, int> bot::get_coordinates(void)
 //	{
-//		assert(m_game->m_current_player == this);
+//		assert(m_game->m_game_state->get_current_player() == this);
 //		assert(m_game->m_game_freeze);
 //
 //		bool is_first = this->is_first();
@@ -1077,7 +1079,7 @@ namespace checkers
 //			// check if there is at least one move available
 //			bool at_least_one_move_available = false;
 //			int piece_index = 0;
-//			all_of(local_game.m_current_player->get_list()->begin(), local_game.m_current_player->get_list()->end(), [&at_least_one_move_available, &piece_index](piece* p)
+//			all_of(local_game.m_game_state->get_current_player()->get_list()->begin(), local_game.m_game_state->get_current_player()->get_list()->end(), [&at_least_one_move_available, &piece_index](piece* p)
 //				{
 //					if (!(p->get_av_list()->empty()))
 //					{
@@ -1098,7 +1100,7 @@ namespace checkers
 //			bool at_least_one_capture_available = m_game->m_available_capture;
 //
 //			// for every available move or capture of every piece of current player
-//			for_each(std::next(local_game.m_current_player->get_list()->begin(), piece_index), local_game.m_current_player->get_list()->end(), [this, &local_game, &best_move, &best_score, &alpha, &beta, at_least_one_capture_available, &is_first](piece* p)
+//			for_each(std::next(local_game.m_game_state->get_current_player()->get_list()->begin(), piece_index), local_game.m_game_state->get_current_player()->get_list()->end(), [this, &local_game, &best_move, &best_score, &alpha, &beta, at_least_one_capture_available, &is_first](piece* p)
 //				{
 //					for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [this, &local_game, p, &best_move, &best_score, &alpha, &beta, &at_least_one_capture_available, &is_first](available_move* move)
 //						{

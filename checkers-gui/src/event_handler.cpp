@@ -15,7 +15,7 @@ namespace checkers
 		std::ostream& log = m_game_pointer->m_log;
 		sf::Window& window = m_game_pointer->m_gui->get_window();
 		sf::Event& event = m_game_pointer->m_gui->get_event();
-		while (window.pollEvent(event) || (bool)dynamic_cast<bot*>(m_game_pointer->m_current_player))
+		while (window.pollEvent(event) || (bool)dynamic_cast<bot*>(m_game_pointer->m_game_state->get_current_player()))
 		{
 			if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 			{
@@ -66,7 +66,7 @@ namespace checkers
 				m_game_pointer->m_any_changes = true;
 				os << "test" << std::endl;
 			}
-			else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left || (bool)dynamic_cast<bot*>(m_game_pointer->m_current_player) || m_game_pointer->m_console_game)
+			else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left || (bool)dynamic_cast<bot*>(m_game_pointer->m_game_state->get_current_player()) || m_game_pointer->m_console_game)
 			{
 				//m_signaled_bot = false;
 				if (!m_game_pointer->m_selected)
@@ -96,7 +96,7 @@ namespace checkers
 					m_game_pointer->m_selected_piece = nullptr;
 					m_game_pointer->m_selected = false;
 					int dummy = 0;
-					m_game_pointer->m_available_capture = m_game_pointer->evaluate(m_game_pointer->m_current_player->get_list(), m_game_pointer->m_board, &dummy, dummy, m_game_pointer->m_current_player, m_game_pointer->m_last_capture_direction, &m_game_pointer->m_to_delete_list, m_game_pointer->m_moving_piece);
+					m_game_pointer->m_available_capture = m_game_pointer->evaluate(m_game_pointer->m_game_state->get_current_player()->get_list(), m_game_pointer->m_board, &dummy, dummy, m_game_pointer->m_game_state->get_current_player(), m_game_pointer->m_last_capture_direction, &m_game_pointer->m_to_delete_list, m_game_pointer->m_moving_piece);
 					os << "Game re-evaluated" << std::endl;
 					break;
 				}

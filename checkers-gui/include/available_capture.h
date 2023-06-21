@@ -12,7 +12,7 @@ namespace checkers
 		int m_x_d;
 		// y coordinate of a piece to delete making a capture
 		int m_y_d;
-		//
+		// integer representing maximal possible recursive capture
 		int m_max_score;
 	public:
 		// creates new capture move with given goto, delete coords and max score of evaluated multicapture
@@ -21,7 +21,7 @@ namespace checkers
 		int get_x_d(void);
 		// returns y coordinate of a piece to delete making a capture
 		int get_y_d(void);
-		//
+		// returns maximal possible capture score after multicapture
 		int get_max_score(void);
 	};
 }

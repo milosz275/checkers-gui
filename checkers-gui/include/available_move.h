@@ -2,7 +2,6 @@
 #define AVAILABLEMOVE_H
 
 #include <list>
-//#include "piece.h"
 
 namespace checkers
 {
@@ -13,8 +12,6 @@ namespace checkers
 		int m_x;
 		// y coordinate of available move
 		int m_y;
-		////
-		//piece* m_piece = nullptr;
 	public:
 		// creates available move
 		available_move(int x, int y);
@@ -24,8 +21,6 @@ namespace checkers
 		int get_x(void);
 		// returns y coordinate of available move
 		int get_y(void);
-		////
-		//piece* get_piece(void);
 	};
 }
 

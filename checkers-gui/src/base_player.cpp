@@ -4,12 +4,12 @@
 
 namespace checkers
 {
-	base_player::base_player(char sign, std::string name) : m_sign(std::toupper(sign, std::locale())), m_name(name), m_captured_pieces(0), m_combo(false), m_next_player(nullptr), m_piece_list(nullptr), m_is_first(false)
+	base_player::base_player(char sign, std::string name) : m_sign(std::toupper(sign, std::locale())), m_name(name), m_captured_pieces(0), m_combo(false), m_piece_list(nullptr), m_is_first(false)
 	{
 		assert(std::isalpha(sign, std::locale()));
 	}
 
-	base_player::base_player(const base_player& player) : m_sign(player.m_sign), m_name(player.m_name), m_captured_pieces(player.m_combo), m_combo(player.m_combo), m_next_player(nullptr), m_piece_list(nullptr), m_is_first(player.m_is_first) {}
+	base_player::base_player(const base_player& player) : m_sign(player.m_sign), m_name(player.m_name), m_captured_pieces(player.m_combo), m_combo(player.m_combo), m_piece_list(nullptr), m_is_first(player.m_is_first) {}
 
 	base_player::~base_player() {}
 
@@ -20,10 +20,6 @@ namespace checkers
 	bool base_player::is_first(void) { return m_is_first; }
 	
 	bool base_player::set_first(bool is_first) { return m_is_first = is_first; }
-
-	base_player* base_player::get_next_player(void) { assert(m_next_player); return m_next_player; }
-
-	base_player* base_player::set_next_player(base_player* next_player) { assert(next_player != this); return m_next_player = next_player; }
 
 	std::list<piece*>* base_player::get_list(void) { return m_piece_list; }
 

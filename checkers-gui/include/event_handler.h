@@ -10,15 +10,15 @@ namespace checkers
 	class game;
 	class event_handler
 	{
-		//
+		// pointer to the game
 		game* m_game_pointer;
 	public:
-		//
-		void handle_events(void);
-		//
+		// creates event handler for given game pointer
 		event_handler(game* game_pointer);
-		//
+		// deletes the event handler
 		~event_handler();
+		// handles all events
+		void handle_events(void);
 	};
 }
 

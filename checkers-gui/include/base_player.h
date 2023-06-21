@@ -10,7 +10,6 @@
 
 namespace checkers
 {
-	// declare to avoid compile conflict
 	class piece;
 	class king;
 
@@ -26,8 +25,6 @@ namespace checkers
 		bool m_combo;
 		// flag indicating if the first player is currently making a move
 		bool m_is_first;
-		// pointer to the next player (next round)
-		base_player* m_next_player;
 		// pointer to player's list of pieces
 		std::list<piece*>* m_piece_list;
 	public:
@@ -47,10 +44,6 @@ namespace checkers
 		bool is_first(void);
 		// sets and returns flag indicating if a player is first
 		bool set_first(bool is_first);
-		// returns pointer to the next player (next round)
-		base_player* get_next_player(void);
-		// sets and returns pointer to the next player
-		base_player* set_next_player(base_player* next_player);
 		// returns the list of possible moves of the player
 		std::list<piece*>* get_list(void);
 		// sets and returns the list of possible moves of the player

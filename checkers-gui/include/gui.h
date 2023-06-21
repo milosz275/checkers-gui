@@ -31,14 +31,12 @@ namespace checkers
 		// radius of one piece
 		const float m_radius;
 	protected:
-		//
+		// executes drawing
 		void draw(void);
-		//
+		// 
 		void highlight_selected(int x, int y);
 		//
 		void highlight_available(int x, int y);
-		//// applies chroma effect to the given piece list
-		//void chroma_effect(std::list<piece*>& list);
 	public:
 		//
 		gui(int fps);

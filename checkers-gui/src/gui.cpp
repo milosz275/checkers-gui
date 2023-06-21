@@ -4,9 +4,6 @@
 
 namespace checkers
 {
-	//sf::Color hsl_to_rgb(float hue, float saturation, float lightness);
-	//sf::Vector3f rgb_to_hsl(sf::Color color);
-
 	gui::gui(int fps) : m_fps(fps), m_square_size(sf::VideoMode::getDesktopMode().height * 0.8 / s_size), m_radius(m_square_size / 2.5), m_clock(), m_event(), m_settings()
 	{
 		if (m_fps < 1)
@@ -41,7 +38,6 @@ namespace checkers
 	void gui::draw_board(std::list<piece*>& list_1, std::list<piece*>& list_2, std::list<piece*>& dead_list, piece* selected_piece)
 	{
 		m_window->clear();
-		//chroma_effect(list_1);
 		draw();
 
 		// highlight selected piece and its corresponding moves, when moves exist
@@ -76,24 +72,6 @@ namespace checkers
 					});
 			});
 	}
-
-	/*void gui::chroma_effect(std::list<piece*>& list)
-	{
-		for_each(list.begin(), list.end(), [this, i = 0](piece* p) mutable
-			{
-				int x = p->get_x();
-				int y = p->get_y();
-				sf::CircleShape& shape = p->get_shape();
-				sf::Color current_color = shape.getFillColor();
-				sf::Vector3f hsl_values = RGBToHSL(current_color);
-				float hue = hsl_values.x;
-				float saturation = hsl_values.y;
-				float lightness = hsl_values.z;
-				sf::Color new_color = HSLToRGB(hue + 1, saturation, lightness);
-				shape.setFillColor(new_color);
-				++i;
-			});
-	}*/
 
 	void gui::highlight_selected(int x, int y)
 	{
@@ -137,85 +115,4 @@ namespace checkers
 		// draw on the board
 		m_window->draw(shape);
 	}
-
-	//sf::Color hsl_to_rgb(float hue, float saturation, float lightness)
-	//{
-	//	float chroma = (1 - std::abs(2 * lightness - 1)) * saturation;
-	//	float huePrime = hue / 60.0f;
-	//	float x = chroma * (1 - std::abs(std::fmod(huePrime, 2) - 1));
-	//	float r, g, b;
-
-	//	if (huePrime >= 0 && huePrime < 1) {
-	//		r = chroma;
-	//		g = x;
-	//		b = 0;
-	//	}
-	//	else if (huePrime >= 1 && huePrime < 2) {
-	//		r = x;
-	//		g = chroma;
-	//		b = 0;
-	//	}
-	//	else if (huePrime >= 2 && huePrime < 3) {
-	//		r = 0;
-	//		g = chroma;
-	//		b = x;
-	//	}
-	//	else if (huePrime >= 3 && huePrime < 4) {
-	//		r = 0;
-	//		g = x;
-	//		b = chroma;
-	//	}
-	//	else if (huePrime >= 4 && huePrime < 5) {
-	//		r = x;
-	//		g = 0;
-	//		b = chroma;
-	//	}
-	//	else {
-	//		r = chroma;
-	//		g = 0;
-	//		b = x;
-	//	}
-
-	//	float lightnessMatch = lightness - chroma / 2.0f;
-	//	r += lightnessMatch;
-	//	g += lightnessMatch;
-	//	b += lightnessMatch;
-
-	//	return sf::Color(static_cast<sf::Uint8>(r * 255), static_cast<sf::Uint8>(g * 255), static_cast<sf::Uint8>(b * 255));
-	//}
-
-	//sf::Vector3f rgb_to_hsl(sf::Color color)
-	//{
-	//	float r = color.r / 255.0f;
-	//	float g = color.g / 255.0f;
-	//	float b = color.b / 255.0f;
-
-	//	float maxComponent = std::max(r, std::max(g, b));
-	//	float minComponent = std::min(r, std::min(g, b));
-
-	//	float hue, saturation, lightness;
-	//	hue = saturation = lightness = (maxComponent + minComponent) / 2.0f;
-
-	//	if (maxComponent == minComponent) {
-	//		hue = saturation = 0; // achromatic
-	//	}
-	//	else {
-	//		float delta = maxComponent - minComponent;
-	//		saturation = lightness > 0.5f ? delta / (2.0f - maxComponent - minComponent) : delta / (maxComponent + minComponent);
-
-	//		if (maxComponent == r) {
-	//			hue = (g - b) / delta + (g < b ? 6.0f : 0.0f);
-	//		}
-	//		else if (maxComponent == g) {
-	//			hue = (b - r) / delta + 2.0f;
-	//		}
-	//		else if (maxComponent == b) {
-	//			hue = (r - g) / delta + 4.0f;
-	//		}
-
-	//		hue /= 6.0f;
-	//	}
-
-	//	return sf::Vector3f(hue, saturation, lightness);
-	//}
 }
