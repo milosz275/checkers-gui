@@ -18,9 +18,6 @@ namespace checkers
 		//
 		game_state* m_game_state;
 
-		//
-		//bool m_signaled_bot;
-		// indicates if the players should use stream to choose pieces and moves
 		bool m_console_game;
 		// player 1
 		base_player* m_player_1;
@@ -122,14 +119,7 @@ namespace checkers
 		bool check_game_completion_no_possible_moves(std::list<piece*>* list);
 
 
-		// debug section:
-
-		// prints result to the given stream
-		void print_results(std::ostream& os);
-		// prints alive pieces to the given stream
-		void print_pieces(std::list<piece*>* list);
-		// print basic info about the game
-		void debug_info(std::ostream& os);
+		
 
 	public:
 		// create the game of given size and target frames per second
@@ -145,31 +135,63 @@ namespace checkers
 		event_handler* get_event_handler(void);
 		//
 		game_state* get_game_state(void);
-
+		//
+		void select_piece(int x, int y);
+		//
+		void move_selected_piece(int x, int y);
 		// executes the game
 		void loop(void);
 		// returns current game score (white pieces - black pieces)
 		int get_score(void);
+		//
+		int get_last_capture_direction(void);
+		//
+		int set_last_capture_direction(int direction);
+		// returns first player (lower)
+		base_player* get_player_1(void);
+		// returs second player (upper)
+		base_player* get_player_2(void);
+		//
+		bool get_selected(void);
+		//
+		bool set_selected(bool flag);
+		// returns piece selected to move
+		piece* get_selected_piece(void);
+		//
+		piece* set_selected_piece(piece* p);
+		// returns moving
+		piece* get_moving_piece(void);
+		//
+		piece* set_moving_piece(piece* p);
 		// returns currently evaluated possibility for at least one possible capture
 		bool get_available_capture(void);
-		// returns first player (lower)
-		const base_player* get_player_1(void);
-		// returs second player (upper)
-		const base_player* get_player_2(void);
-		// returns piece selected to move
-		const piece* get_selected_piece(void);
+		//
+		bool set_available_capture(bool flag);
 		// returns list of pieces of the current player
 		std::list<piece*>* get_pieces(void);
 		// returns main game board
 		std::vector<std::vector<piece*>>* get_board(void);
 		// returns list of dead pieces (pieces captured during multicapture)
 		std::list<piece*>* get_to_delete_list(void);
-		// returns board to the stream
-		friend std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);
+		//
+		std::ostream& get_os(void);
+		//
+		std::ostream& get_log(void);
+		
+
+		// debug section:
+
+		// prints result to the given stream
+		void print_results(std::ostream& os);
+		// prints alive pieces to the given stream
+		void print_pieces(std::list<piece*>* list);
+		// print basic info about the game
+		void debug_info(std::ostream& os);
+
 		//
 		friend class event_handler;
-		friend class gamestate;
-		friend class bot;
+		// returns board to the stream
+		friend std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);
 	};
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board);
 }

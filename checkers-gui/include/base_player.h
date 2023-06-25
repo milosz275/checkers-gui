@@ -67,7 +67,7 @@ namespace checkers
 
 		friend std::ostream& operator<<(std::ostream& os, const base_player* player);
 #ifdef _DEBUG
-		friend class bot;
+		//friend class bot;
 #endif
 	};
 

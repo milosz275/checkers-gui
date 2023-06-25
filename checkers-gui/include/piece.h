@@ -6,10 +6,7 @@
 
 #include "include/game.h"
 #include "include/available_move.h"
-
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
-#include <SFML/System.hpp>
+#include "include/sfml.h"
 
 namespace checkers
 {
@@ -26,7 +23,7 @@ namespace checkers
 		// list containing all evaluated possible moves for the piece
 		std::list<available_move*>* m_av_list;
 		// object that is printed in the window
-		sf::CircleShape* m_shape = nullptr;
+		sfml::circle_shape* m_shape = nullptr;
 		// pointer to the piece's owner
 		base_player* m_owner;
 		//
@@ -61,7 +58,7 @@ namespace checkers
 		// sets and returns the piece's owner
 		base_player* set_owner(base_player* owner);
 		//
-		sf::CircleShape& get_shape(void);
+		sfml::circle_shape& get_shape(void);
 		// lets to print the piece in given stream
 		friend std::ostream& operator<<(std::ostream& os, const piece* piece);
 		// returns the list of all evaluated moves
@@ -71,7 +68,7 @@ namespace checkers
 		// draws the piece to the window
 		void draw(void);
 
-		friend class gui;
+		//friend class gui;
 	};
 
 	std::ostream& operator<<(std::ostream& os, const piece* piece);

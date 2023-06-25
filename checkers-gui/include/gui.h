@@ -17,15 +17,15 @@ namespace checkers
 		// fraction of second that is time of one frame
 		float m_frame_duration = 1.0f / m_fps;
 		// SFML object drawing checkerboard
-		std::vector<std::vector<sf::RectangleShape>>* m_tiles = nullptr;
+		std::vector<std::vector<sfml::rectangle_shape>>* m_tiles = nullptr;
 		// SFML clock
-		sf::Clock m_clock;
+		sfml::clock m_clock;
 		// SFML settings
-		sf::ContextSettings m_settings;
+		sfml::context_settings m_settings;
 		// SFML window
-		sf::RenderWindow* m_window = nullptr;
+		sfml::render_window* m_window = nullptr;
 		// SFML event
-		sf::Event m_event;
+		sfml::event m_event;
 		// square/tile size
 		const float m_square_size;
 		// radius of one piece
@@ -41,11 +41,11 @@ namespace checkers
 		//
 		gui(int fps);
 		//
-		sf::Event& get_event(void);
+		sfml::event& get_event(void);
 		//
-		sf::Window& get_window(void);
+		sfml::window& get_window(void);
 		//
-		sf::Clock& get_clock(void);
+		sfml::clock& get_clock(void);
 		//
 		float get_square_size(void);
 		//
@@ -55,7 +55,7 @@ namespace checkers
 		//
 		void draw_board(std::list<piece*>& list_1, std::list<piece*>& list_2, std::list<piece*>& dead_list, piece* selected_piece);
 		//
-		void draw_piece(sf::CircleShape& shape, int x, int y);
+		void draw_piece(sfml::circle_shape& shape, int x, int y);
 	};
 }
 

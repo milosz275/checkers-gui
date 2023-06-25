@@ -112,6 +112,8 @@ namespace checkers
 		// recreate game state
 		m_game_state = new game_state(*game.m_game_state);
 		m_game_state->set_current_player(game.m_game_state->get_current_player() == game.m_player_1 ? m_player_1 : m_player_2);
+		m_game_state->set_next_player(game.m_game_state->get_next_player() == game.m_player_2 ? m_player_1 : m_player_2);
+		assert(m_player_1 != m_player_2);
 
 		// copy the board and recreate the lists
 		m_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, nullptr));
@@ -241,15 +243,35 @@ namespace checkers
 
 	int game::get_score(void) { return m_p_list_1.size() - m_p_list_2.size(); }
 
-	const base_player* game::get_player_1(void) { return m_player_1; }
+	int game::get_last_capture_direction(void) { return m_last_capture_direction; }
 
-	const base_player* game::get_player_2(void) { return m_player_2; }
+	int game::set_last_capture_direction(int direction) { assert(direction >= 0 && direction < 4); return m_last_capture_direction = direction; }
 
-	const piece* game::get_selected_piece(void) { return m_selected_piece; }
+	base_player* game::get_player_1(void) { return m_player_1; }
+
+	base_player* game::get_player_2(void) { return m_player_2; }
+
+	bool game::get_selected(void) { return m_selected; }
+
+	bool game::set_selected(bool flag) { return m_selected = flag; }
+
+	piece* game::get_selected_piece(void) { return m_selected_piece; }
+
+	piece* game::set_selected_piece(piece* p) { return m_selected_piece = p; }
+
+	piece* game::get_moving_piece(void) { return m_moving_piece; }
+
+	piece* game::set_moving_piece(piece* p) { return m_moving_piece = p; }
 
 	bool game::get_available_capture(void) { return m_available_capture; }
 
+	bool game::set_available_capture(bool flag) { return m_available_capture = flag; }
+
 	std::list<piece*>* game::get_pieces(void) { return m_game_state->get_current_player()->get_list(); }
+
+	std::ostream& game::get_os(void) { return m_os; }
+
+	std::ostream& game::get_log(void) { return m_log; }
 
 	void game::populate_board(int rows)
 	{
@@ -338,11 +360,12 @@ namespace checkers
 				}
 				return false;
 			}
-			if (turn == 1)
-				m_game_state->set_current_player(m_player_1);
-			else if (turn == 2)
+			if (turn == 2)
+			{
 				m_game_state->set_current_player(m_player_2);
-			else
+				m_game_state->set_next_player(m_player_1);
+			}
+			else if (turn != 1)
 				return false;
 		}
 		if (std::getline(file, line))
@@ -668,30 +691,51 @@ namespace checkers
 #ifdef _DEBUG
 				m_os << "That piece belongs to you" << std::endl;
 #endif
+				bool at_least_one_move = false;
 				bool found_capture = false;
 				if (!(*m_board)[x][y]->get_av_list()->empty())
 				{
-					// find at least one move that is a capture
-					all_of((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [&found_capture](available_move* a)
-					{
-						if (dynamic_cast<available_capture*>(a))
+					// find at least one move
+					all_of((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [&at_least_one_move](available_move* a)
 						{
-							found_capture = true;
-							return false;
-						}
-						return true;
-					});
-#ifdef _DEBUG
-					for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [this](available_move* a)
+							if (a)
+							{
+								at_least_one_move = true;
+								return false;
+							}
+							return true;
+						});
+
+					if (at_least_one_move)
 					{
-						m_os << "available: x: " << a->get_x() << "; y: " << a->get_y();
-						if (dynamic_cast<available_capture*>(a))
-							m_os << "; max captures: " << dynamic_cast<available_capture*>(a)->get_max_score();
-						m_os << std::endl;
-					});
+						// find at least one move that is a capture
+						all_of((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [&found_capture](available_move* a)
+							{
+								if (dynamic_cast<available_capture*>(a))
+								{
+									found_capture = true;
+									return false;
+								}
+								return true;
+							});
+#ifdef _DEBUG
+						for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [this](available_move* a)
+							{
+								m_os << "available: x: " << a->get_x() << "; y: " << a->get_y();
+								if (dynamic_cast<available_capture*>(a))
+									m_os << "; max captures: " << dynamic_cast<available_capture*>(a)->get_max_score();
+								m_os << std::endl;
+							});
+#endif
+					}
+				}
+				if (!at_least_one_move)
+				{
+#ifdef _DEBUG
+					m_os << "No moves for this piece - not selecting" << std::endl;
 #endif
 				}
-				if ((found_capture && m_available_capture) || (!found_capture && !m_available_capture)) // this lets making only capture moves, comment out to enable testing - replace to xnor
+				else if ((found_capture && m_available_capture) || (!found_capture && !m_available_capture)) // this lets making only capture moves, comment out to enable testing - replace to xnor
 				{
 #ifdef _DEBUG
 					m_os << "Selecting" << std::endl;

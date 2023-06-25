@@ -2,9 +2,9 @@
 
 namespace checkers
 {
-	game_state::game_state() : m_game_freeze(false), m_any_changes(false), m_first_won(false), m_second_won(false), m_current_player(nullptr), m_next_player(nullptr) {}
+	game_state::game_state() : m_game_freeze(false), m_any_changes(false), m_first_won(false), m_second_won(false), m_current_player(nullptr), m_next_player(nullptr), m_completed(false) {}
 
-	game_state::game_state(const game_state& source_game_state) : m_game_freeze(source_game_state.m_game_freeze), m_any_changes(source_game_state.m_any_changes), m_first_won(source_game_state.m_first_won), m_second_won(source_game_state.m_second_won), m_current_player(nullptr), m_next_player(nullptr) {}
+	game_state::game_state(const game_state& source_game_state) : m_game_freeze(source_game_state.m_game_freeze), m_any_changes(source_game_state.m_any_changes), m_first_won(source_game_state.m_first_won), m_second_won(source_game_state.m_second_won), m_current_player(nullptr), m_next_player(nullptr), m_completed(false) { check_completion(); }
 
 	game_state::~game_state() {}
 
@@ -36,7 +36,7 @@ namespace checkers
 
 	bool game_state::check_completion(void) { if (m_first_won || m_second_won) return m_completed = true; }
 
-	bool game_state::reset_completion(void) { m_first_won = false; m_second_won = false; }
+	void game_state::reset_completion(void) { m_first_won = false; m_second_won = false; }
 	
-	bool game_state::reset_state(void) { m_game_freeze = false; m_any_changes = true; }
+	void game_state::reset_state(void) { m_game_freeze = false; m_any_changes = true; }
 }

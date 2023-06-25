@@ -57,9 +57,9 @@ namespace checkers
 		//
 		bool check_completion(void);
 		//
-		bool reset_completion(void);
+		void reset_completion(void);
 		//
-		bool reset_state(void);
+		void reset_state(void);
 	};
 }
 

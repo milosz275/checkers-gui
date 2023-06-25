@@ -14,7 +14,7 @@ namespace checkers
 		// considered steps ahead
 		int m_depth;
 		// pointer to the game
-		const game* m_game;
+		game* m_game;
 		// anti-loop field reseting, when a piece is selected
 		int m_counter_select;
 		// anti-loop field reseting, when a piece is moved
@@ -23,9 +23,9 @@ namespace checkers
 		std::pair<int, int> m_saved_move;
 	public:
 		// creates bot player with its corresponding sign and game pointer
-		bot(char sign, const game* game);
+		bot(char sign, game* game);
 		// copies the bot
-		bot(const bot& bot);
+		//bot(const bot& bot);
 		// deletes the bot
 		~bot();
 		// calculates coordinates of piece to move and coordinates where to go after selecting 
