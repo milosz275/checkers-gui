@@ -58,6 +58,8 @@ namespace checkers
 		bool get_combo(void);
 		// sets the combo flag and returns it
 		bool set_combo(bool combo);
+		// returns kings count
+		int get_kings(void);
 		// decreases pieces count, increases captured pieces count
 		void add_capture(void);
 		// checks if the target piece could change into king and does it, if yes

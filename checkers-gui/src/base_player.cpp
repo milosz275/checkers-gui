@@ -33,6 +33,12 @@ namespace checkers
 
 	int base_player::get_captured_pieces(void) { return m_captured_pieces; }
 
+	int base_player::get_kings(void)
+	{
+		int count = 0;
+		for_each(m_piece_list->begin(), m_piece_list->end(), [&count](piece* p) { if (dynamic_cast<king*>(p)) ++count; });
+	}
+
 	int base_player::set_captured_pieces(int pieces)
 	{
 #ifndef _DEBUG
