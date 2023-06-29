@@ -1,4 +1,4 @@
-#include <include/evaluator.h>
+#include <evaluator.h>
 
 namespace checkers
 {

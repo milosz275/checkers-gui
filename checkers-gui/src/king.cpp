@@ -1,4 +1,4 @@
-#include "include/king.h"
+#include "king.h"
 
 namespace checkers
 {

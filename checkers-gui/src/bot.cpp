@@ -1,4 +1,4 @@
-#include "include/bot.h"
+#include "bot.h"
 
 namespace checkers
 {
@@ -37,16 +37,15 @@ namespace checkers
 			// check if there is at least one move available
 			bool at_least_one_move_available = false;
 			int piece_index = 0;
-			all_of(game_copy.get_game_state()->get_current_player()->get_list()->begin(), game_copy.get_game_state()->get_current_player()->get_list()->end(), [&at_least_one_move_available, &piece_index](piece* p)
+			for (piece* p : *game_copy.get_game_state()->get_current_player()->get_list())
+			{
+				if (!(p->get_av_list()->empty()))
 				{
-					if (!(p->get_av_list()->empty()))
-					{
-						at_least_one_move_available = true;
-						return false;
-					}
-					++piece_index;
-					return true;
-				});
+					at_least_one_move_available = true;
+					break;
+				}
+				++piece_index;
+			}
 			assert(at_least_one_move_available);
 
 			std::pair<std::pair<int, int>, std::pair<int, int>> best_move = find_best_move(&game_copy, m_depth, s_min_score, s_max_score, true);
@@ -118,7 +117,7 @@ namespace checkers
 
 	std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> bot::find_best_games(game* game_copy, int depth, int alpha, int beta, bool maximizing_player)
 	{
-		m_game->get_os() << "current depth: " << depth << std::endl;
+		m_game->get_os() << "Current depth: " << depth << std::endl;
 		if (depth == 0 || game_copy->get_game_state()->check_completion())
 		{
 			m_game->get_os() << "Bot: Find best games: algorithm hit boundary condition: depth or complete game" << std::endl;
@@ -190,67 +189,70 @@ namespace checkers
 				if (selected_coords != std::make_pair(-1, -1) && saved_coords != std::make_pair(-1, -1))
 				{
 					std::vector<std::vector<piece*>>* board = game_copy->get_board();
+					
 					int x = std::get<0>(selected_coords);
 					int y = std::get<1>(selected_coords);
 					int new_x = std::get<0>(saved_coords);
 					int new_y = std::get<1>(saved_coords);
+					
 					piece* moving_piece = (*board)[x][y];
 					assert(moving_piece);
 					game_copy->set_selected_piece(moving_piece);
+					
 					bool there_is_found_move = false;
-					all_of(moving_piece->get_av_list()->begin(), moving_piece->get_av_list()->end(), [&game_copy, &x, &y, &new_x, &new_y, &there_is_found_move](available_move* a)
+					for (available_move* a : *moving_piece->get_av_list())
+					{
+						assert(a);
+						if (a->get_x() == new_x && a->get_y() == new_y)
 						{
-							assert(a);
-							if (a->get_x() == new_x && a->get_y() == new_y)
+							available_capture* found_capture = dynamic_cast<available_capture*>(a);
+							if (found_capture)
 							{
-								available_capture* found_capture = dynamic_cast<available_capture*>(a);
-								if (found_capture)
+								int x_d = found_capture->get_x_d();
+								int y_d = found_capture->get_y_d();
+
+								if (x_d > x && y_d < y)
+									game_copy->set_last_capture_direction(3);
+								else if (x_d < x && y_d < y)
+									game_copy->set_last_capture_direction(2);
+								else if (x_d > x && y_d > y)
+									game_copy->set_last_capture_direction(1);
+								else if (x_d < x && y_d > y)
+									game_copy->set_last_capture_direction(0);
+								else
+									throw std::runtime_error("Capturing in wrong direction");
+
+								// check game completion
+								if (game_copy->get_game_state()->get_next_player()->get_list()->empty())
 								{
-									int x_d = found_capture->get_x_d();
-									int y_d = found_capture->get_y_d();
-									
-									if (x_d > x && y_d < y)
-										game_copy->set_last_capture_direction(3);
-									else if (x_d < x && y_d < y)
-										game_copy->set_last_capture_direction(2);
-									else if (x_d > x && y_d > y)
-										game_copy->set_last_capture_direction(1);
-									else if (x_d < x && y_d > y)
-										game_copy->set_last_capture_direction(0);
+									if (game_copy->get_game_state()->get_current_player()->is_first())
+										game_copy->get_game_state()->set_first_won(true);
 									else
-										throw std::runtime_error("Capturing in wrong direction");
-
-									// check game completion
-									if (game_copy->get_game_state()->get_next_player()->get_list()->empty())
-									{
-										if (game_copy->get_game_state()->get_current_player()->is_first())
-											game_copy->get_game_state()->set_first_won(true);
-										else
-											game_copy->get_game_state()->set_second_won(true);
+										game_copy->get_game_state()->set_second_won(true);
 #ifdef _DEBUG
-										game_copy->get_os() << "Setting the end of the game flags: current player has no pieces" << std::endl;
-#endif
-									}
-
-									// if there is no multicapture, set new moving piece
-									if (game_copy->get_to_delete_list()->empty())
-										game_copy->set_moving_piece(game_copy->get_selected_piece());
-
-									// create new piece which represents dead piece during multicapture, it is indifferent whether it was normal piece or king
-									game_copy->get_to_delete_list()->push_back(new piece(x_d, y_d, false, game_copy->get_game_state()->get_next_player(), nullptr));
-									game_copy->get_game_state()->get_current_player()->set_combo(true);
-#ifdef _DEBUG
-									game_copy->get_os() << game_copy->get_game_state()->get_current_player()->get_name() << " combo" << std::endl;
+									game_copy->get_os() << "Setting the end of the game flags: current player has no pieces" << std::endl;
 #endif
 								}
-								game_copy->move_piece(game_copy->get_selected_piece(), game_copy->get_board(), new_x, new_y);
-								(*game_copy->get_board())[x][y] = game_copy->get_selected_piece();
-								game_copy->set_selected(false);
 
-								there_is_found_move = true;
-								return false;
+								// if there is no multicapture, set new moving piece
+								if (game_copy->get_to_delete_list()->empty())
+									game_copy->set_moving_piece(game_copy->get_selected_piece());
+
+								// create new piece which represents dead piece during multicapture, it is indifferent whether it was normal piece or king
+								game_copy->get_to_delete_list()->push_back(new piece(x_d, y_d, false, game_copy->get_game_state()->get_next_player(), nullptr));
+								game_copy->get_game_state()->get_current_player()->set_combo(true);
+#ifdef _DEBUG
+								game_copy->get_os() << game_copy->get_game_state()->get_current_player()->get_name() << " combo" << std::endl;
+#endif
 							}
-						});
+							game_copy->move_piece(game_copy->get_selected_piece(), game_copy->get_board(), new_x, new_y);
+							(*game_copy->get_board())[x][y] = game_copy->get_selected_piece();
+							game_copy->set_selected(false);
+
+							there_is_found_move = true;
+							break;
+						}
+					}
 					assert(there_is_found_move);
 				}
 			});
@@ -265,50 +267,50 @@ namespace checkers
 		if (maximizing_player)
 		{
 			int max_score = s_min_score;
-			all_of(list_of_games.begin(), list_of_games.end(), [&max_score, &best_moves, &alpha, &beta](std::tuple<game*, std::pair<int, int>, std::pair<int, int>>& game_and_coords) mutable
+			for (std::tuple<game*, std::pair<int, int>, std::pair<int, int>>& game_and_coords : list_of_games)
+			{
+				int current_score = std::get<0>(game_and_coords)->get_score();
+				if (current_score > max_score)
 				{
-					int current_score = std::get<0>(game_and_coords)->get_score();
-					if (current_score > max_score)
-					{
-						max_score = current_score;
-						best_moves.clear();
-						best_moves.emplace_back(game_and_coords);
-					}
-					else if (current_score == max_score)
-						best_moves.emplace_back(game_and_coords);
+					max_score = current_score;
+					best_moves.clear();
+					best_moves.emplace_back(game_and_coords);
+				}
+				else if (current_score == max_score)
+					best_moves.emplace_back(game_and_coords);
 
-					// beta cutoff
-					alpha = std::max(alpha, max_score);
-					if (beta <= alpha)
-					{
-						//delete game_copy;
-						return false; 
-					}
-				});
+				// beta cutoff
+				alpha = std::max(alpha, max_score);
+				if (beta <= alpha)
+				{
+					//delete game_copy;
+					break;
+				}
+			}
 		}
 		else // minimazing
 		{
 			int min_score = s_max_score;
-			all_of(list_of_games.begin(), list_of_games.end(), [&min_score, &best_moves, &alpha, &beta](std::tuple<game*, std::pair<int, int>, std::pair<int, int>>& game_and_coords) mutable
+			for (std::tuple<game*, std::pair<int, int>, std::pair<int, int>>& game_and_coords : list_of_games)
+			{
+				int current_score = std::get<0>(game_and_coords)->get_score();
+				if (current_score < min_score)
 				{
-					int current_score = std::get<0>(game_and_coords)->get_score();
-					if (current_score < min_score)
-					{
-						min_score = current_score;
-						best_moves.clear();
-						best_moves.emplace_back(game_and_coords);
-					}
-					else if (current_score == min_score)
-						best_moves.emplace_back(game_and_coords);
+					min_score = current_score;
+					best_moves.clear();
+					best_moves.emplace_back(game_and_coords);
+				}
+				else if (current_score == min_score)
+					best_moves.emplace_back(game_and_coords);
 
-					// alpha cutoff
-					beta = std::min(beta, min_score);
-					if (beta <= alpha)
-					{
-						//delete game_copy;
-						return false;
-					}
-				});
+				// alpha cutoff
+				beta = std::min(beta, min_score);
+				if (beta <= alpha)
+				{
+					//delete game_copy;
+					break;
+				}
+			}
 		}
 		
 		return best_moves;
@@ -337,59 +339,59 @@ namespace checkers
 					for_each(p->get_av_list()->begin(), p->get_av_list()->end(), [&src_coords, &dest_coords, &game_copy, &p, &list_of_games, this](available_move* a)
 						{
 							assert(a);
-
-							game* local_copy = new game(*game_copy);
-							
 							available_capture* found_capture = dynamic_cast<available_capture*>(a);
-							assert(found_capture);
-							
-							int old_x = p->get_x();
-							int old_y = p->get_y();
-
-							int new_x = found_capture->get_x();
-							int new_y = found_capture->get_y();
-
-							int deleted_x = found_capture->get_x_d();
-							int deleted_y = found_capture->get_y_d();
-
-							std::vector<std::vector<piece*>>* board = local_copy->get_board();
-							piece* moving_piece = (*board)[old_x][old_y];
-							local_copy->set_moving_piece(moving_piece);
-							
-							// save capture direction: 0 - top right, 1 - top left, 2 - bottom right, 3 - bottom left
-							if (deleted_x > new_x && deleted_y < new_y)
-								local_copy->set_last_capture_direction(3);
-							else if (deleted_x < new_x && deleted_y < new_y)
-								local_copy->set_last_capture_direction(2);
-							else if (deleted_x > new_x && deleted_y > new_y)
-								local_copy->set_last_capture_direction(1);
-							else if (deleted_x < new_x && deleted_y > new_y)
-								local_copy->set_last_capture_direction(0);
-							else
-								throw std::runtime_error("Capturing in wrong direction");
-							
-							piece* to_delete_piece = (*board)[found_capture->get_x_d()][found_capture->get_y_d()];
-						
-							std::list<piece*>* to_delete_list = local_copy->get_to_delete_list();
-							local_copy->make_capture(board, moving_piece, to_delete_piece, new_x, new_y, to_delete_list);
-							int dummy = 0;
-							local_copy->set_available_capture(local_copy->evaluate(local_copy->get_game_state()->get_current_player()->get_list(), local_copy->get_board(), &dummy, dummy, local_copy->get_last_capture_direction(), local_copy->get_to_delete_list(), local_copy->get_moving_piece()));
-
-							bool changed_argument = false;
-							if (!src_coords)
+							assert(found_capture); // not working in release mode
+							if (found_capture)
 							{
-								changed_argument = true;
-								src_coords = new std::pair<int, int>(std::make_pair(old_x, old_y));
-								dest_coords = new std::pair<int, int>(std::make_pair(new_x, new_y));
-							}
+								int old_x = p->get_x();
+								int old_y = p->get_y();
 
-							// recursively go through all captures
-							add_to_game_copy_list(list_of_games, local_copy, src_coords, dest_coords);
+								int new_x = found_capture->get_x();
+								int new_y = found_capture->get_y();
 
-							if (changed_argument)
-							{
-								src_coords = nullptr;
-								dest_coords = nullptr;
+								int deleted_x = found_capture->get_x_d();
+								int deleted_y = found_capture->get_y_d();
+
+								game* local_copy = new game(*game_copy);
+								std::vector<std::vector<piece*>>* board = local_copy->get_board();
+								piece* moving_piece = (*board)[old_x][old_y];
+								local_copy->set_moving_piece(moving_piece);
+
+								// save capture direction: 0 - top right, 1 - top left, 2 - bottom right, 3 - bottom left
+								if (deleted_x > new_x && deleted_y < new_y)
+									local_copy->set_last_capture_direction(3);
+								else if (deleted_x < new_x && deleted_y < new_y)
+									local_copy->set_last_capture_direction(2);
+								else if (deleted_x > new_x && deleted_y > new_y)
+									local_copy->set_last_capture_direction(1);
+								else if (deleted_x < new_x && deleted_y > new_y)
+									local_copy->set_last_capture_direction(0);
+								else
+									throw std::runtime_error("Capturing in wrong direction");
+
+								piece* to_delete_piece = (*board)[found_capture->get_x_d()][found_capture->get_y_d()];
+
+								std::list<piece*>* to_delete_list = local_copy->get_to_delete_list();
+								local_copy->make_capture(board, moving_piece, to_delete_piece, new_x, new_y, to_delete_list);
+								int dummy = 0;
+								local_copy->set_available_capture(local_copy->evaluate(local_copy->get_game_state()->get_current_player()->get_list(), local_copy->get_board(), &dummy, dummy, local_copy->get_last_capture_direction(), local_copy->get_to_delete_list(), local_copy->get_moving_piece()));
+
+								bool changed_argument = false;
+								if (!src_coords)
+								{
+									changed_argument = true;
+									src_coords = new std::pair<int, int>(std::make_pair(old_x, old_y));
+									dest_coords = new std::pair<int, int>(std::make_pair(new_x, new_y));
+								}
+
+								// recursively go through all captures
+								add_to_game_copy_list(list_of_games, local_copy, src_coords, dest_coords);
+
+								if (changed_argument)
+								{
+									src_coords = nullptr;
+									dest_coords = nullptr;
+								}
 							}
 						});
 				});

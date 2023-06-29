@@ -1,4 +1,4 @@
-#include "include/game.h"
+#include "game.h"
 // The game is based on: https://en.wikipedia.org/wiki/International_draughts
 // Project uses snake_case name convention, however SFML is the exception as an external library
 

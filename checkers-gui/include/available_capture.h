@@ -2,7 +2,7 @@
 #define AVAILABLECAPTURE_H
 
 #include <list>
-#include "include/available_move.h"
+#include "available_move.h"
 
 namespace checkers
 {

@@ -11,13 +11,13 @@
 #include <cassert>
 #include <tuple>
 
-#include "include/base_player.h"
-#include "include/player.h"
-#include "include/bot.h"
-#include "include/piece.h"
-#include "include/available_capture.h"
-#include "include/gui.h"
-#include "include/event_handler.h"
-#include "include/game_state.h"
+#include "base_player.h"
+#include "player.h"
+#include "bot.h"
+#include "piece.h"
+#include "available_capture.h"
+#include "gui.h"
+#include "event_handler.h"
+#include "game_state.h"
 
 #endif

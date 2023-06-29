@@ -1,7 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "include/base_player.h"
+#include "base_player.h"
 #include <map>
 #include <functional>
 

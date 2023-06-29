@@ -4,9 +4,9 @@
 #include <iostream>
 #include <list>
 
-#include "include/game.h"
-#include "include/available_move.h"
-#include "include/sfml.h"
+#include "game.h"
+#include "available_move.h"
+#include "sfml.h"
 
 namespace checkers
 {

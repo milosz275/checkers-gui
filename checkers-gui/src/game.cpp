@@ -1,5 +1,5 @@
-#include "include/game.h"
-#include "include/king.h"
+#include "game.h"
+#include "king.h"
 
 // TODO: add menu
 // TODO: add animation
@@ -36,20 +36,21 @@ namespace checkers
 		bool against_bot = true;
 		int bot_intelligence = 1;
 
-		/*m_os << "Do you want to play against another player (0) or versus bot (1)?" << std::endl << "Enter: ";
+		m_os << "Do you want to play against another player (0) or versus bot (1)?" << std::endl << "Enter: ";
 		m_is >> against_bot;
 		while (against_bot)
 		{
 			m_os << "Chosen player vs bot" << std::endl;
-			m_os << "How many moves ahead should bot consider?" << std::endl << "Enter: ";
+			break;
+			/*m_os << "How many moves ahead should bot consider?" << std::endl << "Enter: ";
 			m_is >> bot_intelligence;
 			if (bot_intelligence <= 0 || bot_intelligence >= 10)
 				m_os << "Bot's intelligence greater than 0 and smaller than 10" << std::endl;
 			else
-				break;
+				break;*/
 		}
 		if (!against_bot)
-			m_os << "Chosen player vs player" << std::endl;*/
+			m_os << "Chosen player vs player" << std::endl;
 
 		// setup user interface
 		m_gui = new gui(fps);
@@ -326,9 +327,9 @@ namespace checkers
 			m_board->clear();
 		}
 
-		if (m_player_1);
+		if (m_player_1)
 			delete m_player_1;
-		if (m_player_2);
+		if (m_player_2)
 			delete m_player_2;
 #ifdef _DEBUG
 		m_os << "Deleted game" << std::endl;
@@ -341,7 +342,7 @@ namespace checkers
 	
 	game_state* game::get_game_state(void) { return m_game_state; }
 
-	int game::get_score(void) { return m_p_list_1.size() - m_p_list_2.size(); }
+	int game::get_score(void) { return (int)m_p_list_1.size() - (int)m_p_list_2.size(); }
 
 	int game::get_last_capture_direction(void) { return m_last_capture_direction; }
 
@@ -571,8 +572,8 @@ namespace checkers
 		}
 #ifndef _DEBUG
 		const int pieces_of_each_player = (s_size / 2 - 1) * (s_size / 2);
-		m_player_1->set_captured_pieces(pieces_of_each_player - m_player_1->get_list()->size());
-		m_player_2->set_captured_pieces(pieces_of_each_player - m_player_2->get_list()->size());
+		m_player_1->set_captured_pieces(pieces_of_each_player - (int)m_player_1->get_list()->size());
+		m_player_2->set_captured_pieces(pieces_of_each_player - (int)m_player_2->get_list()->size());
 #endif
 		file.close();
 		return true;
@@ -791,28 +792,26 @@ namespace checkers
 				if (!(*m_board)[x][y]->get_av_list()->empty())
 				{
 					// find at least one move
-					all_of((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [&at_least_one_move](available_move* a)
+					for (available_move* a : *(*m_board)[x][y]->get_av_list())
+					{
+						if (a)
 						{
-							if (a)
-							{
-								at_least_one_move = true;
-								return false;
-							}
-							return true;
-						});
+							at_least_one_move = true;
+							break;
+						}
+					}
 
 					if (at_least_one_move)
 					{
 						// find at least one move that is a capture
-						all_of((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [&found_capture](available_move* a)
+						for (available_move* a : *(*m_board)[x][y]->get_av_list())
+						{
+							if (dynamic_cast<available_capture*>(a))
 							{
-								if (dynamic_cast<available_capture*>(a))
-								{
-									found_capture = true;
-									return false;
-								}
-								return true;
-							});
+								found_capture = true;
+								break;
+							}
+						}
 #ifdef _DEBUG
 						for_each((*m_board)[x][y]->get_av_list()->begin(), (*m_board)[x][y]->get_av_list()->end(), [this](available_move* a)
 							{
@@ -888,20 +887,20 @@ namespace checkers
 		bool is_found = false;
 		available_move* found_move = nullptr;
 
-		all_of(m_selected_piece->get_av_list()->begin(), m_selected_piece->get_av_list()->end(), [this, &x, &y, &is_found, &found_move](available_move* a)
+		for (available_move* a : *m_selected_piece->get_av_list())
+		{
+			// check if selected coords match any of possible moves
+			if (a->get_x() == x && a->get_y() == y)
 			{
-				// check if selected coords match any of possible moves
-				if (a->get_x() == x && a->get_y() == y)
-				{
 #ifdef _DEBUG
-					m_os << a->get_x() << " " << a->get_y() << std::endl;
+				m_os << a->get_x() << " " << a->get_y() << std::endl;
 #endif		
-					found_move = a;
-					is_found = true;
-					return false;
-				}
-				return true;
-			});
+				found_move = a;
+				is_found = true;
+				break;
+			}
+		}
+
 		if (!is_found) // deselection when wrong coords given
 		{
 			m_selected = false;
@@ -1254,23 +1253,21 @@ namespace checkers
 
 				// check, when there wasn't multicapture, but there are two or more pieces that can do captures
 				int pieces_with_captures = 0;
-				all_of(list->begin(), list->end(), [&pieces_with_captures](piece* p)
+				for (piece* p : *list)
+				{
+					for (available_move* a : *p->get_av_list())
 					{
-						all_of(p->get_av_list()->begin(), p->get_av_list()->end(), [&pieces_with_captures](available_move* a)
-							{
-								// if at least one of available moves is a capture, increment and go to the next piece
-								if (dynamic_cast<available_capture*>(a))
-								{
-									pieces_with_captures++;
-									return false;
-								}
-								return true;
-							});
-						// stop checking, if there is at least two pieces containing separate captures
-						if (pieces_with_captures >= 2)
-							return false;
-						return true;
-					});
+						// if at least one of available moves is a capture, increment and go to the next piece
+						if (dynamic_cast<available_capture*>(a))
+						{
+							pieces_with_captures++;
+							break;
+						}
+					}
+					// stop checking, if there is at least two pieces containing separate captures
+					if (pieces_with_captures >= 2)
+						break;
+				}
 
 				// delete normal moves
 				if (pieces_with_captures >= 1)
@@ -1350,8 +1347,8 @@ namespace checkers
 			av_capture ? (m_os << "true") : (m_os << "false");
 			m_os << std::endl;
 #endif
-			return av_capture;
 		}
+		return av_capture;
 	}
 
 	bool game::evaluate_piece(piece* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive)
@@ -1867,7 +1864,7 @@ namespace checkers
 						while (x + i + 1 + j <= s_size - 1 && y - i - 1 - j >= 0 && (*board)[x + i + 1 + j][y - i - 1 - j] == nullptr && dead_board[x + i + 1 + j][y - i - 1 - j] == nullptr)
 						{
 #ifdef _DEBUG
-							m_os << "\%piece at x: " << x << ", y: " << y << " can capture on coords: x: " << x + i + 1 + j << ", y: " << y - i - 1 - j << std::endl;
+							m_os << "=piece at x: " << x << ", y: " << y << " can capture on coords: x: " << x + i + 1 + j << ", y: " << y - i - 1 - j << std::endl;
 #endif
 							local_captures_top_right.push_back(available_capture(x + i + 1 + j, y - i - 1 - j, x + i, y - i, 1));
 							++j;
@@ -1969,7 +1966,7 @@ namespace checkers
 						while (x - i - 1 - j >= 0 && y - i - 1 - j >= 0 && (*board)[x - i - 1 - j][y - i - 1 - j] == nullptr && dead_board[x - i - 1 - j][y - i - 1 - j] == nullptr)
 						{
 #ifdef _DEBUG
-							m_os << "\%piece at x: " << x << ", y: " << y << " can capture on coords: x: " << x - i - 1 - j << ", y: " << y - i - 1 - j << std::endl;
+							m_os << "=piece at x: " << x << ", y: " << y << " can capture on coords: x: " << x - i - 1 - j << ", y: " << y - i - 1 - j << std::endl;
 #endif
 							local_captures_top_left.push_back(available_capture(x - i - 1 - j, y - i - 1 - j, x - i, y - i, 1));
 							++j;
@@ -2071,7 +2068,7 @@ namespace checkers
 						while (x + i + 1 + j <= s_size - 1 && y + i + 1 + j <= s_size - 1 && (*board)[x + i + 1 + j][y + i + 1 + j] == nullptr && dead_board[x + i + 1 + j][y + i + 1 + j] == nullptr)
 						{
 #ifdef _DEBUG
-							m_os << "\%piece at x: " << x << ", y: " << y << " can capture on coords: x: " << x + i + 1 + j << ", y: " << y + i + 1 + j << std::endl;
+							m_os << "=piece at x: " << x << ", y: " << y << " can capture on coords: x: " << x + i + 1 + j << ", y: " << y + i + 1 + j << std::endl;
 #endif
 							local_captures_bottom_right.push_back(available_capture(x + i + 1 + j, y + i + 1 + j, x + i, y + i, 1));
 							++j;
@@ -2173,7 +2170,7 @@ namespace checkers
 						while (x - i - 1 - j >= 0 && y + i + 1 + j <= s_size - 1 && (*board)[x - i - 1 - j][y + i + 1 + j] == nullptr && dead_board[x - i - 1 - j][y + i + 1 + j] == nullptr)
 						{
 #ifdef _DEBUG
-							m_os << "\%piece at x: " << x << ", y: " << y << " can capture on coords: x: " << x - i - 1 - j << ", y: " << y + i + 1 + j << std::endl;
+							m_os << "=piece at x: " << x << ", y: " << y << " can capture on coords: x: " << x - i - 1 - j << ", y: " << y + i + 1 + j << std::endl;
 #endif
 							local_captures_bottom_left.push_back(available_capture(x - i - 1 - j, y + i + 1 + j, x - i, y + i, 1));
 							++j;
@@ -2274,10 +2271,10 @@ namespace checkers
 			// mark returned evaluation as true
 			av_capture = true;
 
-			int top_right = local_captures_top_right.size();
-			int top_left = local_captures_top_left.size();
-			int bottom_right = local_captures_bottom_right.size();
-			int bottom_left = local_captures_bottom_left.size();
+			int top_right = (int)local_captures_top_right.size();
+			int top_left = (int)local_captures_top_left.size();
+			int bottom_right = (int)local_captures_bottom_right.size();
+			int bottom_left = (int)local_captures_bottom_left.size();
 
 			// for storing recursively evaluated capture counters
 			std::vector<int> capture_counter[4] = { std::vector<int>(top_right), std::vector<int>(top_left), std::vector<int>(bottom_right), std::vector<int>(bottom_left) }; // 0 - top right, 1 - top left, 2 - bottom right, 3 - bottom left

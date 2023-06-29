@@ -1,4 +1,4 @@
-#include "include/available_move.h"
+#include "available_move.h"
 
 namespace checkers
 {

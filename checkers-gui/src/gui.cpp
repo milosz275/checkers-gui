@@ -1,6 +1,6 @@
-#include "include/gui.h"
-#include "include/piece.h"
-#include "include/available_move.h"
+#include "gui.h"
+#include "piece.h"
+#include "available_move.h"
 
 namespace checkers
 {

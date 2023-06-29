@@ -1,7 +1,7 @@
-#include "include/event_handler.h"
-#include "include/game.h"
-#include "include/piece.h"
-#include "include/king.h"
+#include "event_handler.h"
+#include "game.h"
+#include "piece.h"
+#include "king.h"
 
 namespace checkers
 {

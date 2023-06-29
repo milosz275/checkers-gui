@@ -1,5 +1,5 @@
-#include "include/game_state.h"
-#include "include/piece.h"
+#include "game_state.h"
+#include "piece.h"
 
 namespace checkers
 {
@@ -56,7 +56,8 @@ namespace checkers
 		else if (m_first_won || m_second_won)
 		{
 			std::cout << "Checking completion: Flags already set. Setting completed" << std::endl;
-			return m_completed = true;
+			m_completed = true;
+			return true;
 		}
 		else
 			return false;
@@ -91,20 +92,22 @@ namespace checkers
 		if (!at_least_one_piece_1 && !at_least_one_piece_2)
 			std::cout << "WARNING: Setting two winning flags at the same time" << std::endl;
 		if (!at_least_one_piece_1 || !at_least_one_piece_2)
-			return m_completed = true;
+		{
+			m_completed = true;
+			return true;
+		}
 
 		// moves
 		bool at_least_one_move = false;
 		assert(m_current_player);
-		all_of(m_current_player->get_list()->begin(), m_current_player->get_list()->end(), [&at_least_one_move](piece* p)
+		for (piece* p : *m_current_player->get_list())
+		{
+			if (!p->get_av_list()->empty())
 			{
-				if (!p->get_av_list()->empty())
-				{
-					at_least_one_move = true;
-					return false;
-				}
-				return true;
-			});
+				at_least_one_move = true;
+				break;
+			}
+		}
 		if (!at_least_one_move)
 		{
 			std::cout << "Checking completion: No more moves possible. Setting completed" << std::endl;
@@ -112,8 +115,10 @@ namespace checkers
 				m_second_won = true;
 			else
 				m_first_won = true;
-			return m_completed = true;
+			m_completed = true;
+			return true;
 		}
+		return m_completed;
 	}
 
 	void game_state::reset_completion(void) { m_first_won = false; m_second_won = false; m_completed = false; }

@@ -1,8 +1,8 @@
 #ifndef BOT_H
 #define BOT_H
 
-#include "include/base_player.h"
-#include "include/game.h"
+#include "base_player.h"
+#include "game.h"
 #include <cassert>
 
 namespace checkers

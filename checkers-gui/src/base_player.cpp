@@ -1,6 +1,6 @@
-#include "include/base_player.h"
-#include "include/piece.h"
-#include "include/king.h"
+#include "base_player.h"
+#include "piece.h"
+#include "king.h"
 
 namespace checkers
 {
