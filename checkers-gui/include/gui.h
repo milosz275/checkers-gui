@@ -33,28 +33,28 @@ namespace checkers
 	protected:
 		// executes drawing
 		void draw(void);
-		// 
+		// highlights selected field of given coordinates
 		void highlight_selected(int x, int y);
-		//
+		// highlights available field of given coordinates
 		void highlight_available(int x, int y);
 	public:
-		//
+		// creates graphical user interface refreshing with given fps
 		gui(int fps);
-		//
+		// returns event 
 		sfml::event& get_event(void);
-		//
+		// returns window
 		sfml::window& get_window(void);
-		//
+		// returns clock
 		sfml::clock& get_clock(void);
-		//
+		// returns size of field
 		float get_square_size(void);
-		//
+		// returns radius of piece
 		float get_radius(void);
-		//
+		// returns coordinates of performed click
 		std::pair<int, int> get_click_coordinates(void);
-		//
+		// draws the board
 		void draw_board(std::list<piece*>& list_1, std::list<piece*>& list_2, std::list<piece*>& dead_list, piece* selected_piece);
-		//
+		// draws the piece
 		void draw_piece(sfml::circle_shape& shape, int x, int y);
 	};
 }

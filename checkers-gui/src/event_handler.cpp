@@ -13,11 +13,11 @@ namespace checkers
 	{
 		std::ostream& os = m_game_pointer->get_os();
 		std::ostream& log = m_game_pointer->get_log();
-		sf::Window& window = m_game_pointer->get_gui()->get_window();
-		sf::Event& event = m_game_pointer->get_gui()->get_event();
+		sfml::window& window = m_game_pointer->get_gui()->get_window();
+		sfml::event& event = m_game_pointer->get_gui()->get_event();
 		while (window.pollEvent(event) || (bool)dynamic_cast<bot*>(m_game_pointer->get_game_state()->get_current_player()))
 		{
-			if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape)
+			if (event.type == sfml::event::Closed || event.type == sfml::event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 			{
 				window.close();
 #ifdef _DEBUG
@@ -27,11 +27,11 @@ namespace checkers
 				break;
 			}
 #ifdef _DEBUG
-			if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R)
+			if (event.type == sfml::event::KeyPressed && event.key.code == sf::Keyboard::R)
 			{
 				os << "Reseted the game" << std::endl;
-				m_game_pointer->get_game_state()->set_first_won(false);
-				m_game_pointer->get_game_state()->set_second_won(false);
+				m_game_pointer->get_game_state()->reset_completion();
+				m_game_pointer->get_game_state()->reset_state();
 				m_game_pointer->get_player_1()->set_captured_pieces(0);
 				m_game_pointer->get_player_2()->set_captured_pieces(0);
 				break;
@@ -39,16 +39,15 @@ namespace checkers
 #endif
 			if ((m_game_pointer->get_player_1()->get_pieces() == 0 || m_game_pointer->get_player_2()->get_pieces() == 0) && (m_game_pointer->get_player_1()->get_captured_pieces() > 0 || m_game_pointer->get_player_2()->get_captured_pieces() > 0))
 			{
-				//m_signaled_bot = false;
-				if (event.type == sf::Event::KeyPressed || event.type == sf::Event::MouseButtonPressed)
+				/*if (event.type == sfml::event::KeyPressed || event.type == sfml::event::MouseButtonPressed)
 				{
 					os << "Game was finished. Click Escape!" << std::endl;
-				}
+				}*/
 				break;
 			}
 			else if (m_game_pointer->get_game_state()->get_game_freeze())
 			{
-				if (event.type == sf::Event::KeyPressed || event.type == sf::Event::MouseButtonPressed)
+				if (event.type == sfml::event::KeyPressed || event.type == sfml::event::MouseButtonPressed)
 				{
 					if (event.key.code == sf::Keyboard::X)
 					{
@@ -61,14 +60,13 @@ namespace checkers
 				}
 				break;
 			}
-			else if (event.type == sf::Event::Resized)
+			else if (event.type == sfml::event::Resized)
 			{
 				m_game_pointer->get_game_state()->set_any_changes(true);
 				os << "test" << std::endl;
 			}
-			else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left || (bool)dynamic_cast<bot*>(m_game_pointer->get_game_state()->get_current_player()) || m_game_pointer->m_console_game)
+			else if (event.type == sfml::event::MouseButtonPressed && event.mouseButton.button == sfml::mouse::Left || (bool)dynamic_cast<bot*>(m_game_pointer->get_game_state()->get_current_player()) || m_game_pointer->m_console_game)
 			{
-				//m_signaled_bot = false;
 				if (!m_game_pointer->get_selected())
 				{
 					m_game_pointer->select_piece();
@@ -81,13 +79,13 @@ namespace checkers
 				}
 			}
 #ifdef _DEBUG
-			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right)
+			if (event.type == sfml::event::MouseButtonPressed && event.mouseButton.button == sfml::mouse::Right)
 			{
 				// display debug info
 				m_game_pointer->debug_info(os);
 				break;
 			}
-			else if (event.type == sf::Event::KeyPressed)
+			else if (event.type == sfml::event::KeyPressed)
 			{
 				if (event.key.code == sf::Keyboard::E)
 				{
@@ -232,7 +230,7 @@ namespace checkers
 				}
 			}
 #endif
-			if (m_game_pointer->get_game_state()->check_completion())
+			/*if (m_game_pointer->get_game_state()->check_completion())
 			{
 				os << "Game is finished. Click Escape to display the results" << std::endl;
 				m_game_pointer->set_selected(false);
@@ -240,7 +238,7 @@ namespace checkers
 				m_game_pointer->get_game_state()->set_game_freeze(true);
 				m_game_pointer->get_gui()->draw_board(*m_game_pointer->get_player_1()->get_list(), *m_game_pointer->get_player_2()->get_list(), *m_game_pointer->get_to_delete_list(), m_game_pointer->get_selected_piece());
 				break;
-			}
+			}*/
 		}
 	}
 }

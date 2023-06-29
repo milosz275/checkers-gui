@@ -18,7 +18,7 @@ namespace checkers
 		player(const player& player);
 		// deletes the player
 		~player();
-		//
+		// method proxy using game (gui or stream) to get coordinates 
 		std::pair<int, int> get_coordinates(void);
 	};
 }

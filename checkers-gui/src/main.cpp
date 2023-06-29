@@ -1,14 +1,15 @@
 #include "include/game.h"
 // The game is based on: https://en.wikipedia.org/wiki/International_draughts
-// project uses snake_case name convention, however SFML is the exception as an external library
+// Project uses snake_case name convention, however SFML is the exception as an external library
 
 int main(int argc, char* argv[])
 {
-	// todo: make use argc and argv
+	// TODO: make use argc and argv
 	try
 	{
-		checkers::game checkers;
-		checkers.loop();
+		checkers::game* checkers = new checkers::game();
+		checkers->loop();
+		delete checkers;
 	}
 	catch (std::exception& e)
 	{

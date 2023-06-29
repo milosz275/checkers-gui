@@ -53,7 +53,7 @@ namespace checkers
 		// make sure the list is not empty
 		assert(!target->get_owner()->get_list()->empty());
 
-		//
+		// cannot change dead pieces
 		assert(target->is_alive());
 
 		// add asertion if this is not the current player and if has no captures
@@ -80,7 +80,7 @@ namespace checkers
 		(*board)[x][y] = nullptr;
 		target->get_owner()->get_list()->remove(target);
 		
-		(*board)[x][y] = new king(get_sign(), x, y, true, this, target->get_gui());
+		(*board)[x][y] = new king(x, y, true, this, target->get_gui());
 		target->get_owner()->get_list()->push_back((*board)[x][y]);
 
 		return true;

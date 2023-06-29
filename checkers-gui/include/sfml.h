@@ -21,6 +21,7 @@ namespace sfml
 	using video_mode = sf::VideoMode;
 	using vector_2f = sf::Vector2f;
 	using mouse = sf::Mouse;
+	using time = sf::Time;
 	using context_settings = sf::ContextSettings;
 }
 

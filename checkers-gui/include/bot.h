@@ -8,7 +8,6 @@
 namespace checkers
 {
 	class game;
-
 	class bot : public base_player
 	{
 		// considered steps ahead
@@ -22,18 +21,22 @@ namespace checkers
 		// x and y coordinates of save planned move after selection
 		std::pair<int, int> m_saved_move;
 	public:
-		// creates bot player with its corresponding sign and game pointer
-		bot(char sign, game* game);
-		// copies the bot
-		//bot(const bot& bot);
+		// creates bot player with its corresponding sign and depth for simulation
+		bot(char sign, int depth);
 		// deletes the bot
 		~bot();
+		// returns the game, the bot is operating on
+		game* get_game(void);
+		// sets and returns the game, the bot is operating on
+		game* set_game(game* game);
 		// calculates coordinates of piece to move and coordinates where to go after selecting 
 		std::pair<int, int> get_coordinates(void);
-		// finds the best move for actual abstrat game turn (simulation)
-		std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> find_best_move(game* game_copy, int depth, int alpha, int beta, bool maximizing_player);
-		// recursively go through all possible captures for the given game and then add results to the given list of games
-		void add_to_game_copy_list(std::list<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>>& list_of_games, game* game_copy, std::pair<int, int>* source_coords, std::pair<int, int>* destination_coords);
+		// returns coordinates of best possible move for all combinations of game_copy within given conditions
+		std::pair<std::pair<int, int>, std::pair<int, int>> find_best_move(game* game_copy, int depth, int min_score, int max_score, bool is_maximizing);
+		// returns vector of games and corresponding moves with the highest score, uses find_best_move recursively to move pieces to the given depth
+		std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> find_best_games(game* game_copy, int depth, int alpha, int beta, bool maximizing_player);
+		// recursively runs through the given game_copy and adds game after one turn to the given list (goes through all possible captures till no more possible, or goes through all possible moves)
+		void add_to_game_copy_list(std::list<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>>& list_of_games, game* game_copy, std::pair<int, int>* src_coords, std::pair<int, int>* dest_coords);
 	};
 }
 

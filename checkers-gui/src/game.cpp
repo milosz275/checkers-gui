@@ -1,18 +1,13 @@
 #include "include/game.h"
 #include "include/king.h"
 
-// TODO: remake code into more functions
 // TODO: add menu
 // TODO: add animation
-// TODO: move some methods into private
-// TODO: add seters with value check
-// TODO: add saving player scores in save and load from file
 // TODO: scale to window resolution
-// TODO: change display flag after rescaling window
 
 namespace checkers
 {
-	game::game(int fps, std::istream& is, std::ostream& os) : m_gui(new gui(fps)), m_event_handler(new event_handler(this)), m_game_state(new game_state()), m_console_game(false),
+	game::game(int fps, std::istream& is, std::ostream& os) : m_event_handler(new event_handler(this)), m_game_state(new game_state()), m_console_game(false),
 		m_is_finished(false), m_fps(fps),
 		m_selected(false), m_selected_piece(nullptr), m_moving_piece(nullptr), m_available_capture(false), m_last_capture_direction(-1), m_is(is), m_os(os),
 		m_log_file("log.txt", std::ios::app)
@@ -37,25 +32,49 @@ namespace checkers
 #endif
 		}
 
-		bool against_bot = false;
+		// choose how to play
+		bool against_bot = true;
+		int bot_intelligence = 1;
 
-		// simplified: set values
+		/*m_os << "Do you want to play against another player (0) or versus bot (1)?" << std::endl << "Enter: ";
+		m_is >> against_bot;
+		while (against_bot)
+		{
+			m_os << "Chosen player vs bot" << std::endl;
+			m_os << "How many moves ahead should bot consider?" << std::endl << "Enter: ";
+			m_is >> bot_intelligence;
+			if (bot_intelligence <= 0 || bot_intelligence >= 10)
+				m_os << "Bot's intelligence greater than 0 and smaller than 10" << std::endl;
+			else
+				break;
+		}
+		if (!against_bot)
+			m_os << "Chosen player vs player" << std::endl;*/
+
+		// setup user interface
+		m_gui = new gui(fps);
+		std::string player_name_1 = "Player name 1";
+		std::string player_name_2 = "Player name 2";
+		char player_sign_1 = 'W';
+		char player_sign_2 = 'B';
+
+		// bind user input
 		if (!m_console_game)
 		{
 			auto get_coords = std::bind(&game::get_click_coordinates, this);
-			m_player_1 = new player('W', "Player1", get_coords);
+			m_player_1 = new player(player_sign_1, player_name_1, get_coords);
 			if (!against_bot)
-				m_player_2 = new player('B', "Player2", get_coords);
+				m_player_2 = new player(player_sign_2, player_name_2, get_coords);
 		}
 		else
 		{
 			auto get_coords = std::bind(&game::get_coordinates_from_stream, this);
-			m_player_1 = new player('W', "Player1", get_coords);
+			m_player_1 = new player(player_sign_1, player_name_1, get_coords);
 			if (!against_bot)
-				m_player_2 = new player('B', "Player2", get_coords);
+				m_player_2 = new player(player_sign_2, player_name_2, get_coords);
 		}
 		if (against_bot)
-			m_player_2 = new bot('B', this);
+			m_player_2 = new bot('B', bot_intelligence);
 
 		// set play order and evaluation direction
 		m_player_1->set_first(true);
@@ -76,6 +95,7 @@ namespace checkers
 		//populate_board_debug();
 		load_pieces_from_file("pieces.txt");
 #else
+		// load pieces from file, if it fails fill with default board
 		bool loaded_pieces = load_pieces_from_file("pieces.txt");
 		if (!loaded_pieces)
 			populate_board(s_size / 2 - 1);
@@ -97,25 +117,43 @@ namespace checkers
 
 	game::game(const game& game) : m_fps(game.m_fps)
 	{
+		s_game_copied++;
+#ifdef _DEBUG
+		m_os << "Game copy construction overall: " << s_game_copied << std::endl;
+#endif
 		// copy player 1
+		assert(game.m_player_1);
 		if (dynamic_cast<player*>(game.m_player_1))
 			m_player_1 = new player(*dynamic_cast<player*>(game.m_player_1));
 		else
 			m_player_1 = new bot(*dynamic_cast<bot*>(game.m_player_1));
 
 		// copy player 2
+		assert(game.m_player_2);
 		if (dynamic_cast<player*>(game.m_player_2))
 			m_player_2 = new player(*dynamic_cast<player*>(game.m_player_2));
 		else
 			m_player_2 = new bot(*dynamic_cast<bot*>(game.m_player_2));
 
 		// recreate game state
+		assert(game.m_game_state);
+		assert(game.m_game_state->get_current_player());
+		assert(game.m_game_state->get_current_player() != game.m_game_state->get_next_player());
 		m_game_state = new game_state(*game.m_game_state);
-		m_game_state->set_current_player(game.m_game_state->get_current_player() == game.m_player_1 ? m_player_1 : m_player_2);
-		m_game_state->set_next_player(game.m_game_state->get_next_player() == game.m_player_2 ? m_player_1 : m_player_2);
-		assert(m_player_1 != m_player_2);
+		
+		if (game.m_game_state->get_current_player() == game.m_player_1)
+		{
+			m_game_state->set_current_player(m_player_1);
+			m_game_state->set_next_player(m_player_2);
+		}
+		else
+		{
+			m_game_state->set_current_player(m_player_2);
+			m_game_state->set_next_player(m_player_1);
+		}
 
 		// copy the board and recreate the lists
+		assert(game.m_board);
 		m_board = new std::vector<std::vector<piece*>>(s_size, std::vector<piece*>(s_size, nullptr));
 		std::vector<std::vector<piece*>>* original_board = game.m_board;
 
@@ -152,55 +190,87 @@ namespace checkers
 #ifdef _DEBUG
 		m_os << "Board after copying: " << std::endl;
 		m_os << m_board << std::endl;
-
+#endif
 		for_each(m_p_list_1.begin(), m_p_list_1.end(), [this](piece* p) { assert(p->get_owner() == m_player_1); });
 		for_each(m_p_list_2.begin(), m_p_list_2.end(), [this](piece* p) { assert(p->get_owner() == m_player_2); });
-
+#ifdef _DEBUG
 		m_os << "List of pieces of first player" << std::endl;
 		print_pieces(&m_p_list_1);
 
 		m_os << "List of pieces of second player" << std::endl;
 		print_pieces(&m_p_list_2);
 #endif
-
-		// recreate to delete list
-		for_each(game.m_to_delete_list.begin(), game.m_to_delete_list.end(), [this](piece* p)
-			{
-				if (dynamic_cast<king*>(p))
+		
+		if (!game.m_to_delete_list.empty())
+		{
+			// recreate to delete list
+			for_each(game.m_to_delete_list.begin(), game.m_to_delete_list.end(), [this, &game](piece* p) // check if to delete list contains opponent's pieces
 				{
-					if (p->get_owner()->is_first())
-						m_to_delete_list.push_back(new king(p->get_sign(), p->get_x(), p->get_y(), false, m_player_1));
-					else
-						m_to_delete_list.push_back(new king(p->get_sign(), p->get_x(), p->get_y(), false, m_player_2));
-				}
-				else
+					assert(p);
+					assert(p->get_owner() == game.m_game_state->get_next_player());
+				});
+			for_each(game.m_to_delete_list.begin(), game.m_to_delete_list.end(), [this](piece* p)
 				{
-					if (p->get_owner()->is_first())
-						m_to_delete_list.push_back(new piece(p->get_sign(), p->get_x(), p->get_y(), false, m_player_1));
+					if (dynamic_cast<king*>(p))
+					{
+						if (p->get_owner()->is_first())
+							m_to_delete_list.push_back(new king(p->get_x(), p->get_y(), false, m_player_1));
+						else
+							m_to_delete_list.push_back(new king(p->get_x(), p->get_y(), false, m_player_2));
+					}
+					else if (p)
+					{
+						if (p->get_owner()->is_first())
+							m_to_delete_list.push_back(new piece(p->get_x(), p->get_y(), false, m_player_1));
+						else
+							m_to_delete_list.push_back(new piece(p->get_x(), p->get_y(), false, m_player_2));
+					}
 					else
-						m_to_delete_list.push_back(new piece(p->get_sign(), p->get_x(), p->get_y(), false, m_player_2));
-				}
-			});
-
+						throw std::runtime_error("To delete list contains nullptr instead of pieces");
+				});
+			for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [this](piece* p) // check if to delete list contains opponent's pieces
+				{
+					assert(p);
+					assert(p->get_owner() == m_game_state->get_next_player());
+				});
+		}
+		else
+			assert(m_to_delete_list.empty());
+		
+		// recreate selected piece
+		if (!(game.m_selected_piece))
+			m_selected_piece = nullptr;
+		else
+		{
+			assert(game.m_game_state->get_current_player() == game.m_selected_piece->get_owner());
+			m_selected_piece = (*m_board)[game.m_selected_piece->get_x()][game.m_selected_piece->get_y()];
+		}
+		
 		// recreate moving piece
 		if (!(game.m_moving_piece))
 			m_moving_piece = nullptr;
 		else
+		{
+			assert(game.m_game_state->get_current_player() == game.m_moving_piece->get_owner());
 			m_moving_piece = (*m_board)[game.m_moving_piece->get_x()][game.m_moving_piece->get_y()];
+		}
 
 		// check if the source game was normal
-		assert(m_to_delete_list.empty() && !m_moving_piece);
-		assert(!m_to_delete_list.empty() && m_moving_piece);
+		assert((m_to_delete_list.empty() && !m_moving_piece) || (!m_to_delete_list.empty() && m_moving_piece));
+		assert((game.m_to_delete_list.empty() && !game.m_moving_piece) || (!game.m_to_delete_list.empty() && game.m_moving_piece));
 
 		// other fields
+		m_selected = game.m_selected;
 		m_last_capture_direction = game.m_last_capture_direction;
 		m_console_game = game.m_console_game;
 		m_is_finished = game.m_is_finished;
-		m_selected_piece = nullptr;
 		m_gui = nullptr;
-		m_event_handler = new event_handler(this);
+		m_event_handler = nullptr;
 
 		// evaluate available moves for the current player
+#ifdef _DEBUG
+		m_os << "Starting game copy evaluation" << std::endl;
+#endif
 		int counter = 0;
 		m_available_capture = evaluate(m_game_state->get_current_player()->get_list(), m_board, &counter, counter, m_last_capture_direction, &m_to_delete_list, m_moving_piece);
 #ifdef _DEBUG
@@ -230,9 +300,39 @@ namespace checkers
 
 	game::~game()
 	{
-		delete m_board;
-		delete m_player_1;
-		delete m_player_2;
+		if (m_gui)
+			delete m_gui;
+		if (m_event_handler)
+			delete m_event_handler;
+		if (m_game_state)
+			delete m_game_state;
+		m_p_list_1.clear();
+		m_p_list_2.clear();
+		for_each(m_to_delete_list.begin(), m_to_delete_list.end(), [](piece* p) { assert(p); delete p; });
+		m_to_delete_list.clear();
+		m_selected_piece = nullptr;
+		m_moving_piece = nullptr;
+		if (m_board)
+		{
+			for_each(m_board->begin(), m_board->end(), [](std::vector<piece*>& row)
+				{
+					for_each(row.begin(), row.end(), [](piece* p)
+						{
+							if (p)
+								delete p;
+						});
+					row.clear();
+				});
+			m_board->clear();
+		}
+
+		if (m_player_1);
+			delete m_player_1;
+		if (m_player_2);
+			delete m_player_2;
+#ifdef _DEBUG
+		m_os << "Deleted game" << std::endl;
+#endif
 	}
 
 	gui* game::get_gui(void) { return m_gui; }
@@ -250,6 +350,14 @@ namespace checkers
 	base_player* game::get_player_1(void) { return m_player_1; }
 
 	base_player* game::get_player_2(void) { return m_player_2; }
+
+	base_player* game::set_player_1(base_player* player) { return m_player_1 = player; }
+
+	base_player* game::set_player_2(base_player* player) { return m_player_2 = player; }
+
+	std::list<piece*>& game::get_list_1(void) { return m_p_list_1; }
+
+	std::list<piece*>& game::get_list_2(void) { return m_p_list_2; }
 
 	bool game::get_selected(void) { return m_selected; }
 
@@ -273,12 +381,13 @@ namespace checkers
 
 	std::ostream& game::get_log(void) { return m_log; }
 
+	std::ofstream& game::get_log_file(void) { return m_log_file; }
+
 	void game::populate_board(int rows)
 	{
 		assert(m_board->size() == s_size);
 		assert(rows <= s_size / 2);
 
-		// todo: change to algorithm
 		// rows of the second player (upper)
 		for (int i = 0; i < rows; ++i)
 			for (int j = 0; j < s_size; ++j)
@@ -297,22 +406,7 @@ namespace checkers
 	void game::populate_board_debug(void)
 	{
 		assert(m_board->size() == s_size);
-
-		/*add_new_piece(m_player_2->get_list(), m_board, m_player_2, new king(m_player_2->get_sign(), 7, 0, true, m_player_2));
-		add_new_piece(m_player_2->get_list(), m_board, m_player_2, 4, 5, true);
-
-		add_new_piece(m_player_1->get_list(), m_board, m_player_1, 1, 2, true);
-		add_new_piece(m_player_1->get_list(), m_board, m_player_1, 3, 2, true);
-		add_new_piece(m_player_1->get_list(), m_board, m_player_1, 5, 2, true);
-		add_new_piece(m_player_1->get_list(), m_board, m_player_1, 6, 5, true);
-		add_new_piece(m_player_1->get_list(), m_board, m_player_1, 3, 6, true);
-		add_new_piece(m_player_1->get_list(), m_board, m_player_1, 6, 7, true);*/
-
-		// rows of the second player (upper)
-		//add_new_piece(m_player_2->get_list(), m_board, m_player_2, 1, 8, true);
-
-		// rows of the first player (lower)
-		//add_new_piece(m_player_1->get_list(), m_board, m_player_1, 5, 4, true);
+		//...
 	}
 
 	bool game::load_pieces_from_file(std::string file_name)
@@ -413,8 +507,6 @@ namespace checkers
 			int is_alive = -1;
 			if (!(ss >> x >> y >> owner >> is_king >> is_alive))
 			{
-				/*std::string error("Incorrect data at line " + line_index) << std::endl;
-				throw std::runtime_error(error);*/
 #ifdef _DEBUG
 				m_os << "Incorrect data at line: " << line_index << std::endl;
 #endif 
@@ -435,13 +527,13 @@ namespace checkers
 				return false;
 			}
 			if (is_king && owner == 1)
-				loaded_pieces.push(new king(m_player_1->get_sign(), x, y, is_alive, m_player_1));
+				loaded_pieces.push(new king(x, y, is_alive, m_player_1));
 			else if (is_king && owner == 2)
-				loaded_pieces.push(new king(m_player_2->get_sign(), x, y, is_alive, m_player_2));
+				loaded_pieces.push(new king(x, y, is_alive, m_player_2));
 			else if (!is_king && owner == 1)
-				loaded_pieces.push(new piece(m_player_1->get_sign(), x, y, is_alive, m_player_1));
+				loaded_pieces.push(new piece(x, y, is_alive, m_player_1));
 			else if (!is_king && owner == 2)
-				loaded_pieces.push(new piece(m_player_2->get_sign(), x, y, is_alive, m_player_2));
+				loaded_pieces.push(new piece(x, y, is_alive, m_player_2));
 			else
 			{
 				while (!loaded_pieces.empty())
@@ -464,7 +556,7 @@ namespace checkers
 			}
 			else
 			{
-				m_to_delete_list.push_back(new piece(p->get_owner()->get_sign(), p->get_x(), p->get_y(), false, p->get_owner(), m_gui));
+				m_to_delete_list.push_back(new piece(p->get_x(), p->get_y(), false, p->get_owner(), m_gui));
 			}
 			loaded_pieces.pop();
 		}
@@ -544,9 +636,10 @@ namespace checkers
 	{
 		if ((*board)[x][y])
 			return;
-		piece* p = new piece(player->get_sign(), x, y, is_alive, player, ui);
+		piece* p = new piece(x, y, is_alive, player, ui);
 		(*board)[x][y] = p;
-		list->push_back(p);
+		if (list)
+			list->push_back(p);
 		bool changed_to_king = player->change_to_king(p, board);
 #ifdef _DEBUG
 		if (changed_to_king)
@@ -562,15 +655,17 @@ namespace checkers
 			return;
 		if (force_king)
 		{
-			king* p = new king(player->get_sign(), x, y, is_alive, player, ui);
+			king* p = new king(x, y, is_alive, player, ui);
 			(*board)[x][y] = p;
-			list->push_back(p);
+			if (list)
+				list->push_back(p);
 		}
 		else
 		{
-			piece* p = new piece(player->get_sign(), x, y, is_alive, player, ui);
+			piece* p = new piece(x, y, is_alive, player, ui);
 			(*board)[x][y] = p;
-			list->push_back(p);
+			if (list)
+				list->push_back(p);
 		}
 #ifdef _DEBUG
 		if (force_king)
@@ -580,20 +675,6 @@ namespace checkers
 #endif
 	}
 
-	//void game::add_new_piece(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, base_player* player, piece* based_on)
-	//{
-	//	int x = based_on->get_x();
-	//	int y = based_on->get_y();
-	//	if ((*board)[x][y])
-	//		return;
-	//	if (dynamic_cast<king*>(based_on))
-	//		(*board)[x][y] = new king(player->get_sign(), x, y, based_on->is_alive(), player, based_on->get_gui());
-	//	else
-	//		(*board)[x][y] = new piece(player->get_sign(), x, y, based_on->is_alive(), player, based_on->get_gui());
-	//	list->push_back((*board)[x][y]);
-	//	//m_any_changes = true;
-	//}
-
 	std::vector<std::vector<piece*>>* game::get_board(void) { assert(m_board); return m_board; }
 
 	std::list<piece*>* game::get_to_delete_list(void) { return &m_to_delete_list; }
@@ -601,9 +682,23 @@ namespace checkers
 	std::pair<int, int> game::get_coordinates(void)
 	{	
 		m_game_state->set_game_freeze(true);
+		bot* player_bot = dynamic_cast<bot*>(m_game_state->get_current_player());
+		if (player_bot)
+		{
+			game* previous = player_bot->get_game();
+			assert(this != previous);
+
+			m_os << "Game: Setting new game copy for bot" << std::endl;
+			player_bot->set_game(new game(*this));
+
+			if (previous)
+			{
+				this->get_os() << "Game: Deleting previous game copy for bot" << std::endl;
+				delete previous;
+			}
+		}
 		std::pair<int, int> coords = m_game_state->get_current_player()->get_coordinates();
-		if (dynamic_cast<bot*>(m_game_state->get_current_player()))
-			assert(coords.first >= 0 && coords.first < s_size && coords.second >= 0 && coords.second < s_size);
+		assert(coords.first >= 0 && coords.first < s_size && coords.second >= 0 && coords.second < s_size);
 		m_game_state->set_game_freeze(false);
 		return coords;
 	}
@@ -816,10 +911,10 @@ namespace checkers
 		else // making a move
 		{
 			m_game_state->set_any_changes(true);
-			if (dynamic_cast<available_capture*>(found_move))
+			available_capture* found_capture = dynamic_cast<available_capture*>(found_move);
+			if (found_capture)
 			{
 				// mark found capture
-				available_capture* found_capture = dynamic_cast<available_capture*>(found_move);
 				int x_d = found_capture->get_x_d();
 				int y_d = found_capture->get_y_d();
 
@@ -856,6 +951,7 @@ namespace checkers
 #endif
 				// delete captured piece
 				piece* piece_to_delete = (*m_board)[x_d][y_d];
+				std::cout << "here?" << std::endl;
 				delete_piece(piece_to_delete, m_board, m_game_state->get_next_player());
 				m_game_state->get_next_player()->add_capture();
 
@@ -876,7 +972,7 @@ namespace checkers
 					m_moving_piece = m_selected_piece;
 
 				// create new piece which represents dead piece during multicapture, it is indifferent whether it was normal piece or king
-				m_to_delete_list.push_back(new piece(m_game_state->get_next_player()->get_sign(), x_d, y_d, false, m_game_state->get_next_player(), m_gui));
+				m_to_delete_list.push_back(new piece(x_d, y_d, false, m_game_state->get_next_player(), m_gui));
 				m_game_state->get_current_player()->set_combo(true);
 #ifdef _DEBUG
 				m_os << m_game_state->get_current_player()->get_name() << " combo" << std::endl;
@@ -909,6 +1005,10 @@ namespace checkers
 					m_os << m_game_state->get_current_player()->get_name() << " changed his piece to king!" << std::endl;
 #endif
 				m_game_state->switch_turn();
+				// TODO: move to game state
+				m_selected = false;
+				m_selected_piece = nullptr;
+				m_moving_piece = nullptr;
 			}
 			else // section to test (fixes stuff)
 			{
@@ -929,13 +1029,18 @@ namespace checkers
 				m_moving_piece = nullptr;
 
 				// delete opponent's pieces of multi capture, clear failed list of possible moves, cancel combo, evaluate again
-				clear_to_delete_list(&m_to_delete_list, &m_p_list_1);
-				clear_to_delete_list(&m_to_delete_list, &m_p_list_2);
-
-				clear_list(&m_p_list_1);
-				clear_list(&m_p_list_2);
+				if (m_game_state->get_current_player()->is_first())
+				{
+					clear_to_delete_list(&m_to_delete_list, &m_p_list_2);
+					clear_list(&m_p_list_1);
+				}
+				else
+				{
+					clear_to_delete_list(&m_to_delete_list, &m_p_list_1);
+					clear_list(&m_p_list_2);
+				}
 				m_game_state->get_current_player()->set_combo(false);
-				m_game_state->get_next_player()->set_combo(false);
+				//m_game_state->get_next_player()->set_combo(false);
 #ifdef _DEBUG
 				m_os << "Combo cancelled" << std::endl;
 #endif
@@ -948,21 +1053,15 @@ namespace checkers
 					m_os << m_game_state->get_current_player()->get_name() << " changed his piece to king!" << std::endl;
 #endif
 				m_game_state->switch_turn();
+				// TODO: move to game state
+				m_selected = false;
+				m_selected_piece = nullptr;
+				m_moving_piece = nullptr;
 				m_available_capture = evaluate(m_game_state->get_current_player()->get_list(), m_board, &counter, counter, m_last_capture_direction, &m_to_delete_list, m_moving_piece);
 #ifdef _DEBUG
 				m_os << "main game loop: second evaluation counter: " << counter << std::endl;
 #endif
-				// second game completion check
-				if (check_game_completion_no_possible_moves(m_game_state->get_current_player()->get_list()))
-				{
-					if (m_game_state->get_current_player()->is_first())
-						m_game_state->set_second_won(true);
-					else
-						m_game_state->set_first_won(true);
-#ifdef _DEBUG
-				m_os << "Setting the end of the game flags: no possible moves for current player" << std::endl;
-#endif
-				}
+				m_game_state->check_completion();
 			}
 			else // continue the combo
 			{
@@ -1020,68 +1119,52 @@ namespace checkers
 		m_log << "Deleted piece: x: " << x << "; y: " << y << std::endl;
 	}
 
-	bool game::check_game_completion_no_possible_moves(std::list<piece*>* list)
-	{
-		// check, if the are no moves at all
-		bool at_least_one_move = false;
-		all_of(list->begin(), list->end(), [&at_least_one_move](piece* p)
-			{
-				if (!p->get_av_list()->empty())
-				{
-					at_least_one_move = true;
-					return false;
-				}
-				return true;
-			});
-		return !at_least_one_move;
-	}
-
 	void game::copy_board(std::vector<std::vector<piece*>>* source_board, std::vector<std::vector<piece*>>* copy_of_board, base_player* owner_1, base_player* owner_2) // TODO: first: == owner; second: == is_first_player
 	{
-		for (int i = 0; i < s_size; ++i)
+		assert(source_board);
+		assert(copy_of_board);
+		assert(owner_1);
+		assert(owner_2);
+		
+		base_player* player_1 = nullptr;
+		base_player* player_2 = nullptr;
+		if (owner_1->is_first())
 		{
+			player_1 = owner_1;
+			player_2 = owner_2;
+		}
+		else if (owner_2->is_first())
+		{
+			player_1 = owner_2;
+			player_2 = owner_1;
+		}
+		else
+			throw std::runtime_error("Copying board: none of the players is a first player");
+		assert(player_1 != player_2);
+		assert((player_1->is_first() && !player_2->is_first()) || (!player_1->is_first() && player_2->is_first()));
+
+		for (int i = 0; i < s_size; ++i)
 			for (int j = 0; j < s_size; ++j)
 			{
 				piece* p = (*source_board)[i][j];
 				if (p)
 				{
-					if (dynamic_cast<king*>(p)) // kings
+					if (dynamic_cast<king*>(p))
 					{
-						if (p->get_owner() == owner_1 || p->get_owner() == owner_2) // copying through ownership
-						{
-							if (p->get_owner() == owner_1)
-								(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner_1);
-							else
-								(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner_2);
-						}
-						else // copying through traits
-						{
-							if (p->get_owner()->is_first() && owner_1->is_first())
-								(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner_1);
-							else
-								(*copy_of_board)[i][j] = new king(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner_2);
-						}
+						if (p->get_owner()->is_first())
+							add_new_piece(nullptr, copy_of_board, player_1, i, j, true, true);
+						else
+							add_new_piece(nullptr, copy_of_board, player_2, i, j, true, true);
 					}
-					else // pieces
+					else
 					{
-						if (p->get_owner() == owner_1 || p->get_owner() == owner_2) // copying through ownership
-						{
-							if (p->get_owner() == owner_1)
-								(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner_1);
-							else
-								(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner_2);
-						}
-						else // copying through traits
-						{
-							if (p->get_owner()->is_first() && owner_1->is_first())
-								(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner_1);
-							else
-								(*copy_of_board)[i][j] = new piece(p->get_sign(), p->get_x(), p->get_y(), p->is_alive(), owner_2);
-						}
+						if (p->get_owner()->is_first())
+							add_new_piece(nullptr, copy_of_board, player_1, i, j, true);
+						else 
+							add_new_piece(nullptr, copy_of_board, player_2, i, j, true);
 					}
 				}
 			}
-		}
 	}
 
 	void game::loop(void)
@@ -1145,10 +1228,7 @@ namespace checkers
 				m_os << "Evaluating empty list" << std::endl;
 #else
 				// in release mode, evaluating an empty list is end-of-game 
-				if (player == m_player_1)
-					m_second_won = true;
-				else
-					m_first_won = true;
+				get_game_state()->check_lists();
 				m_os << "Setting the end of the game flags: no possible moves for current player (evaluation)" << std::endl;
 #endif
 			}
@@ -1352,14 +1432,6 @@ namespace checkers
 				
 				piece* deleted_piece = (*copy_of_board)[x + 1][y - 1];
 				delete_piece(deleted_piece, copy_of_board, opponent);
-
-				/*(*copy_of_board)[moving_piece->get_x()][moving_piece->get_y()] = nullptr;
-				moving_piece->set_x(x + 2);
-				moving_piece->set_y(y - 2);
-				(*copy_of_board)[x + 2][y - 2] = moving_piece;
-				copy_of_list.push_back(moving_piece);
-				(*copy_of_board)[x + 1][y - 1] = nullptr;
-				moving_piece = (*copy_of_board)[x + 2][y - 2];*/
 #ifdef _DEBUG
 				m_os << copy_of_board << std::endl;
 #endif
@@ -1567,7 +1639,7 @@ namespace checkers
 						break;
 					}
 					default:
-						throw std::exception("Evaluation error on piece " + p->get_sign());
+						throw std::exception("Evaluation error on piece " + p->get_owner()->get_sign());
 					}
 				}
 		}
@@ -1735,9 +1807,9 @@ namespace checkers
 				if (dead_board[x][y] == nullptr)
 				{
 					if (dynamic_cast<king*>(p))
-						dead_board[x][y] = new king(p->get_sign(), x, y, p->is_alive(), p->get_owner());
+						dead_board[x][y] = new king(x, y, p->is_alive(), p->get_owner());
 					else
-						dead_board[x][y] = new piece(p->get_sign(), x, y, p->is_alive(), p->get_owner());
+						dead_board[x][y] = new piece(x, y, p->is_alive(), p->get_owner());
 				}
 				else
 					throw std::runtime_error("Copying to delete list: wrong piece data: overwriting another piece");
@@ -2232,7 +2304,7 @@ namespace checkers
 						std::list<piece*>* copy_of_list = new std::list<piece*>;
 						std::list<piece*>* copy_of_dead = new std::list<piece*>;
 						copy_board(board, copy_of_board, player, opponent);
-						for_each(dead_list->begin(), dead_list->end(), [&copy_of_dead](piece* p) { copy_of_dead->push_back(new piece(p->get_sign(), p->get_x(), p->get_y(), false, p->get_owner())); });
+						for_each(dead_list->begin(), dead_list->end(), [&copy_of_dead](piece* p) { copy_of_dead->push_back(new piece(p->get_x(), p->get_y(), false, p->get_owner())); });
 
 						// make planned move
 						piece* moving_piece = (*copy_of_board)[x][y];
@@ -2291,7 +2363,7 @@ namespace checkers
 						std::list<piece*>* copy_of_list = new std::list<piece*>;
 						std::list<piece*>* copy_of_dead = new std::list<piece*>;
 						copy_board(board, copy_of_board, player, opponent);
-						for_each(dead_list->begin(), dead_list->end(), [&copy_of_dead](piece* p) { copy_of_dead->push_back(new piece(p->get_sign(), p->get_x(), p->get_y(), false, p->get_owner())); });
+						for_each(dead_list->begin(), dead_list->end(), [&copy_of_dead](piece* p) { copy_of_dead->push_back(new piece(p->get_x(), p->get_y(), false, p->get_owner())); });
 
 						// make planned move
 						piece* moving_piece = (*copy_of_board)[x][y];
@@ -2348,7 +2420,7 @@ namespace checkers
 						std::list<piece*>* copy_of_list = new std::list<piece*>;
 						std::list<piece*>* copy_of_dead = new std::list<piece*>;
 						copy_board(board, copy_of_board, player, opponent);
-						for_each(dead_list->begin(), dead_list->end(), [&copy_of_dead](piece* p) { copy_of_dead->push_back(new piece(p->get_sign(), p->get_x(), p->get_y(), false, p->get_owner())); });
+						for_each(dead_list->begin(), dead_list->end(), [&copy_of_dead](piece* p) { copy_of_dead->push_back(new piece(p->get_x(), p->get_y(), false, p->get_owner())); });
 
 						// make planned move
 						piece* moving_piece = (*copy_of_board)[x][y];
@@ -2404,7 +2476,7 @@ namespace checkers
 						std::list<piece*>* copy_of_list = new std::list<piece*>;
 						std::list<piece*>* copy_of_dead = new std::list<piece*>;
 						copy_board(board, copy_of_board, player, opponent);
-						for_each(dead_list->begin(), dead_list->end(), [&copy_of_dead](piece* p) { copy_of_dead->push_back(new piece(p->get_sign(), p->get_x(), p->get_y(), false, p->get_owner())); });
+						for_each(dead_list->begin(), dead_list->end(), [&copy_of_dead](piece* p) { copy_of_dead->push_back(new piece(p->get_x(), p->get_y(), false, p->get_owner())); });
 
 						// make planned move
 						piece* moving_piece = (*copy_of_board)[x][y];
@@ -2528,10 +2600,11 @@ namespace checkers
 		return av_capture;
 	}
 
-	void game::clear_list(std::list<piece*>* list) { for_each(list->begin(), list->end(), [this](piece* p) { p->get_av_list()->clear(); }); }
+	void game::clear_list(std::list<piece*>* list) { assert(list); for_each(list->begin(), list->end(), [this](piece* p) { assert(p); p->get_av_list()->clear(); }); }
 
 	void game::print_pieces(std::list<piece*>* list)
 	{
+		assert(list);
 		std::for_each(list->begin(), list->end(), [i = 1, this](piece* p) mutable
 			{
 				m_os << i++ << "; sign: " << p << "; x: " << p->get_x() << "; y: " << p->get_y();
@@ -2541,7 +2614,12 @@ namespace checkers
 			});
 	}
 
-	void game::delete_from_list(std::list<piece*>* list, piece* piece_to_delete) { list->remove(piece_to_delete); }
+	void game::delete_from_list(std::list<piece*>* list, piece* piece_to_delete)
+	{
+		assert(list);
+		//assert(piece_to_delete);
+		list->remove(piece_to_delete);
+	}
 
 	void game::clear_to_delete_list(std::list<piece*>* del_list, std::list<piece*>* src_list)
 	{
@@ -2612,7 +2690,7 @@ namespace checkers
 		os << "selected piece: ";
 		if (m_selected_piece)
 		{
-			os << "sign: " << m_selected_piece->get_sign() << "; x: " << m_selected_piece->get_x() << "; y: " << m_selected_piece->get_y() << "; list of available moves: " << m_selected_piece->get_av_list()->size();
+			os << "sign: " << m_selected_piece->get_owner()->get_sign() << "; x: " << m_selected_piece->get_x() << "; y: " << m_selected_piece->get_y() << "; list of available moves: " << m_selected_piece->get_av_list()->size();
 			os << "; is king: ";
 			dynamic_cast<king*>(m_selected_piece) ? os << "true" << std::endl : os << "false" << std::endl;
 		}
@@ -2624,7 +2702,7 @@ namespace checkers
 		os << "moving piece: ";
 		if (m_moving_piece)
 		{
-			os << "sign: " << m_moving_piece->get_sign() << "; x: " << m_moving_piece->get_x() << "; y: " << m_moving_piece->get_y() << "; list of available moves: " << m_moving_piece->get_av_list()->size();
+			os << "sign: " << m_moving_piece->get_owner()->get_sign() << "; x: " << m_moving_piece->get_x() << "; y: " << m_moving_piece->get_y() << "; list of available moves: " << m_moving_piece->get_av_list()->size();
 			os << "; is king: ";
 			dynamic_cast<king*>(m_moving_piece) ? os << "true" << std::endl : os << "false" << std::endl;
 		}
@@ -2642,7 +2720,7 @@ namespace checkers
 			os << "hovered piece: ";
 			if (hovered_piece)
 			{
-				os << "sign: " << hovered_piece->get_sign() << "; x: " << hovered_piece->get_x() << "; y: " << hovered_piece->get_y() << "; list of available moves: " << hovered_piece->get_av_list()->size();
+				os << "sign: " << hovered_piece->get_owner()->get_sign() << "; x: " << hovered_piece->get_x() << "; y: " << hovered_piece->get_y() << "; list of available moves: " << hovered_piece->get_av_list()->size();
 				os << "; is king: ";
 				dynamic_cast<king*>(hovered_piece) ? os << "true" << std::endl : os << "false" << std::endl;
 			}
@@ -2650,5 +2728,62 @@ namespace checkers
 				os << "nullptr" << std::endl;
 		}
 		os << "fps: " << m_fps << std::endl;
+	}
+
+	void game::debug_ptrs(void)
+	{
+		if (m_board)
+			m_os << "Board\t true" << std::endl;
+		else
+			m_os << "Board\t false" << std::endl;
+		
+		if (m_gui)
+			m_os << "Gui\t true" << std::endl;
+		else
+			m_os << "Gui\t false" << std::endl;
+
+		if (m_event_handler)
+			m_os << "Event handler\t true" << std::endl;
+		else
+			m_os << "Event handler\t false" << std::endl;
+
+		if (m_game_state)
+			m_os << "Game state\t true" << std::endl;
+		else
+			m_os << "Game state\t false" << std::endl;
+
+		if (m_player_1)
+			m_os << "Player 1\t true" << std::endl;
+		else
+			m_os << "Player 1\t false" << std::endl;
+
+		if (m_player_2)
+			m_os << "Player 2\t true" << std::endl;
+		else
+			m_os << "Player 2\t false" << std::endl;
+
+		if (m_selected_piece)
+			m_os << "Selected piece\t true" << std::endl;
+		else
+			m_os << "Selected piece\t false" << std::endl;
+
+		if (m_moving_piece)
+			m_os << "Moving piece\t true" << std::endl;
+		else
+			m_os << "Moving piece\t false" << std::endl;
+	}
+
+	void game::debug_setup(void)
+	{
+		populate_board(4);
+		int dummy = 0;
+		m_available_capture = evaluate(m_game_state->get_current_player()->get_list(), m_board, &dummy, dummy, m_last_capture_direction, &m_to_delete_list, nullptr);
+		m_os << "Game is evaluated" << std::endl;
+
+		m_os << "List of pieces of first player" << std::endl;
+		print_pieces(m_player_1->get_list());
+
+		m_os << "List of pieces of second player" << std::endl;
+		print_pieces(m_player_2->get_list());
 	}
 }
