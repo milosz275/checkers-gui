@@ -8,7 +8,6 @@ namespace checkers
 	{
 		if (m_fps < 1)
 			throw std::runtime_error("Fps cannot be less than 1");
-		std::cout << m_square_size << std::endl;
 		
 		m_window = new sfml::render_window(sfml::video_mode(m_square_size * s_size, m_square_size * s_size), "Checkers", sf::Style::Default, m_settings);
 		m_tiles = new std::vector<std::vector<sfml::rectangle_shape>>(s_size, std::vector<sfml::rectangle_shape>(s_size, sfml::rectangle_shape()));

@@ -3,9 +3,9 @@
 
 namespace checkers
 {
-	game_state::game_state() : m_game_freeze(false), m_any_changes(false), m_first_won(false), m_second_won(false), m_current_player(nullptr), m_next_player(nullptr), m_completed(false) {}
+	game_state::game_state(std::ostream& os) : m_game_freeze(false), m_any_changes(false), m_first_won(false), m_second_won(false), m_current_player(nullptr), m_next_player(nullptr), m_completed(false), m_os(os) {}
 
-	game_state::game_state(const game_state& source_game_state) : m_game_freeze(source_game_state.m_game_freeze), m_any_changes(source_game_state.m_any_changes), m_first_won(source_game_state.m_first_won), m_second_won(source_game_state.m_second_won), m_current_player(nullptr), m_next_player(nullptr), m_completed(source_game_state.m_completed) {}
+	game_state::game_state(const game_state& source_game_state) : m_game_freeze(source_game_state.m_game_freeze), m_any_changes(source_game_state.m_any_changes), m_first_won(source_game_state.m_first_won), m_second_won(source_game_state.m_second_won), m_current_player(nullptr), m_next_player(nullptr), m_completed(source_game_state.m_completed), m_os(source_game_state.m_os) {}
 
 	game_state::~game_state() {}
 
@@ -18,8 +18,9 @@ namespace checkers
 		//m_selected = false;
 		//m_selected_piece = nullptr;
 		//m_moving_piece = nullptr;
-
-		std::cout << "Switched turn" << std::endl;
+#ifdef _DEBUG
+		m_os << "Switched turn" << std::endl;
+#endif
 	}
 
 	base_player* game_state::set_current_player(base_player* player) { assert(m_current_player != player); return m_current_player = player; }
@@ -50,12 +51,16 @@ namespace checkers
 	{
 		if (m_completed)
 		{
-			std::cout << "Checking completion: game already completed!" << std::endl;
+#ifdef _DEBUG
+			m_os << "Checking completion: game already completed!" << std::endl;
+#endif
 			return true;
 		}
 		else if (m_first_won || m_second_won)
 		{
-			std::cout << "Checking completion: Flags already set. Setting completed" << std::endl;
+#ifdef _DEBUG
+			m_os << "Checking completion: Flags already set. Setting completed" << std::endl;
+#endif
 			m_completed = true;
 			return true;
 		}
@@ -66,9 +71,19 @@ namespace checkers
 	bool game_state::check_lists(void)
 	{
 		if (m_completed)
-			std::cout << "Game state: check lists: game is already completed" << std::endl;
+		{
+#ifdef _DEBUG
+			m_os << "Game state: check lists: game is already completed" << std::endl;
+#endif
+			return true;
+		}
 		if (m_first_won || m_second_won)
-			std::cout << "Game state: check lists: at least one flag is already set to win" << std::endl;
+		{
+#ifdef _DEBUG
+			m_os << "Game state: check lists: at least one flag is already set to win" << std::endl;
+#endif
+			return true;
+		}
 
 		// piece count
 		bool at_least_one_piece_1 = false;
@@ -90,7 +105,7 @@ namespace checkers
 		if (!at_least_one_piece_2)
 			m_first_won = true;
 		if (!at_least_one_piece_1 && !at_least_one_piece_2)
-			std::cout << "WARNING: Setting two winning flags at the same time" << std::endl;
+			m_os << "WARNING: Setting two winning flags at the same time" << std::endl;
 		if (!at_least_one_piece_1 || !at_least_one_piece_2)
 		{
 			m_completed = true;
@@ -110,7 +125,7 @@ namespace checkers
 		}
 		if (!at_least_one_move)
 		{
-			std::cout << "Checking completion: No more moves possible. Setting completed" << std::endl;
+			m_os << "Checking completion: No more moves possible. Setting completed" << std::endl;
 			if (m_current_player->is_first())
 				m_second_won = true;
 			else

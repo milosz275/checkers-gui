@@ -7,7 +7,7 @@
 
 namespace checkers
 {
-	game::game(int fps, std::istream& is, std::ostream& os) : m_event_handler(new event_handler(this)), m_game_state(new game_state()), m_console_game(false),
+	game::game(int fps, std::istream& is, std::ostream& os) : m_event_handler(new event_handler(this)), m_game_state(new game_state(os)), m_console_game(false),
 		m_is_finished(false), m_fps(fps),
 		m_selected(false), m_selected_piece(nullptr), m_moving_piece(nullptr), m_available_capture(false), m_last_capture_direction(-1), m_is(is), m_os(os),
 		m_log_file("log.txt", std::ios::app)
@@ -75,7 +75,7 @@ namespace checkers
 				m_player_2 = new player(player_sign_2, player_name_2, get_coords);
 		}
 		if (against_bot)
-			m_player_2 = new bot('B', bot_intelligence);
+			m_player_2 = new bot('B', bot_intelligence, m_os);
 
 		// set play order and evaluation direction
 		m_player_1->set_first(true);
@@ -128,6 +128,7 @@ namespace checkers
 			m_player_1 = new player(*dynamic_cast<player*>(game.m_player_1));
 		else
 			m_player_1 = new bot(*dynamic_cast<bot*>(game.m_player_1));
+		assert(m_player_1);
 
 		// copy player 2
 		assert(game.m_player_2);
@@ -135,6 +136,7 @@ namespace checkers
 			m_player_2 = new player(*dynamic_cast<player*>(game.m_player_2));
 		else
 			m_player_2 = new bot(*dynamic_cast<bot*>(game.m_player_2));
+		assert(m_player_2);
 
 		// recreate game state
 		assert(game.m_game_state);
@@ -393,13 +395,19 @@ namespace checkers
 		for (int i = 0; i < rows; ++i)
 			for (int j = 0; j < s_size; ++j)
 				if ((i + j) % 2 != 0)
+				{
 					add_new_piece(&m_p_list_2, m_board, m_player_2, j, i, true, m_gui);
+					s_pieces_initialized++;
+				}
 
 		// rows of the first player (lower)
 		for (int i = s_size - 1; i >= s_size - rows; --i)
 			for (int j = 0; j < s_size; ++j)
 				if ((i + j) % 2 != 0)
+				{
 					add_new_piece(&m_p_list_1, m_board, m_player_1, j, i, true, m_gui);
+					s_pieces_initialized++;
+				}
 
 		m_log << "Populated board: row count: " << rows << std::endl;
 	}
@@ -551,9 +559,15 @@ namespace checkers
 			if (p->is_alive())
 			{
 				if (dynamic_cast<king*>(p))
+				{
 					add_new_piece(p->get_owner()->get_list(), m_board, p->get_owner(), p->get_x(), p->get_y(), true, true, m_gui);
+					s_pieces_initialized++;
+				}
 				else
+				{
 					add_new_piece(p->get_owner()->get_list(), m_board, p->get_owner(), p->get_x(), p->get_y(), true, m_gui);
+					s_pieces_initialized++;
+				}
 			}
 			else
 			{
@@ -688,13 +702,16 @@ namespace checkers
 		{
 			game* previous = player_bot->get_game();
 			assert(this != previous);
-
+#ifdef _DEBUG
 			m_os << "Game: Setting new game copy for bot" << std::endl;
+#endif
 			player_bot->set_game(new game(*this));
 
 			if (previous)
 			{
-				this->get_os() << "Game: Deleting previous game copy for bot" << std::endl;
+#ifdef _DEBUG
+				m_os << "Game: Deleting previous game copy for bot" << std::endl;
+#endif
 				delete previous;
 			}
 		}
@@ -746,7 +763,9 @@ namespace checkers
 			os << "Player: \"" << m_player_1->get_name() << "\" won!" << std::endl;
 		else
 			os << "Player: \"" << m_player_2->get_name() << "\" won!" << std::endl;
-		os << "Player \"" << m_player_1->get_name() << "\"'s score: " << m_player_2->get_captured_pieces() << "; Player \"" << m_player_2->get_name() << "\"'s score: " << m_player_1->get_captured_pieces() << std::endl;
+
+		os << "Player \"" << m_player_1->get_name() << "\" captured " << m_player_2->get_captured_pieces() << " pieces" << std::endl;
+		os << "Player \"" << m_player_2->get_name() << "\" captured " << m_player_1->get_captured_pieces() << " pieces" << std::endl;
 	}
 
 	void game::select_piece(void)
@@ -950,7 +969,6 @@ namespace checkers
 #endif
 				// delete captured piece
 				piece* piece_to_delete = (*m_board)[x_d][y_d];
-				std::cout << "here?" << std::endl;
 				delete_piece(piece_to_delete, m_board, m_game_state->get_next_player());
 				m_game_state->get_next_player()->add_capture();
 
@@ -1228,7 +1246,7 @@ namespace checkers
 #else
 				// in release mode, evaluating an empty list is end-of-game 
 				get_game_state()->check_lists();
-				m_os << "Setting the end of the game flags: no possible moves for current player (evaluation)" << std::endl;
+				m_os << "Setting the end of the game flags: no possible moves for current player evaluated" << std::endl;
 #endif
 			}
 			else

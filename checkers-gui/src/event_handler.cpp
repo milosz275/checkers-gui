@@ -165,7 +165,7 @@ namespace checkers
 					std::pair<int, int> coords = m_game_pointer->get_click_coordinates();
 					int x = std::get<0>(coords);
 					int y = std::get<1>(coords);
-					std::cout << "x: " << x << "; y: " << y << std::endl;
+					os << "x: " << x << "; y: " << y << std::endl;
 					if (!(x < 0 || x > s_size - 1 || y < 0 || y > s_size - 1) && (x % 2 == 0 && y % 2 != 0 || x % 2 != 0 && y % 2 == 0) && (*m_game_pointer->get_board())[x][y] != nullptr)
 					{
 						piece* p = (*m_game_pointer->get_board())[x][y];

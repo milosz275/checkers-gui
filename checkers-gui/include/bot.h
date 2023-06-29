@@ -20,9 +20,11 @@ namespace checkers
 		int m_counter_move;
 		// x and y coordinates of save planned move after selection
 		std::pair<int, int> m_saved_move;
+		// reference to output stream
+		std::ostream& m_os = std::cout;
 	public:
 		// creates bot player with its corresponding sign and depth for simulation
-		bot(char sign, int depth);
+		bot(char sign, int depth, std::ostream& os);
 		// deletes the bot
 		~bot();
 		// returns the game, the bot is operating on

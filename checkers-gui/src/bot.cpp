@@ -2,7 +2,7 @@
 
 namespace checkers
 {
-	bot::bot(char sign, int depth) : base_player(sign, "Bot") { m_game = nullptr; assert(depth >= 1); m_depth = depth; m_counter_select = 0; m_counter_move = 0; m_saved_move = std::pair<int, int>(std::make_pair(-1, -1)); }
+	bot::bot(char sign, int depth, std::ostream& os) : base_player(sign, "Bot"), m_os(os) { m_game = nullptr; assert(depth >= 1); m_depth = depth; m_counter_select = 0; m_counter_move = 0; m_saved_move = std::pair<int, int>(std::make_pair(-1, -1)); }
 
 	bot::~bot() {}
 
@@ -15,17 +15,23 @@ namespace checkers
 		assert(m_game);
 		assert(m_game->get_game_state()->get_current_player()->is_first() == is_first());
 		assert(m_game->get_game_state()->get_game_freeze());
-		m_game->get_os() << "Getting coords from bot" << std::endl;
+#ifdef _DEBUG
+		m_os << "Getting coords from bot" << std::endl;
+#endif
 		if (!(m_game->get_selected_piece())) // bot has not selected any piece yet
 		{
-			m_game->get_os() << "Bot select" << std::endl;
+#ifdef _DEBUG
+			m_os << "Bot selects" << std::endl;
+#endif
 			// select loop detection
 			++m_counter_select;
 			m_counter_move = 0;
 			if (m_counter_select > 1)
 			{
-				m_game->get_os() << "Bot is stuck in a select loop" << std::endl;
+#ifdef _DEBUG
+				m_os << "Bot is stuck in a select loop" << std::endl;
 				system("pause");
+#endif
 				throw std::runtime_error("Bot is stuck in a select loop");
 			}
 			
@@ -56,18 +62,22 @@ namespace checkers
 		}
 		else // bot selected the piece and makes planned move
 		{
-			m_game->get_os() << "Bot move" << std::endl;
+#ifdef _DEBUG
+			m_os << "Bot moves" << std::endl;
+#endif
 			// move loop detection
 			++m_counter_move;
 			m_counter_select = 0;
 			if (m_counter_move > 1)
 			{
-				m_game->get_os() << "Bot is stuck in a move loop" << std::endl;
+#ifdef _DEBUG
+				m_os << "Bot is stuck in a move loop" << std::endl;
 				system("pause");
+#endif
 				throw std::runtime_error("Bot is stuck in a move loop");
 			}
 #ifdef _DEBUG
-			m_game->get_os() << "Bot is making planned move: x: " << std::get<0>(m_saved_move) << "; y: " << std::get<1>(m_saved_move) << std::endl;
+			m_os << "Bot is making planned move: x: " << std::get<0>(m_saved_move) << "; y: " << std::get<1>(m_saved_move) << std::endl;
 #endif
 			bool there_is_that_move = false;
 			for_each(get_list()->begin(), get_list()->end(), [this, &there_is_that_move](piece* p)
@@ -100,16 +110,17 @@ namespace checkers
 			
 			std::pair<int, int> selected_coords = std::get<1>(chosen_move);
 			std::pair<int, int> saved_coords = std::get<2>(chosen_move);
-
-			m_game->get_os() << "Bot: Find best move: randomly choosing from \'" << best_moves.size() << "\' games of equal score" << std::endl;
-			m_game->get_os() << "-Best found move from: x: " << selected_coords.first << "; y: " << selected_coords.second << std::endl;
-			m_game->get_os() << "-Saved to move to: x: " << saved_coords.first << "; y: " << saved_coords.second << std::endl;
+#ifdef _DEBUG
+			m_os << "Bot: Find best move: randomly choosing from \'" << best_moves.size() << "\' games of equal score" << std::endl;
+			m_os << "-Best found move from: x: " << selected_coords.first << "; y: " << selected_coords.second << std::endl;
+			m_os << "-Saved to move to: x: " << saved_coords.first << "; y: " << saved_coords.second << std::endl;
+#endif
 			return std::make_pair(selected_coords, saved_coords);
 		}
 		else
 		{
 #ifdef _DEBUG
-			m_game->get_os() << "Bot: Find best move: Returned list of games was empty. Choosing -1" << std::endl;
+			m_os << "Bot: Find best move: Returned list of games was empty. Choosing -1" << std::endl;
 #endif
 			return std::make_pair(std::make_pair(-1, -1), std::make_pair(-1, -1));
 		}
@@ -117,17 +128,23 @@ namespace checkers
 
 	std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> bot::find_best_games(game* game_copy, int depth, int alpha, int beta, bool maximizing_player)
 	{
-		m_game->get_os() << "Current depth: " << depth << std::endl;
+#ifdef _DEBUG
+		m_os << "Current depth: " << depth << std::endl;
+#endif
 		if (depth == 0 || game_copy->get_game_state()->check_completion())
 		{
-			m_game->get_os() << "Bot: Find best games: algorithm hit boundary condition: depth or complete game" << std::endl;
+#ifdef _DEBUG
+			m_os << "Bot: Find best games: algorithm hit boundary condition: depth or complete game" << std::endl;
+#endif
 			std::vector<std::tuple<game*, std::pair<int, int>, std::pair<int, int>>> result;
 			result.emplace_back(game_copy, std::make_pair(-1, -1), std::make_pair(-1, -1));
 			return result;
 		}
 		else if (depth < m_depth)
 		{
-			m_game->get_os() << "Bot: Find best games: switching turn" << std::endl;
+#ifdef _DEBUG
+			m_os << "Bot: Find best games: switching turn" << std::endl;
+#endif
 			game_copy->get_game_state()->switch_turn();
 			// TODO: move to game state
 			game_copy->set_selected(false);
@@ -171,13 +188,13 @@ namespace checkers
 						});
 				});
 		}
-		
+#ifdef _DEBUG
 		// print scores after each simulation
 		for_each(list_of_games.begin(), list_of_games.end(), [i = 0, this](std::tuple<game*, std::pair<int, int>, std::pair<int, int>>& game_and_coords) mutable
 			{
-				m_game->get_os() << "simulation score (no recursion): " << ++i << ": " << std::get<0>(game_and_coords)->get_score() << std::endl;
+				m_os << "simulation score (no recursion): " << ++i << ": " << std::get<0>(game_and_coords)->get_score() << std::endl;
 			});
-
+#endif
 		// recursively go through all games again
 		for_each(list_of_games.begin(), list_of_games.end(), [this, &depth, &maximizing_player](std::tuple<game*, std::pair<int, int>, std::pair<int, int>>& game_and_coords) mutable
 			{
@@ -260,7 +277,7 @@ namespace checkers
 		// print scores after each simulation
 		for_each(list_of_games.begin(), list_of_games.end(), [i = 0, this](std::tuple<game*, std::pair<int, int>, std::pair<int, int>>& game_and_coords) mutable
 			{
-				m_game->get_os() << "simulation score (after recursion): " << ++i << ": " << std::get<0>(game_and_coords)->get_score() << std::endl;
+				m_os << "simulation score (after recursion): " << ++i << ": " << std::get<0>(game_and_coords)->get_score() << std::endl;
 			});
 #endif
 		// find max score of all simulations
@@ -288,7 +305,7 @@ namespace checkers
 				}
 			}
 		}
-		else // minimazing
+		else // minimizing
 		{
 			int min_score = s_max_score;
 			for (std::tuple<game*, std::pair<int, int>, std::pair<int, int>>& game_and_coords : list_of_games)

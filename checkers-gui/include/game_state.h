@@ -21,9 +21,11 @@ namespace checkers
 		base_player* m_current_player;
 		// pointer to player making move
 		base_player* m_next_player;
+		// reference to the output stream
+		std::ostream& m_os;
 	public:
 		// create the game state
-		game_state();
+		game_state(std::ostream& os);
 		// copies the game state
 		game_state(const game_state& source_game_state);
 		// deletes the game state
