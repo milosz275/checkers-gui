@@ -16,7 +16,7 @@ namespace checkers
         m_gui = gui;
         if (m_gui)
         {
-            m_shape = new sfml::circle_shape(m_gui->get_radius());
+            m_shape = new sfml::circle_shape((float)m_gui->get_radius());
             setup_shape();
         }
     }
@@ -24,7 +24,7 @@ namespace checkers
     piece::piece(const piece& piece) : m_x(piece.m_x), m_y(piece.m_y), m_is_alive(piece.m_is_alive), m_owner(nullptr), m_av_list(new std::list<available_move*>)
     {
         if (m_gui)
-            m_shape = new sfml::circle_shape(m_gui->get_radius());
+            m_shape = new sfml::circle_shape((float)m_gui->get_radius());
     }
 
     piece::~piece() {}

@@ -9,7 +9,7 @@ namespace checkers
 		if (m_fps < 1)
 			throw std::runtime_error("Fps cannot be less than 1");
 		
-		m_window = new sfml::render_window(sfml::video_mode(m_square_size * s_size, m_square_size * s_size), "Checkers", sf::Style::Default, m_settings);
+		m_window = new sfml::render_window(sfml::video_mode((int)(m_square_size * s_size), (int)(m_square_size * s_size)), "Checkers", sf::Style::Default, m_settings);
 		m_tiles = new std::vector<std::vector<sfml::rectangle_shape>>(s_size, std::vector<sfml::rectangle_shape>(s_size, sfml::rectangle_shape()));
 
 		// SFML setup, using original methods in camelCase style instead of snake_case
@@ -22,8 +22,8 @@ namespace checkers
 			{
 				for_each(row.begin(), row.end(), [&i, j = 0, this](sfml::rectangle_shape& tile) mutable
 					{
-						tile.setSize(sfml::vector_2f(m_square_size, m_square_size));
-						tile.setPosition(sfml::vector_2f(m_square_size * i, m_square_size * j));
+						tile.setSize(sfml::vector_2f((float)m_square_size, (float)m_square_size));
+						tile.setPosition(sfml::vector_2f((float)(m_square_size * i), (float)(m_square_size * j)));
 						if ((i + j) % 2 == 0)
 							tile.setFillColor(sfml::color(193, 173, 158, 255));
 						else
@@ -56,7 +56,7 @@ namespace checkers
 		// sleep according to fps
 		sfml::time elapsed_time = m_clock.restart();
 		if (elapsed_time.asSeconds() < m_frame_duration)
-			sf::sleep(sf::seconds(m_frame_duration - elapsed_time.asSeconds()));
+			sf::sleep(sf::seconds((float)(m_frame_duration - elapsed_time.asSeconds())));
 
 		m_window->display();
 	}
@@ -75,18 +75,18 @@ namespace checkers
 	void gui::highlight_selected(int x, int y)
 	{
 		sfml::rectangle_shape selected_tile;
-		selected_tile.setSize(sfml::vector_2f(m_square_size, m_square_size));
+		selected_tile.setSize(sfml::vector_2f((float)m_square_size, (float)m_square_size));
 		selected_tile.setFillColor(sfml::color(173, 134, 106, 255));
-		selected_tile.setPosition(sfml::vector_2f(m_square_size * x, m_square_size * y));
+		selected_tile.setPosition(sfml::vector_2f((float)(m_square_size * x), (float)(m_square_size * y)));
 		m_window->draw(selected_tile);
 	}
 
 	void gui::highlight_available(int x, int y)
 	{
 		sfml::rectangle_shape available_tile;
-		available_tile.setSize(sfml::vector_2f(m_square_size, m_square_size));
+		available_tile.setSize(sfml::vector_2f((float)m_square_size, (float)m_square_size));
 		available_tile.setFillColor(sfml::color(103, 194, 106, 255));
-		available_tile.setPosition(sfml::vector_2f(m_square_size * x, m_square_size * y));
+		available_tile.setPosition(sfml::vector_2f((float)(m_square_size * x), (float)(m_square_size * y)));
 		m_window->draw(available_tile);
 	}
 
@@ -96,9 +96,9 @@ namespace checkers
 
 	sfml::clock& gui::get_clock(void) { return m_clock; }
 
-	float gui::get_square_size(void) { return m_square_size; }
+	double gui::get_square_size(void) { return m_square_size; }
 	
-	float gui::get_radius(void) { return m_radius; }
+	double gui::get_radius(void) { return m_radius; }
 
 	std::pair<int, int> gui::get_click_coordinates(void)
 	{
@@ -110,7 +110,7 @@ namespace checkers
 	void gui::draw_piece(sfml::circle_shape& shape, int x, int y)
 	{
 		// update location
-		shape.setPosition(sfml::vector_2f(x * m_square_size + (m_square_size - m_radius * 2) / 2, y * m_square_size + (m_square_size - 2 * m_radius) / 2));
+		shape.setPosition(sfml::vector_2f((float)(x * m_square_size + (m_square_size - m_radius * 2) / 2), (float)(y * m_square_size + (m_square_size - 2 * m_radius) / 2)));
 		// draw on the board
 		m_window->draw(shape);
 	}

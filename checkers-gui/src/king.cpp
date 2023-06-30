@@ -13,7 +13,7 @@ namespace checkers
         if (m_gui)
         {
             m_shape->setOutlineColor(sfml::color(232, 27, 16, 255));
-            m_shape->setOutlineThickness(m_gui->get_radius() / 12.5);
+            m_shape->setOutlineThickness((float)(m_gui->get_radius() / 12.5));
         }
     }
 }

@@ -15,7 +15,7 @@ namespace checkers
 		// target frames per second
 		int m_fps;
 		// fraction of second that is time of one frame
-		float m_frame_duration = 1.0f / m_fps;
+		double m_frame_duration = 1.0f / m_fps;
 		// SFML object drawing checkerboard
 		std::vector<std::vector<sfml::rectangle_shape>>* m_tiles = nullptr;
 		// SFML clock
@@ -27,9 +27,9 @@ namespace checkers
 		// SFML event
 		sfml::event m_event;
 		// square/tile size
-		const float m_square_size;
+		const double m_square_size;
 		// radius of one piece
-		const float m_radius;
+		const double m_radius;
 	protected:
 		// executes drawing
 		void draw(void);
@@ -47,9 +47,9 @@ namespace checkers
 		// returns clock
 		sfml::clock& get_clock(void);
 		// returns size of field
-		float get_square_size(void);
+		double get_square_size(void);
 		// returns radius of piece
-		float get_radius(void);
+		double get_radius(void);
 		// returns coordinates of performed click
 		std::pair<int, int> get_click_coordinates(void);
 		// draws the board

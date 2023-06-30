@@ -29,7 +29,7 @@ namespace checkers
 
 	bool base_player::set_combo(bool combo) { return m_combo = combo; }
 
-	int base_player::get_pieces(void) { return m_piece_list->size(); }
+	int base_player::get_pieces(void) { return (int)m_piece_list->size(); }
 
 	int base_player::get_captured_pieces(void) { return m_captured_pieces; }
 
@@ -37,6 +37,7 @@ namespace checkers
 	{
 		int count = 0;
 		for_each(m_piece_list->begin(), m_piece_list->end(), [&count](piece* p) { if (dynamic_cast<king*>(p)) ++count; });
+		return count;
 	}
 
 	int base_player::set_captured_pieces(int pieces)
