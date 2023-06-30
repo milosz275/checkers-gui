@@ -1,5 +1,2 @@
 # International draughts
-It's a SFML checkers game that let's you play against another player and Ai in the future. The game is following all international draughts rules. Ai will use MiniMax algorithm with alpha-beta prunning.
-
----
-For this moment project is in alpha, contains bugs and not all features.
+Functional C++ checkers game utilizing SFML library. Player vs Player or Player vs Bot gameplay. Bot using MiniMax algorithm with alpha-beta prunning under development.
