@@ -45,7 +45,7 @@
   <Class Name="checkers::game">
     <Position X="17.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AVQwAAJmAAsICAiCAICAmAAU0CGPAUAoEhYCAkAAAgI=</HashCode>
+      <HashCode>AVQwAgJmIEsICAiCAoSAmAkU0COPCUAoEhYCAkAAAwI=</HashCode>
       <FileName>include\game.h</FileName>
     </TypeIdentifier>
   </Class>
@@ -56,13 +56,6 @@
       <FileName>include\bot.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="checkers::evaluator">
-    <Position X="19.5" Y="0.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAggAAAAAAAAACAAAAAAAAAAIIAEAAIAAAAAAAAAA=</HashCode>
-      <FileName>include\evaluator.h</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="checkers::event_handler">
     <Position X="15" Y="0.5" Width="1.5" />
     <TypeIdentifier>
@@ -71,16 +64,16 @@
     </TypeIdentifier>
   </Class>
   <Class Name="checkers::game_state">
-    <Position X="19.5" Y="3.5" Width="1.5" />
+    <Position X="19.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>BADCIUAUIMEAAAiTIgQEEQoIgAAIGAAAEFEABAIAARA=</HashCode>
+      <HashCode>BADCAUAQAIEAAAgTIAAEAQIIgAAIEAAAEEEABAIAAAA=</HashCode>
       <FileName>include\game_state.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="checkers::gui">
     <Position X="15" Y="3" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>CIAAAABBAAgIBpAACAAACAXAAAABAAAAAAAQACAAAAA=</HashCode>
+      <HashCode>CIAgAABBAAgIBpAACAIACATAAAABAAAAAAAQACAAAAA=</HashCode>
       <FileName>include\gui.h</FileName>
     </TypeIdentifier>
   </Class>
