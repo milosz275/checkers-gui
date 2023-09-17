@@ -29005,3 +29005,496 @@ Results:
 Player: "Player name 1" won!
 Player "Player name 1" captured 20 pieces
 Player "Bot" captured 6 pieces
+Log file: Checkers game (10x10)
+Sun Sep 17 18:23:06 2023
+Populated board: row count: 4
+Moved piece: origin: x:3; y: 6; destination: x: 2; y: 5
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:2; y: 3; destination: x: 3; y: 4
+Moved piece: origin: x:2; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:4; y: 3; destination: x: 5; y: 4
+Moved piece: origin: x:4; y: 3; destination: x: 3; y: 4
+Moved piece: origin: x:6; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:6; y: 3; destination: x: 5; y: 4
+Moved piece: origin: x:8; y: 3; destination: x: 9; y: 4
+Moved piece: origin: x:8; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:2; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:2; y: 5; destination: x: 3; y: 4
+Moved piece: origin: x:4; y: 3; destination: x: 2; y: 5
+Deleted piece: x: 3; y: 4
+Deleted piece: x: 3; y: 4
+Moved piece: origin: x:4; y: 3; destination: x: 2; y: 5
+Moved piece: origin: x:1; y: 6; destination: x: 3; y: 4
+Deleted piece: x: 2; y: 5
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:1; y: 6; destination: x: 3; y: 4
+Moved piece: origin: x:1; y: 2; destination: x: 2; y: 3
+Moved piece: origin: x:1; y: 4; destination: x: 2; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 0; y: 5
+Moved piece: origin: x:3; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 2; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:6; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:6; y: 3; destination: x: 5; y: 4
+Moved piece: origin: x:8; y: 3; destination: x: 9; y: 4
+Moved piece: origin: x:8; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:1; y: 4; destination: x: 0; y: 5
+Moved piece: origin: x:3; y: 4; destination: x: 2; y: 3
+Moved piece: origin: x:1; y: 2; destination: x: 3; y: 4
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 1; y: 4
+Deleted piece: x: 2; y: 3
+Deleted piece: x: 2; y: 3
+Moved piece: origin: x:1; y: 2; destination: x: 3; y: 4
+Moved piece: origin: x:5; y: 6; destination: x: 4; y: 5
+Moved piece: origin: x:3; y: 4; destination: x: 5; y: 6
+Deleted piece: x: 4; y: 5
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 4; destination: x: 5; y: 6
+Moved piece: origin: x:4; y: 7; destination: x: 6; y: 5
+Deleted piece: x: 5; y: 6
+Deleted piece: x: 5; y: 6
+Moved piece: origin: x:6; y: 7; destination: x: 4; y: 5
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:0; y: 5; destination: x: 1; y: 6
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:3; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:3; y: 2; destination: x: 2; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:6; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:6; y: 3; destination: x: 5; y: 4
+Moved piece: origin: x:8; y: 3; destination: x: 9; y: 4
+Moved piece: origin: x:8; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:3; y: 2; destination: x: 2; y: 3
+Moved piece: origin: x:4; y: 7; destination: x: 3; y: 6
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:0; y: 5; destination: x: 1; y: 6
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:2; y: 3; destination: x: 3; y: 4
+Moved piece: origin: x:2; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:6; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:6; y: 3; destination: x: 5; y: 4
+Moved piece: origin: x:8; y: 3; destination: x: 9; y: 4
+Moved piece: origin: x:8; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:6; y: 3; destination: x: 5; y: 4
+Moved piece: origin: x:4; y: 5; destination: x: 6; y: 3
+Deleted piece: x: 5; y: 4
+Deleted piece: x: 5; y: 4
+Moved piece: origin: x:4; y: 5; destination: x: 6; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 7; y: 4
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 5; y: 4
+Deleted piece: x: 6; y: 3
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 5; y: 4
+Results:
+Game wasn't finished
+Player "Player_1" captured 3 pieces
+Player "Bot" captured 4 pieces
+Log file: Checkers game (10x10)
+Sun Sep 17 18:23:33 2023
+Moved piece: origin: x:7; y: 6; destination: x: 6; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 6
+Deleted piece: x: 6; y: 5
+Deleted piece: x: 6; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 7; y: 6
+Deleted piece: x: 7; y: 6
+Moved piece: origin: x:8; y: 7; destination: x: 6; y: 5
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:0; y: 5; destination: x: 1; y: 6
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:2; y: 3; destination: x: 3; y: 4
+Moved piece: origin: x:2; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:6; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:8; y: 3; destination: x: 9; y: 4
+Moved piece: origin: x:8; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:8; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:6; y: 5; destination: x: 8; y: 3
+Deleted piece: x: 7; y: 4
+Deleted piece: x: 7; y: 4
+Moved piece: origin: x:6; y: 5; destination: x: 8; y: 3
+Moved piece: origin: x:9; y: 2; destination: x: 7; y: 4
+Deleted piece: x: 8; y: 3
+Deleted piece: x: 8; y: 3
+Moved piece: origin: x:9; y: 2; destination: x: 7; y: 4
+Moved piece: origin: x:9; y: 6; destination: x: 8; y: 5
+Moved piece: origin: x:7; y: 4; destination: x: 9; y: 6
+Deleted piece: x: 8; y: 5
+Deleted piece: x: 8; y: 5
+Moved piece: origin: x:7; y: 4; destination: x: 9; y: 6
+Moved piece: origin: x:9; y: 8; destination: x: 8; y: 7
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:0; y: 5; destination: x: 1; y: 6
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:2; y: 3; destination: x: 3; y: 4
+Moved piece: origin: x:2; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:6; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 9; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:6; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:7; y: 8; destination: x: 6; y: 7
+Moved piece: origin: x:9; y: 6; destination: x: 7; y: 8
+Deleted piece: x: 8; y: 7
+Moved piece: origin: x:7; y: 8; destination: x: 5; y: 6
+Deleted piece: x: 6; y: 7
+Deleted piece: x: 8; y: 7
+Moved piece: origin: x:9; y: 6; destination: x: 7; y: 8
+Moved piece: origin: x:7; y: 8; destination: x: 5; y: 6
+Deleted piece: x: 6; y: 7
+Deleted piece: x: 6; y: 7
+Moved piece: origin: x:7; y: 8; destination: x: 5; y: 6
+Moved piece: origin: x:3; y: 6; destination: x: 4; y: 5
+Moved piece: origin: x:5; y: 6; destination: x: 3; y: 4
+Deleted piece: x: 4; y: 5
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 6; destination: x: 3; y: 4
+Moved piece: origin: x:2; y: 7; destination: x: 3; y: 6
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:0; y: 5; destination: x: 1; y: 6
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:2; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:3; y: 4; destination: x: 4; y: 5
+Moved piece: origin: x:3; y: 4; destination: x: 2; y: 5
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 0; destination: x: 6; y: 1
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:7; y: 0; destination: x: 6; y: 1
+Moved piece: origin: x:7; y: 2; destination: x: 8; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:8; y: 1; destination: x: 9; y: 2
+Moved piece: origin: x:7; y: 2; destination: x: 8; y: 3
+Moved piece: origin: x:3; y: 6; destination: x: 2; y: 5
+Moved piece: origin: x:3; y: 4; destination: x: 1; y: 6
+Deleted piece: x: 2; y: 5
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:3; y: 4; destination: x: 1; y: 6
+Moved piece: origin: x:0; y: 7; destination: x: 2; y: 5
+Deleted piece: x: 1; y: 6
+Deleted piece: x: 1; y: 6
+Moved piece: origin: x:0; y: 7; destination: x: 2; y: 5
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:0; y: 5; destination: x: 1; y: 6
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:2; y: 3; destination: x: 3; y: 4
+Moved piece: origin: x:2; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 0; destination: x: 6; y: 1
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:7; y: 0; destination: x: 6; y: 1
+Moved piece: origin: x:8; y: 1; destination: x: 9; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:8; y: 3; destination: x: 9; y: 4
+Moved piece: origin: x:8; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:8; y: 3; destination: x: 9; y: 4
+Moved piece: origin: x:3; y: 8; destination: x: 2; y: 7
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:0; y: 5; destination: x: 1; y: 6
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:2; y: 3; destination: x: 3; y: 4
+Moved piece: origin: x:2; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 0; destination: x: 6; y: 1
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:7; y: 0; destination: x: 6; y: 1
+Moved piece: origin: x:8; y: 1; destination: x: 9; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:9; y: 4; destination: x: 8; y: 5
+Moved piece: origin: x:7; y: 0; destination: x: 6; y: 1
+Moved piece: origin: x:2; y: 7; destination: x: 1; y: 6
+Moved piece: origin: x:0; y: 5; destination: x: 2; y: 7
+Deleted piece: x: 1; y: 6
+Deleted piece: x: 1; y: 6
+Moved piece: origin: x:0; y: 5; destination: x: 2; y: 7
+Moved piece: origin: x:1; y: 8; destination: x: 3; y: 6
+Deleted piece: x: 2; y: 7
+Deleted piece: x: 2; y: 7
+Moved piece: origin: x:1; y: 8; destination: x: 3; y: 6
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:2; y: 3; destination: x: 3; y: 4
+Moved piece: origin: x:2; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:6; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 9; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:9; y: 4; destination: x: 8; y: 5
+Moved piece: origin: x:2; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:3; y: 6; destination: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 6
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 6
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Deleted piece: x: 4; y: 5
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 4
+Moved piece: origin: x:5; y: 8; destination: x: 4; y: 7
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:5; y: 4; destination: x: 6; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 4; y: 5
+Moved piece: origin: x:6; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 9; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:9; y: 4; destination: x: 8; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 4; y: 5
+Moved piece: origin: x:4; y: 7; destination: x: 3; y: 6
+Moved piece: origin: x:4; y: 5; destination: x: 2; y: 7
+Deleted piece: x: 3; y: 6
+Deleted piece: x: 3; y: 6
+Moved piece: origin: x:4; y: 5; destination: x: 2; y: 7
+Moved piece: origin: x:2; y: 9; destination: x: 3; y: 8
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:2; y: 7; destination: x: 1; y: 8
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:6; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 9; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:9; y: 4; destination: x: 8; y: 5
+Moved piece: origin: x:9; y: 4; destination: x: 8; y: 5
+Deleted piece: x: 2; y: 7
+Moved piece: origin: x:3; y: 8; destination: x: 1; y: 6
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:6; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 9; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:8; y: 5; destination: x: 9; y: 6
+Moved piece: origin: x:8; y: 5; destination: x: 7; y: 6
+Moved piece: origin: x:8; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:0; y: 9; destination: x: 1; y: 8
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 8; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:8; y: 5; destination: x: 9; y: 6
+Moved piece: origin: x:8; y: 5; destination: x: 7; y: 6
+Moved piece: origin: x:9; y: 0; destination: x: 8; y: 1
+Moved piece: origin: x:8; y: 5; destination: x: 9; y: 6
+Moved piece: origin: x:1; y: 8; destination: x: 2; y: 7
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 8; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:9; y: 0; destination: x: 8; y: 1
+Moved piece: origin: x:9; y: 6; destination: x: 8; y: 7
+Moved piece: origin: x:9; y: 0; destination: x: 8; y: 1
+Moved piece: origin: x:8; y: 9; destination: x: 7; y: 8
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 8; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:8; y: 1; destination: x: 9; y: 2
+Moved piece: origin: x:9; y: 6; destination: x: 8; y: 7
+Moved piece: origin: x:9; y: 6; destination: x: 8; y: 7
+Moved piece: origin: x:7; y: 8; destination: x: 9; y: 6
+Deleted piece: x: 8; y: 7
+Deleted piece: x: 8; y: 7
+Moved piece: origin: x:7; y: 8; destination: x: 9; y: 6
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:5; y: 2; destination: x: 4; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 8; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:8; y: 1; destination: x: 9; y: 2
+Moved piece: origin: x:5; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:9; y: 6; destination: x: 8; y: 5
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 5; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:6; y: 1; destination: x: 5; y: 2
+Moved piece: origin: x:6; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:6; y: 3; destination: x: 5; y: 4
+Moved piece: origin: x:7; y: 2; destination: x: 8; y: 3
+Moved piece: origin: x:8; y: 1; destination: x: 9; y: 2
+Moved piece: origin: x:6; y: 3; destination: x: 7; y: 4
+Deleted piece: x: 7; y: 4
+Moved piece: origin: x:8; y: 5; destination: x: 6; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 5; y: 4
+Deleted piece: x: 6; y: 3
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 5; y: 4
+Moved piece: origin: x:2; y: 7; destination: x: 3; y: 6
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 5; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 4; destination: x: 6; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 4; y: 5
+Moved piece: origin: x:6; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:6; y: 1; destination: x: 5; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 9; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:6; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:3; y: 6; destination: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 3; y: 6
+Deleted piece: x: 4; y: 5
+Deleted piece: x: 4; y: 5
+Moved piece: origin: x:5; y: 4; destination: x: 3; y: 6
+Moved piece: origin: x:1; y: 6; destination: x: 2; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 1; y: 4
+Deleted piece: x: 2; y: 5
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:3; y: 6; destination: x: 1; y: 4
+Moved piece: origin: x:4; y: 9; destination: x: 3; y: 8
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:1; y: 4; destination: x: 2; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 0; y: 5
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 5; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 0; destination: x: 6; y: 1
+Moved piece: origin: x:7; y: 2; destination: x: 8; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:8; y: 1; destination: x: 9; y: 2
+Moved piece: origin: x:7; y: 2; destination: x: 6; y: 3
+Moved piece: origin: x:3; y: 8; destination: x: 2; y: 7
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:1; y: 4; destination: x: 2; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 0; y: 5
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 5; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 0; destination: x: 6; y: 1
+Moved piece: origin: x:6; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:6; y: 3; destination: x: 5; y: 4
+Moved piece: origin: x:8; y: 1; destination: x: 9; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:8; y: 1; destination: x: 7; y: 2
+Moved piece: origin: x:2; y: 7; destination: x: 3; y: 6
+Moved piece: origin: x:0; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:1; y: 4; destination: x: 2; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 0; y: 5
+Moved piece: origin: x:2; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 5; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 0; destination: x: 6; y: 1
+Moved piece: origin: x:6; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:6; y: 3; destination: x: 5; y: 4
+Moved piece: origin: x:7; y: 2; destination: x: 8; y: 3
+Moved piece: origin: x:2; y: 1; destination: x: 1; y: 2
+Moved piece: origin: x:3; y: 6; destination: x: 2; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 6
+Deleted piece: x: 2; y: 5
+Deleted piece: x: 2; y: 5
+Moved piece: origin: x:1; y: 4; destination: x: 3; y: 6
+Moved piece: origin: x:6; y: 9; destination: x: 5; y: 8
+Moved piece: origin: x:0; y: 3; destination: x: 1; y: 4
+Moved piece: origin: x:1; y: 0; destination: x: 2; y: 1
+Moved piece: origin: x:1; y: 2; destination: x: 2; y: 3
+Moved piece: origin: x:3; y: 0; destination: x: 2; y: 1
+Moved piece: origin: x:3; y: 6; destination: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 2; y: 7
+Moved piece: origin: x:4; y: 1; destination: x: 5; y: 2
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 0; destination: x: 6; y: 1
+Moved piece: origin: x:6; y: 3; destination: x: 7; y: 4
+Moved piece: origin: x:6; y: 3; destination: x: 5; y: 4
+Moved piece: origin: x:7; y: 2; destination: x: 8; y: 3
+Moved piece: origin: x:4; y: 1; destination: x: 3; y: 2
+Moved piece: origin: x:5; y: 8; destination: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 8
+Deleted piece: x: 4; y: 7
+Deleted piece: x: 4; y: 7
+Moved piece: origin: x:3; y: 6; destination: x: 5; y: 8
+Results:
+Player: "Bot" won!
+Player "Player_1" captured 10 pieces
+Player "Bot" captured 20 pieces

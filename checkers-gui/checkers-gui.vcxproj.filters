@@ -30,9 +30,6 @@
     <ClInclude Include="include\dependencies.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\evaluator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\event_handler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -96,9 +93,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\game_state.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\evaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
