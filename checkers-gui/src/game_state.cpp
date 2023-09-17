@@ -14,10 +14,7 @@ namespace checkers
 		base_player* tmp = m_current_player;
 		m_current_player = m_next_player;
 		m_next_player = tmp;
-		
-		//m_selected = false;
-		//m_selected_piece = nullptr;
-		//m_moving_piece = nullptr;
+
 #ifdef _DEBUG
 		m_os << "Switched turn" << std::endl;
 #endif

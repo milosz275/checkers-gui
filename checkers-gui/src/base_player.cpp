@@ -63,8 +63,6 @@ namespace checkers
 		// cannot change dead pieces
 		assert(target->is_alive());
 
-		// add asertion if this is not the current player and if has no captures
-
 		// check if any new kings are made
 		bool is_king = false;
 		if (is_first())

@@ -54,8 +54,8 @@ namespace checkers
 
 		// setup user interface
 		m_gui = new gui(fps);
-		std::string player_name_1 = "Player name 1";
-		std::string player_name_2 = "Player name 2";
+		std::string player_name_1 = "Player_1";
+		std::string player_name_2 = "Player_2";
 		char player_sign_1 = 'W';
 		char player_sign_2 = 'B';
 

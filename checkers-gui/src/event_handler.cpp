@@ -22,7 +22,6 @@ namespace checkers
 				window.close();
 #ifdef _DEBUG
 				os << "Closing the game" << std::endl;
-				//save_pieces_to_file();
 #endif
 				break;
 			}
@@ -38,13 +37,7 @@ namespace checkers
 			}
 #endif
 			if ((m_game_pointer->get_player_1()->get_pieces() == 0 || m_game_pointer->get_player_2()->get_pieces() == 0) && (m_game_pointer->get_player_1()->get_captured_pieces() > 0 || m_game_pointer->get_player_2()->get_captured_pieces() > 0))
-			{
-				/*if (event.type == sfml::event::KeyPressed || event.type == sfml::event::MouseButtonPressed)
-				{
-					os << "Game was finished. Click Escape!" << std::endl;
-				}*/
 				break;
-			}
 			else if (m_game_pointer->get_game_state()->get_game_freeze())
 			{
 				if (event.type == sfml::event::KeyPressed || event.type == sfml::event::MouseButtonPressed)
@@ -230,15 +223,6 @@ namespace checkers
 				}
 			}
 #endif
-			/*if (m_game_pointer->get_game_state()->check_completion())
-			{
-				os << "Game is finished. Click Escape to display the results" << std::endl;
-				m_game_pointer->set_selected(false);
-				m_game_pointer->set_selected_piece(nullptr);
-				m_game_pointer->get_game_state()->set_game_freeze(true);
-				m_game_pointer->get_gui()->draw_board(*m_game_pointer->get_player_1()->get_list(), *m_game_pointer->get_player_2()->get_list(), *m_game_pointer->get_to_delete_list(), m_game_pointer->get_selected_piece());
-				break;
-			}*/
 		}
 	}
 }
