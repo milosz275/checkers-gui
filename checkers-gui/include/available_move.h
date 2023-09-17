@@ -12,7 +12,6 @@ namespace checkers
 		int m_x;
 		// y coordinate of available move
 		int m_y;
-
 	public:
 		// creates available move
 		available_move(int x, int y);

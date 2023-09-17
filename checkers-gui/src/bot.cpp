@@ -18,7 +18,7 @@ namespace checkers
 #ifdef _DEBUG
 		m_os << "Getting coords from bot" << std::endl;
 #endif
-		if (!(m_game->get_game_state()->get_selected_piece())) // bot has not selected any piece yet
+		if (!(m_game->get_selected_piece())) // bot has not selected any piece yet
 		{
 #ifdef _DEBUG
 			m_os << "Bot selects" << std::endl;
@@ -147,11 +147,11 @@ namespace checkers
 #endif
 			game_copy->get_game_state()->switch_turn();
 			// TODO: move to game state
-			game_copy->get_game_state()->set_selected(false);
-			game_copy->get_game_state()->set_selected_piece(nullptr);
-			game_copy->get_game_state()->set_moving_piece(nullptr);
+			game_copy->set_selected(false);
+			game_copy->set_selected_piece(nullptr);
+			game_copy->set_moving_piece(nullptr);
 
-			game_copy->get_evaluator()->clear_list(&game_copy->get_list_1());
+			game_copy->clear_list(&game_copy->get_list_1());
 			game_copy->clear_list(&game_copy->get_list_2());
 			int dummy = 0;
 			game_copy->set_available_capture(game_copy->evaluate(game_copy->get_game_state()->get_current_player()->get_list(), game_copy->get_board(), &dummy, dummy, game_copy->get_last_capture_direction(), game_copy->get_to_delete_list(), nullptr));

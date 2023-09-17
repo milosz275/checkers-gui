@@ -14,6 +14,8 @@ namespace checkers
 	{
 		// target frames per second
 		int m_fps;
+		// fraction of second that is time of one frame
+		double m_frame_duration = 1.0f / m_fps;
 		// SFML object drawing checkerboard
 		std::vector<std::vector<sfml::rectangle_shape>>* m_tiles = nullptr;
 		// SFML clock
@@ -28,15 +30,13 @@ namespace checkers
 		const double m_square_size;
 		// radius of one piece
 		const double m_radius;
-
 	protected:
 		// executes drawing
-		void draw_tiles(void);
+		void draw(void);
 		// highlights selected field of given coordinates
 		void highlight_selected(int x, int y);
 		// highlights available field of given coordinates
 		void highlight_available(int x, int y);
-
 	public:
 		// creates graphical user interface refreshing with given fps
 		gui(int fps);

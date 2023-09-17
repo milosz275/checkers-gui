@@ -37,7 +37,7 @@ namespace checkers
 	void gui::draw_board(std::list<piece*>& list_1, std::list<piece*>& list_2, std::list<piece*>& dead_list, piece* selected_piece)
 	{
 		m_window->clear();
-		draw_tiles();
+		draw();
 
 		// highlight selected piece and its corresponding moves, when moves exist
 		if (selected_piece != nullptr)
@@ -53,10 +53,15 @@ namespace checkers
 		// print dead pieces in multicapture
 		for_each(dead_list.begin(), dead_list.end(), [this](piece* p) { p->draw(); });
 
+		// sleep according to fps
+		sfml::time elapsed_time = m_clock.restart();
+		if (elapsed_time.asSeconds() < m_frame_duration)
+			sf::sleep(sf::seconds((float)(m_frame_duration - elapsed_time.asSeconds())));
+
 		m_window->display();
 	}
 
-	void gui::draw_tiles(void)
+	void gui::draw(void)
 	{
 		for_each(m_tiles->begin(), m_tiles->end(), [this](auto row)
 			{

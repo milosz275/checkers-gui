@@ -17,23 +17,12 @@ namespace checkers
 		bool m_second_won;
 		// flag indicating if the game is completed
 		bool m_completed;
-		// flag indicating if the game is played in console
-		bool m_console_game = false;
-		// flag indicating if anything selected
-		bool m_selected;
-		// pointer to selected piece on the board
-		piece* m_selected_piece;
-		// pointer to piece moving in the last move
-		piece* m_moving_piece;
-		// flag indicating if there is one or more captures, not allowing other moves
-		bool m_available_capture;
 		// pointer to player making move
 		base_player* m_current_player;
 		// pointer to player making move
 		base_player* m_next_player;
 		// reference to the output stream
 		std::ostream& m_os;
-
 	public:
 		// create the game state
 		game_state(std::ostream& os);
@@ -75,24 +64,6 @@ namespace checkers
 		void reset_completion(void);
 		// resets game freeze and sets flag indicating changes to true
 		void reset_state(void);
-		// returns if the game is played in console
-		bool is_console_game(void);
-		// returns flag if anything was selected
-		bool get_selected(void);
-		// sets and returns flag if anything was selected
-		bool set_selected(bool flag);
-		// returns piece selected to move
-		piece* get_selected_piece(void);
-		// sets and returns piece selected to move
-		piece* set_selected_piece(piece* p);
-		// returns moving piece
-		piece* get_moving_piece(void);
-		// sets and returns moving piece
-		piece* set_moving_piece(piece* p);
-		// returns currently evaluated possibility for at least one possible capture
-		bool get_available_capture(void);
-		// sets and returns evaluation for the game
-		bool set_available_capture(bool flag);
 	};
 }
 

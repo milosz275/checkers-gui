@@ -22,7 +22,6 @@ namespace checkers
 		std::pair<int, int> m_saved_move;
 		// reference to output stream
 		std::ostream& m_os = std::cout;
-
 	public:
 		// creates bot player with its corresponding sign and depth for simulation
 		bot(char sign, int depth, std::ostream& os);

@@ -19,6 +19,5 @@
 #include "gui.h"
 #include "event_handler.h"
 #include "game_state.h"
-#include "evaluator.h"
 
 #endif
