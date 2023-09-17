@@ -24,10 +24,34 @@
     <ClInclude Include="include\base_player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\board.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\bot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\dependencies.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\evaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\event_handler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\game.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\game_state.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\global_variables.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\king.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\piece.h">
@@ -36,28 +60,7 @@
     <ClInclude Include="include\player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\king.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\dependencies.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\gui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\global_variables.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\sfml.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\event_handler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\game_state.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\evaluator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -101,5 +104,13 @@
     <ClCompile Include="src\evaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\board.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

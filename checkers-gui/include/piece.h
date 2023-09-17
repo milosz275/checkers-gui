@@ -28,6 +28,7 @@ namespace checkers
 		bool m_is_alive;
 		// pointer to gui where the piece should be shown
 		gui* m_gui = nullptr;
+
 	public:
 		// creates the piece with given coordinates
 		piece(int x, int y, bool is_alive, base_player* owner);
@@ -55,14 +56,15 @@ namespace checkers
 		base_player* set_owner(base_player* owner);
 		// returns the shape of the piece
 		sfml::circle_shape& get_shape(void);
-		// lets to print the piece in given stream
-		friend std::ostream& operator<<(std::ostream& os, const piece* piece);
 		// returns the list of all evaluated moves
 		std::list<available_move*>* get_av_list(void);
 		// returns gui of the piece
 		gui* get_gui(void);
 		// draws the piece to the window
 		void draw(void);
+
+		// lets to print the piece in given stream
+		friend std::ostream& operator<<(std::ostream& os, const piece* piece);
 	};
 
 	std::ostream& operator<<(std::ostream& os, const piece* piece);

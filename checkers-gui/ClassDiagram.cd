@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="checkers::available_capture">
+    <Position X="12.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAgAAAAAAAASQAAAAAAAAIAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\available_capture.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="checkers::piece">
+    <Position X="4.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAQAQAAAAAAgKAEAAAQABgGAAgAEACAiCAJAA=</HashCode>
+      <FileName>include\piece.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="checkers::available_move">
+    <Position X="12.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQABAIAAAAAAAAAAAIgA=</HashCode>
+      <FileName>include\available_move.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="checkers::king">
+    <Position X="4.75" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAAAAAAABAAAACAAAAAAA=</HashCode>
+      <FileName>include\king.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="checkers::base_player">
+    <Position X="7.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EQAoAACEAABAAAQAAAAAAAAAAQEAQAASoBKiCZAAAAA=</HashCode>
+      <FileName>include\base_player.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="checkers::board" Collapsed="true">
+    <Position X="17.25" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAIAAAAAAAAAA=</HashCode>
+      <FileName>include\board.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="checkers::game">
+    <Position X="17.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AVQwAAJmAAsICAiCAICAmAAU0CGPAUAoEhYCAkAAAgI=</HashCode>
+      <FileName>include\game.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="checkers::bot">
+    <Position X="10" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAIEAAAAAAAAAAAIAAAQkEAAAAIQgAEAAAGAAAAAAA=</HashCode>
+      <FileName>include\bot.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="checkers::evaluator">
+    <Position X="19.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAggAAAAAAAAACAAAAAAAAAAIIAEAAIAAAAAAAAAA=</HashCode>
+      <FileName>include\evaluator.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="checkers::event_handler">
+    <Position X="15" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAAAAAAAIAAAAAAAEBAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>include\event_handler.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="checkers::game_state">
+    <Position X="19.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BADCIUAUIMEAAAiTIgQEEQoIgAAIGAAAEFEABAIAARA=</HashCode>
+      <FileName>include\game_state.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="checkers::gui">
+    <Position X="15" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CIAAAABBAAgIBpAACAAACAXAAAABAAAAAAAQACAAAAA=</HashCode>
+      <FileName>include\gui.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="checkers::player">
+    <Position X="10" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEQAAAAAAAAAAAAAAABAAACAAAAAAA=</HashCode>
+      <FileName>include\player.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

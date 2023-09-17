@@ -22,6 +22,7 @@
     <ClInclude Include="include\available_capture.h" />
     <ClInclude Include="include\available_move.h" />
     <ClInclude Include="include\base_player.h" />
+    <ClInclude Include="include\board.h" />
     <ClInclude Include="include\bot.h" />
     <ClInclude Include="include\dependencies.h" />
     <ClInclude Include="include\evaluator.h" />
@@ -39,6 +40,7 @@
     <ClCompile Include="src\available_capture.cpp" />
     <ClCompile Include="src\available_move.cpp" />
     <ClCompile Include="src\base_player.cpp" />
+    <ClCompile Include="src\board.cpp" />
     <ClCompile Include="src\bot.cpp" />
     <ClCompile Include="src\evaluator.cpp" />
     <ClCompile Include="src\event_handler.cpp" />
@@ -49,6 +51,9 @@
     <ClCompile Include="src\piece.cpp" />
     <ClCompile Include="src\player.cpp" />
     <ClCompile Include="src\gui.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

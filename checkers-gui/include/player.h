@@ -11,6 +11,7 @@ namespace checkers
 	{
 		// pointer to game get_coordinates function
 		std::function<std::pair<int, int>()> m_get_coordinates_from_game;
+
 	public:
 		// creates the player of given sign and name
 		player(char sign, std::string name, std::function<std::pair<int, int>()> get_coords);

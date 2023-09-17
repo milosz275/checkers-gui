@@ -4,12 +4,11 @@
 
 namespace checkers
 {
-	base_player::base_player(char sign, std::string name) : m_sign(std::toupper(sign, std::locale())), m_name(name), m_captured_pieces(0), m_combo(false), m_piece_list(nullptr), m_is_first(false)
-	{
-		assert(std::isalpha(sign, std::locale()));
-	}
+	base_player::base_player(char sign, std::string name)
+		: m_sign(std::toupper(sign, std::locale())), m_name(name), m_captured_pieces(0), m_combo(false), m_piece_list(nullptr), m_is_first(false) { assert(std::isalpha(sign, std::locale())); }
 
-	base_player::base_player(const base_player& player) : m_sign(player.m_sign), m_name(player.m_name), m_captured_pieces(player.m_combo), m_combo(player.m_combo), m_piece_list(nullptr), m_is_first(player.m_is_first) {}
+	base_player::base_player(const base_player& player)
+		: m_sign(player.m_sign), m_name(player.m_name), m_captured_pieces(player.m_combo), m_combo(player.m_combo), m_piece_list(nullptr), m_is_first(player.m_is_first) {}
 
 	base_player::~base_player() {}
 
@@ -95,8 +94,8 @@ namespace checkers
 
 	std::ostream& operator<<(std::ostream& os, const base_player* player)
 	{
-		os << "name: " << player->m_name << "; sign: " << player->m_sign << "; alive pieces: " << player->m_piece_list->size() << "(" << player->m_piece_list->size() << ")" << "; dead pieces: " << player->m_captured_pieces;
-		os << "; combo: ";
+		os << "name: " << player->m_name << "; sign: " << player->m_sign << "; alive pieces: " << player->m_piece_list->size() << "(" << player->m_piece_list->size() << ")";
+		os << "; dead pieces: " << player->m_captured_pieces << "; combo: ";
 		player->m_combo ? os << "true" : os << "false";
 		os << "; is first player: ";
 		player->m_is_first ? os << "true" << std::endl : os << "false" << std::endl;

@@ -12,6 +12,7 @@ namespace checkers
 	{
 		// pointer to the game
 		game* m_game_pointer;
+
 	public:
 		// creates event handler for given game pointer
 		event_handler(game* game_pointer);

@@ -12,7 +12,6 @@ namespace checkers
 {
 	class piece;
 	class king;
-
 	class base_player
 	{
 		// sign distinguishing the player from others
@@ -27,6 +26,7 @@ namespace checkers
 		bool m_is_first;
 		// pointer to player's list of pieces
 		std::list<piece*>* m_piece_list;
+
 	public:
 		// creates the player of a given sign and name
 		base_player(char sign, std::string name);

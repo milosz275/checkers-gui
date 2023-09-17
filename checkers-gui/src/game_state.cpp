@@ -3,9 +3,14 @@
 
 namespace checkers
 {
-	game_state::game_state(std::ostream& os) : m_game_freeze(false), m_any_changes(false), m_first_won(false), m_second_won(false), m_current_player(nullptr), m_next_player(nullptr), m_completed(false), m_os(os) {}
+	game_state::game_state(std::ostream& os) : m_game_freeze(false), m_any_changes(false), m_first_won(false), m_second_won(false), m_current_player(nullptr), m_next_player(nullptr), m_completed(false), m_os(os),
+		m_selected(false), m_selected_piece(nullptr), m_moving_piece(nullptr), m_available_capture(false) {}
 
-	game_state::game_state(const game_state& source_game_state) : m_game_freeze(source_game_state.m_game_freeze), m_any_changes(source_game_state.m_any_changes), m_first_won(source_game_state.m_first_won), m_second_won(source_game_state.m_second_won), m_current_player(nullptr), m_next_player(nullptr), m_completed(source_game_state.m_completed), m_os(source_game_state.m_os) {}
+	game_state::game_state(const game_state& source_game_state) : m_game_freeze(source_game_state.m_game_freeze), m_any_changes(source_game_state.m_any_changes), m_first_won(source_game_state.m_first_won), m_second_won(source_game_state.m_second_won),
+		m_current_player(nullptr), m_next_player(nullptr), m_completed(source_game_state.m_completed), m_os(source_game_state.m_os)
+	{
+		
+	}
 
 	game_state::~game_state() {}
 
@@ -139,4 +144,22 @@ namespace checkers
 	void game_state::reset_completion(void) { m_first_won = false; m_second_won = false; m_completed = false; }
 	
 	void game_state::reset_state(void) { m_game_freeze = false; m_any_changes = true; }
+
+	bool game_state::is_console_game(void) { return m_console_game; }
+
+	bool game_state::get_selected(void) { return m_selected; }
+
+	bool game_state::set_selected(bool flag) { return m_selected = flag; }
+
+	piece* game_state::get_selected_piece(void) { return m_selected_piece; }
+
+	piece* game_state::set_selected_piece(piece* p) { return m_selected_piece = p; }
+
+	piece* game_state::get_moving_piece(void) { return m_moving_piece; }
+
+	piece* game_state::set_moving_piece(piece* p) { return m_moving_piece = p; }
+
+	bool game_state::get_available_capture(void) { return m_available_capture; }
+
+	bool game_state::set_available_capture(bool flag) { return m_available_capture = flag; }
 }

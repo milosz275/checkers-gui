@@ -11,18 +11,17 @@ namespace checkers
 
 	void event_handler::handle_events(void)
 	{
-		std::ostream& os = m_game_pointer->get_os();
-		std::ostream& log = m_game_pointer->get_log();
 		sfml::window& window = m_game_pointer->get_gui()->get_window();
 		sfml::event& event = m_game_pointer->get_gui()->get_event();
 		while (window.pollEvent(event) || (bool)dynamic_cast<bot*>(m_game_pointer->get_game_state()->get_current_player()))
 		{
+			std::ostream& os = m_game_pointer->get_os();
+			std::ostream& log = m_game_pointer->get_log();
 			if (event.type == sfml::event::Closed || event.type == sfml::event::KeyPressed && event.key.code == sf::Keyboard::Escape)
 			{
 				window.close();
 #ifdef _DEBUG
 				os << "Closing the game" << std::endl;
-				//save_pieces_to_file();
 #endif
 				break;
 			}
@@ -204,13 +203,6 @@ namespace checkers
 				{
 					log << "Manually switching game turn" << std::endl;
 					m_game_pointer->get_game_state()->switch_turn();
-					break;
-				}
-				else if (event.key.code == sf::Keyboard::R)
-				{
-					// refresh the board
-					os << "Refreshing the board." << std::endl;
-					m_game_pointer->get_game_state()->set_any_changes(true);
 					break;
 				}
 				else if (event.key.code == sf::Keyboard::X)

@@ -17,33 +17,29 @@ namespace checkers
 		event_handler* m_event_handler;
 		// state of the game
 		game_state* m_game_state;
-		// flag indicating if the game is played in console
-		bool m_console_game;
+		//
+		evaluator* m_evaluator;
 		// player 1
 		base_player* m_player_1;
 		// player 2
 		base_player* m_player_2;
-
+		//
+		bool m_is_1_bot = false;
+		//
+		bool m_is_2_bot = false;
 		// piece list of player 1
 		std::list<piece*> m_p_list_1;
 		// piece list of player 2
 		std::list<piece*> m_p_list_2;
 		// list of pieces to delete after multicapture (combo), indicates multicapture
 		std::list<piece*> m_to_delete_list;
-		// flag indicating finished game
-		bool m_is_finished;
-		// flag indicating if anything selected
-		bool m_selected;
-		// pointer to selected piece on the board
-		piece* m_selected_piece;
-		// pointer to piece moving in the last move
-		piece* m_moving_piece;
-		// flag indicating if there is one or more captures, not allowing other moves
-		bool m_available_capture;
+		
 		// integer representing last capture direction
 		int m_last_capture_direction;
 		// frames per second in the game
 		const int m_fps;
+		// fraction of second that is time of one frame
+		double m_frame_duration = 1.0f / m_fps;
 		// default input stream
 		std::istream& m_is = std::cin;
 		// default output stream
@@ -73,7 +69,6 @@ namespace checkers
 		// copy pieces from one board to another
 		void copy_board(std::vector<std::vector<piece*>>* source_board, std::vector<std::vector<piece*>>* copy_of_board, base_player* owner_1, base_player* owner_2);
 
-
 		// automatic piece handling:
 
 		// is runned by event handler, selects piece using input call methods
@@ -83,7 +78,6 @@ namespace checkers
 		// deletes given piece from given list
 		void delete_from_list(std::list<piece*>* list, piece* piece_to_delete);
 
-
 		// handle desirable input:
 
 		// gets move coordinates from the current player
@@ -92,14 +86,6 @@ namespace checkers
 		std::pair<int, int> get_click_coordinates(void);
 		// gets coordinates from game's input stream
 		std::pair<int, int> get_coordinates_from_stream(void);
-		
-		
-		// protected section of evaluation:
-		
-		// evaluate possible moves of one piece
-		bool evaluate_piece(piece* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive);
-		// evaluate possible moves of one king
-		bool evaluate_piece(king* p, std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive, int last_capture_direction, std::list<piece*>* dead_list);
 
 	public:
 		// create the game of given size and target frames per second
@@ -115,14 +101,18 @@ namespace checkers
 		event_handler* get_event_handler(void);
 		// returns game state
 		game_state* get_game_state(void);
+		//
+		evaluator* get_evaluator(void);
 		// executes the game
 		void loop(void);
 		// returns current game score (white pieces - black pieces)
 		int get_score(void);
+
 		// returns integer representing direction of last capture
 		int get_last_capture_direction(void);
 		// sets and returns integer representing direction of last capture
 		int set_last_capture_direction(int direction);
+
 		// returns first player (lower)
 		base_player* get_player_1(void);
 		// returs second player (upper)
@@ -135,22 +125,7 @@ namespace checkers
 		std::list<piece*>& get_list_1(void);
 		// returns piece list of player 2
 		std::list<piece*>& get_list_2(void);
-		// returns flag if anything was selected
-		bool get_selected(void);
-		// sets and returns flag if anything was selected
-		bool set_selected(bool flag);
-		// returns piece selected to move
-		piece* get_selected_piece(void);
-		// sets and returns piece selected to move
-		piece* set_selected_piece(piece* p);
-		// returns moving piece
-		piece* get_moving_piece(void);
-		// sets and returns moving piece
-		piece* set_moving_piece(piece* p);
-		// returns currently evaluated possibility for at least one possible capture
-		bool get_available_capture(void);
-		// sets and returns evaluation for the game
-		bool set_available_capture(bool flag);
+
 		// returns list of pieces of the current player
 		std::list<piece*>* get_pieces(void);
 		// returns main game board
@@ -164,20 +139,15 @@ namespace checkers
 		// returns reference to opened log file
 		std::ofstream& get_log_file(void);
 
-
 		// public game management:
 
 		// runs a partial method of moving one specific piece
 		void move_piece(piece* piece_to_move, std::vector<std::vector<piece*>>* board, int x, int y);
 		// makes a singular capture using move_piece and delete_piece methods
 		void make_capture(std::vector<std::vector<piece*>>* board, piece* moving_piece, piece* delete_piece, int new_x, int new_y, std::list<piece*>* dead_list);
-		// evaluate all possible moves of the given player, returns true if there is at least on possible capture
-		bool evaluate(std::list<piece*>* list, std::vector<std::vector<piece*>>* board, int* counter, int recursive, int last_capture_direction, std::list<piece*>* dead_list, piece* moving_piece);
-		// clears available moves list for every piece in pieces list (gets through lists in list)
-		void clear_list(std::list<piece*>* list);
+		
 		// clears list of dead pieces printed in multicapture
 		void clear_to_delete_list(std::list<piece*>* del_list, std::list<piece*>* src_list);
-
 
 		// debug section:
 
