@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/path/to/your/executable",
+      "args": [],
+      //"stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      //"environment": [],
+      //"externalConsole": false
+    },
+    {
+      "name": "Release",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/path/to/your/executable",
+      "args": [],
+      //"stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      //"environment": [],
+      //"externalConsole": false
+    }
+  ]
+}
