@@ -41,7 +41,7 @@ bld/
 *.app
 *.i*86
 *.x86_64
-checkers-gui
+main
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
