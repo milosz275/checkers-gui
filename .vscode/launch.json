@@ -7,10 +7,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/path/to/your/executable",
       "args": [],
-      //"stopAtEntry": false,
       "cwd": "${workspaceFolder}",
-      //"environment": [],
-      //"externalConsole": false
     },
     {
       "name": "Release",
@@ -18,10 +15,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/path/to/your/executable",
       "args": [],
-      //"stopAtEntry": false,
       "cwd": "${workspaceFolder}",
-      //"environment": [],
-      //"externalConsole": false
     }
   ]
 }
