@@ -29498,3 +29498,18 @@ Results:
 Player: "Bot" won!
 Player "Player_1" captured 10 pieces
 Player "Bot" captured 20 pieces
+Log file: Checkers game (10x10)
+Mon Apr 15 10:12:51 2024
+Populated board: row count: 4
+Moved piece: origin: x:5; y: 6; destination: x: 4; y: 5
+Moved piece: origin: x:6; y: 3; destination: x: 5; y: 4
+Moved piece: origin: x:4; y: 5; destination: x: 6; y: 3
+Deleted piece: x: 5; y: 4
+Deleted piece: x: 5; y: 4
+Moved piece: origin: x:4; y: 5; destination: x: 6; y: 3
+Deleted piece: x: 6; y: 3
+Moved piece: origin: x:7; y: 2; destination: x: 5; y: 4
+Results:
+Game wasn't finished
+Player "Player_1" captured 1 pieces
+Player "Player_2" captured 1 pieces
