@@ -17,6 +17,7 @@
 mono_crash.*
 
 # Build results
+build/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
@@ -32,6 +33,15 @@ bld/
 [Oo]ut/
 [Ll]og/
 [Ll]ogs/
+*.o
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+checkers-gui
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
