@@ -16,6 +16,10 @@
 # Mono auto generated files
 mono_crash.*
 
+# Game elements
+log.txt
+pieces.txt
+
 # Build results
 build/
 [Dd]ebug/
