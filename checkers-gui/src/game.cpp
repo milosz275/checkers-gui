@@ -22,7 +22,7 @@ namespace checkers
 			std::time_t current_time;
 			std::time(&current_time);
 			char buffer[26];
-			ctime_s(buffer, sizeof(buffer), &current_time);
+			ctime_r(&current_time, buffer);
 			m_log << buffer;
 		}
 		else
@@ -1654,7 +1654,7 @@ namespace checkers
 						break;
 					}
 					default:
-						throw std::exception("Evaluation error on piece " + p->get_owner()->get_sign());
+						throw std::runtime_error(std::string("Evaluation error on piece ") + p->get_owner()->get_sign());
 					}
 				}
 		}
