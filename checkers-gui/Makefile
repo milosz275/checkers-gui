@@ -18,7 +18,7 @@ OBJS = $(SRCS:.cpp=.o)
 OBJS := $(addprefix build/, $(OBJS))
 
 # Executable name
-MAIN = checkers-gui
+MAIN = main
 
 .PHONY: depend clean
 
