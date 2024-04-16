@@ -33,14 +33,21 @@ namespace checkers
 		}
 
 		// choose how to play
-		bool against_bot = true;
+		int menu_choice = 0;
+		bool against_bot = false;
 		int bot_intelligence = 1;
 
-		m_os << "Do you want to play against another player (0) or versus bot (1)?" << std::endl << "Enter: ";
-		m_is >> against_bot;
-		while (against_bot)
+		m_os << "Do you want to exit (0), play against another player (1) or versus bot (2)?" << std::endl << "Enter: ";
+		m_is >> menu_choice;
+		if (menu_choice == 0)
+		{
+			m_is_finished = true;
+			return;
+		}
+		while (menu_choice == 2)
 		{
 			m_os << "Chosen player vs bot" << std::endl;
+			against_bot = true;
 			break;
 			/*m_os << "How many moves ahead should bot consider?" << std::endl << "Enter: ";
 			m_is >> bot_intelligence;
@@ -49,7 +56,7 @@ namespace checkers
 			else
 				break;*/
 		}
-		if (!against_bot)
+		if (menu_choice == 1)
 			m_os << "Chosen player vs player" << std::endl;
 
 		// setup user interface
@@ -281,7 +288,6 @@ namespace checkers
 #endif
 	}
 
-
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board)
 	{
 		os << "\t  ";
@@ -337,6 +343,8 @@ namespace checkers
 		m_os << "Deleted game" << std::endl;
 #endif
 	}
+
+	bool game::get_is_finished(void) { return m_is_finished; }
 
 	gui* game::get_gui(void) { return m_gui; }
 	
