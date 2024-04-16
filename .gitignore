@@ -17,8 +17,8 @@
 mono_crash.*
 
 # Game elements
-log.txt
-pieces.txt
+checkers-gui/log.txt
+checkers-gui/pieces.txt
 
 # Build results
 build/
