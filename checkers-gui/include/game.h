@@ -117,6 +117,8 @@ namespace checkers
 		game_state* get_game_state(void);
 		// executes the game
 		void loop(void);
+		// returns flag indicating if the game is finished
+		bool get_is_finished(void);
 		// returns current game score (white pieces - black pieces)
 		int get_score(void);
 		// returns integer representing direction of last capture
