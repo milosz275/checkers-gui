@@ -13,8 +13,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install libfl-dev libsfml-dev -y
+      shell: bash
     - name: configure
       run: |
         cd checkers-gui
         make
+      shell: bash
+    - name: Run tests
+      run: |
+        cd checkers-gui
+        ./checkers-gui
       shell: bash
