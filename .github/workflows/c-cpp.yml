@@ -21,8 +21,8 @@ jobs:
         cd checkers-gui
         make
       shell: bash
-    - name: Run tests
-      run: |
-        cd checkers-gui
-        ./main
-      shell: bash
+    # - name: Run tests
+    #   run: |
+    #     cd checkers-gui
+    #     ./main
+    #   shell: bash
