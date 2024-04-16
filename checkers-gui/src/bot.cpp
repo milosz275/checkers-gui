@@ -2,7 +2,8 @@
 
 namespace checkers
 {
-	bot::bot(char sign, int depth, std::ostream& os) : base_player(sign, "Bot"), m_os(os) { m_game = nullptr; assert(depth >= 1); m_depth = depth; m_counter_select = 0; m_counter_move = 0; m_saved_move = std::pair<int, int>(std::make_pair(-1, -1)); }
+	bot::bot(char sign, int depth, std::ostream& os)
+		: base_player(sign, "Bot"), m_os(os) { m_game = nullptr; assert(depth >= 1); m_depth = depth; m_counter_select = 0; m_counter_move = 0; m_saved_move = std::pair<int, int>(std::make_pair(-1, -1)); }
 
 	bot::~bot() {}
 
