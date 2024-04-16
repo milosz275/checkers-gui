@@ -8,7 +8,9 @@ int main(int argc, char* argv[])
 	try
 	{
 		checkers::game* checkers = new checkers::game();
-		checkers->loop();
+		if (!checkers->get_is_finished())
+			std::cout << "Starting game loop" << std::endl;
+			checkers->loop();
 		delete checkers;
 	}
 	catch (std::exception& e)
