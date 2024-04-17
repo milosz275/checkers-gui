@@ -9,7 +9,7 @@ The project is structured as follows:
 - dependencies/: Contains the SFML library used in the game.
 
 ## Building the Project
-To build the project, you can start it in Visual Studio or you can use the provided Makefile in the checkers-gui/ directory:
+To build the project, you can start it in Visual Studio by cloning the project and opening the .sln file, or you can use the provided Makefile in the checkers-gui/ directory:
 
 ```bash
 cd checkers-gui/
