@@ -1086,7 +1086,7 @@ namespace checkers
 #ifdef _DEBUG
 				m_os << "main game loop: second evaluation counter: " << counter << std::endl;
 #endif
-				m_game_state->check_completion();
+				m_game_state->check_completion(); // TODO: CHECK GAME STATE FOR NO POSSIBLE MOVES
 			}
 			else // continue the combo
 			{
