@@ -1,4 +1,7 @@
 # Checkers GUI
+
+[![CodeQL](https://github.com/mldxo/checkers-gui/actions/workflows/codeql.yml/badge.svg)](https://github.com/mldxo/checkers-gui/actions/workflows/codeql.yml)
+
 This is a functional C++ checkers game that utilizes the SFML library. The game supports Player vs Player and Player vs Bot gameplay. The bot uses the MiniMax algorithm with alpha-beta pruning to determine the best move.
 
 ## Project structure
