@@ -1,6 +1,8 @@
 # Checkers GUI
 
+[![C/C++ CI](https://github.com/mldxo/checkers-gui/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/mldxo/checkers-gui/actions/workflows/c-cpp.yml)
 [![CodeQL](https://github.com/mldxo/checkers-gui/actions/workflows/codeql.yml/badge.svg)](https://github.com/mldxo/checkers-gui/actions/workflows/codeql.yml)
+[![Doxygen Pages](https://github.com/mldxo/checkers-gui/actions/workflows/doxygen-pages.yml/badge.svg)](https://github.com/mldxo/checkers-gui/actions/workflows/doxygen-pages.yml)
 
 This is a functional C++ checkers game that utilizes the SFML library. The game supports Player vs Player and Player vs Bot gameplay. The bot uses the MiniMax algorithm with alpha-beta pruning to determine the best move.
 
