@@ -8,6 +8,29 @@
 namespace checkers
 {
 	class game;
+
+	/**
+	 * @brief Class representing bot player in checkers game
+	 * 
+	 * This class is derived from base_player and adds information about considered steps ahead and game, the bot is operating on
+	 * 
+	 * @see bot::bot
+	 * 		- constructor
+	 * @see bot::~bot
+	 * 		- destructor
+	 * @see bot::get_game
+	 * 		- returns the game, the bot is operating on
+	 * @see bot::set_game
+	 * 		- sets and returns the game, the bot is operating on
+	 * @see bot::get_coordinates
+	 * 		- calculates coordinates of piece to move and coordinates where to go after selecting 
+	 * @see bot::find_best_move
+	 * 		- returns coordinates of best possible move for all combinations of game_copy within given conditions
+	 * @see bot::find_best_games
+	 * 		- returns vector of games and corresponding moves with the highest score, uses find_best_move recursively to move pieces to the given depth
+	 * @see bot::add_to_game_copy_list
+	 * 		- recursively runs through the given game_copy and adds game after one turn to the given list (goes through all possible captures till no more possible, or goes through all possible moves)
+	 */
 	class bot : public base_player
 	{
 		// considered steps ahead

@@ -35,7 +35,6 @@ namespace checkers
 		// choose how to play
 		int menu_choice = 0;
 		bool against_bot = false;
-		int bot_intelligence = 1;
 
 		m_os << "Do you want to exit (0), play against another player (1) or versus bot (2)?" << std::endl << "Enter: ";
 		m_is >> menu_choice;
@@ -50,8 +49,8 @@ namespace checkers
 			against_bot = true;
 			break;
 			/*m_os << "How many moves ahead should bot consider?" << std::endl << "Enter: ";
-			m_is >> bot_intelligence;
-			if (bot_intelligence <= 0 || bot_intelligence >= 10)
+			m_is >> bot_search_depth;
+			if (bot_search_depth <= 0 || bot_search_depth >= 10)
 				m_os << "Bot's intelligence greater than 0 and smaller than 10" << std::endl;
 			else
 				break;*/
@@ -82,7 +81,7 @@ namespace checkers
 				m_player_2 = new player(player_sign_2, player_name_2, get_coords);
 		}
 		if (against_bot)
-			m_player_2 = new bot('B', bot_intelligence, m_os);
+			m_player_2 = new bot('B', bot_search_depth, m_os);
 
 		// set play order and evaluation direction
 		m_player_1->set_first(true);

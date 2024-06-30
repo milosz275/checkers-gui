@@ -6,6 +6,19 @@
 namespace checkers
 {
 	class piece;
+
+	/**
+	 * @brief Class representing available move
+	 * 
+	 * This class is used to store information about available move in checkers game
+	 * 
+	 * @see available_move::available_move
+	 * 		- constructor
+	 * @see available_move::get_x
+	 * 		- returns x coordinate of available move
+	 * @see available_move::get_y
+	 * 		- returns y coordinate of available move
+	 */
 	class available_move
 	{
 		// x coordinate of available move

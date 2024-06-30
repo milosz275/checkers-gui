@@ -8,6 +8,19 @@ namespace checkers
 	class piece;
 	class king;
 	class game;
+	
+	/**
+	 * @brief Class representing event handler
+	 * 
+	 * This class is used to handle all events in the game
+	 * 
+	 * @see event_handler::event_handler
+	 * 		- constructor
+	 * @see event_handler::~event_handler
+	 * 		- destructor
+	 * @see event_handler::handle_events
+	 * 		- handles all events
+	 */
 	class event_handler
 	{
 		// pointer to the game

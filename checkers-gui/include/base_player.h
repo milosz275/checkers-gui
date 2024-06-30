@@ -13,6 +13,52 @@ namespace checkers
 	class piece;
 	class king;
 
+	/**
+	 * @brief Class representing player in checkers game
+	 * 
+	 * This class is used to store information about player in checkers game
+	 * 
+	 * @see base_player::base_player
+	 * 		- constructor
+	 * @see base_player::base_player
+	 * 		- copy constructor
+	 * @see base_player::~base_player
+	 * 		- destructor
+	 * @see base_player::get_coordinates
+	 * 		- loads coordinates
+	 * @see base_player::get_sign
+	 * 		- returns player's sign
+	 * @see base_player::get_name
+	 * 		- returns player nickname
+	 * @see base_player::is_first
+	 * 		- returns if a player is the first, meaning starts from the bottom of the board
+	 * @see base_player::set_first
+	 * 		- sets and returns flag indicating if a player is first
+	 * @see base_player::get_list
+	 * 		- returns the list of possible moves of the player
+	 * @see base_player::set_list
+	 * 		- sets and returns the list of possible moves of the player
+	 * @see base_player::get_pieces
+	 * 		- returns living pieces 
+	 * @see base_player::get_captured_pieces
+	 * 		- returns dead pieces
+	 * @see base_player::set_captured_pieces
+	 * 		- sets and returns dead pieces
+	 * @see base_player::get_combo
+	 * 		- returns if the player can move again
+	 * @see base_player::set_combo
+	 * 		- sets the combo flag and returns it
+	 * @see base_player::get_kings
+	 * 		- returns kings count
+	 * @see base_player::add_capture
+	 * 		- decreases pieces count, increases captured pieces count
+	 * @see base_player::change_to_king
+	 * 		- checks if the target piece could change into king and does it, if yes
+	 * @see base_player::print_player
+	 * 		- prints pieces of the player
+	 * @see operator<<
+	 * 		- prints player
+	 */
 	class base_player
 	{
 		// sign distinguishing the player from others

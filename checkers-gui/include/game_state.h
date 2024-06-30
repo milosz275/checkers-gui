@@ -5,6 +5,46 @@
 
 namespace checkers
 {
+	/**
+	 * @brief Class representing game state
+	 * 
+	 * This class is used to store information about current state of the game
+	 * 
+	 * @see game_state::game_state
+	 * 		- constructor
+	 * @see game_state::set_current_player
+	 * 		- sets and returns current player
+	 * @see game_state::get_current_player
+	 * 		- returns current player
+	 * @see game_state::set_next_player
+	 * 		- sets and returns next players
+	 * @see game_state::get_next_player
+	 * 		- returns next players
+	 * @see game_state::set_first_won
+	 * 		- sets and returns flag indicating that the first player won
+	 * @see game_state::get_first_won
+	 * 		- returns flag indicating that the first player won
+	 * @see game_state::set_second_won
+	 * 		- sets and returns flag indicating that the second player won
+	 * @see game_state::get_second_won
+	 * 		- returns flag indicating that the second player won
+	 * @see game_state::set_game_freeze
+	 * 		- sets and returns flag indicating if the game is frozen
+	 * @see game_state::get_game_freeze
+	 * 		- returns flag indicating if the game is frozen
+	 * @see game_state::set_any_changes
+	 * 		- sets and returns flag indicating that there were changes to the game
+	 * @see game_state::get_any_changes
+	 * 		- returns flag indicating that there were changes to the game
+	 * @see game_state::check_completion
+	 * 		- checks, if the flags were set to winning 
+	 * @see game_state::check_lists
+	 * 		- checks, if the lists of pieces are empty
+	 * @see game_state::reset_completion
+	 * 		- resets game completion along with winning flags
+	 * @see game_state::reset_state
+	 * 		- resets game freeze and sets flag indicating changes to true
+	 */
 	class game_state
 	{
 		// flag indicating if the game is frozen

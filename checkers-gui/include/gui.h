@@ -10,6 +10,31 @@
 namespace checkers
 {
 	class piece;
+
+	/**
+	 * @brief Class representing graphical user interface
+	 * 
+	 * This class is used to draw the board and pieces on it
+	 * 
+	 * @see gui::gui
+	 * 		- constructor
+	 * @see gui::get_event
+	 * 		- returns event
+	 * @see gui::get_window
+	 * 		- returns window
+	 * @see gui::get_clock
+	 * 		- returns clock
+	 * @see gui::get_square_size
+	 * 		- returns size of field
+	 * @see gui::get_radius
+	 * 		- returns radius of piece
+	 * @see gui::get_click_coordinates
+	 * 		- returns coordinates of performed click
+	 * @see gui::draw_board
+	 * 		- draws the board
+	 * @see gui::draw_piece
+	 * 		- draws the piece
+	 */
 	class gui
 	{
 		// target frames per second

@@ -4,9 +4,104 @@
 #include "dependencies.h"
 #include "global_variables.h"
 
+const int bot_search_depth = 1;
+
 namespace checkers
 {
 	class king;
+
+	/**
+	 * @brief Class representing game
+	 * 
+	 * This class is used to represent the game of checkers
+	 * 
+	 * @see game::game
+	 * 		- constructor
+	 * @see game::game
+	 * 		- copy constructor
+	 * @see game::~game
+	 * 		- destructor
+	 * @see game::get_gui
+	 * 		- returns gui
+	 * @see game::get_event_handler
+	 * 		- returns event handler
+	 * @see game::get_game_state
+	 * 		- returns game state
+	 * @see game::loop
+	 * 		- executes the game
+	 * @see game::get_is_finished
+	 * 		- returns flag indicating if the game is finished
+	 * @see game::get_score
+	 * 		- returns current game score (white pieces - black pieces)
+	 * @see game::get_last_capture_direction
+	 * 		- returns integer representing direction of last capture
+	 * @see game::set_last_capture_direction
+	 * 		- sets and returns integer representing direction of last capture
+	 * @see game::get_player_1
+	 * 		- returns first player (lower)
+	 * @see game::get_player_2
+	 * 		- returs second player (upper)
+	 * @see game::set_player_1
+	 * 		- sets and returns player 1
+	 * @see game::set_player_2
+	 * 		- sets and returns player 2
+	 * @see game::get_list_1
+	 * 		- returns piece list of player 1
+	 * @see game::get_list_2
+	 * 		- returns piece list of player 2
+	 * @see game::get_selected
+	 * 		- returns flag if anything was selected
+	 * @see game::set_selected
+	 * 		- sets and returns flag if anything was selected
+	 * @see game::get_selected_piece
+	 * 		- returns piece selected to move
+	 * @see game::set_selected_piece
+	 * 		- sets and returns piece selected to move
+	 * @see game::get_moving_piece
+	 * 		- returns moving piece
+	 * @see game::set_moving_piece
+	 * 		- sets and returns moving piece
+	 * @see game::get_available_capture
+	 * 		- returns currently evaluated possibility for at least one possible capture
+	 * @see game::set_available_capture
+	 * 		- sets and returns evaluation for the game
+	 * @see game::get_pieces
+	 * 		- returns list of pieces of the current player
+	 * @see game::get_board
+	 * 		- returns main game board
+	 * @see game::get_to_delete_list
+	 * 		- returns list of dead pieces (pieces captured during multicapture)
+	 * @see game::get_os
+	 * 		- returns output stream
+	 * @see game::get_log
+	 * 		- returns log stream
+	 * @see game::get_log_file
+	 * 		- returns reference to opened log file
+	 * @see game::move_piece
+	 * 		- runs a partial method of moving one specific piece
+	 * @see game::make_capture
+	 * 		- makes a singular capture using move_piece and delete_piece methods
+	 * @see game::evaluate
+	 * 		- evaluate all possible moves of the given player, returns true if there is at least on possible capture
+	 * @see game::clear_list
+	 * 		- clears available moves list for every piece in pieces list (gets through lists in list)
+	 * @see game::clear_to_delete_list
+	 * 		- clears list of dead pieces printed in multicapture
+	 * @see game::print_results
+	 * 		- prints result to the given stream
+	 * @see game::print_pieces
+	 * 		- prints alive pieces to the given stream
+	 * @see game::debug_info
+	 * 		- print basic info about the game
+	 * @see game::debug_ptrs
+	 * 		- checks pointers
+	 * @see game::debug_setup
+	 * 		- delivers game ready for debugging
+	 * @see game::event_handler
+	 * 		- gives the handler full access to the game
+	 * @see operator<<
+	 * 		- returns board to the stream
+	 */
 	class game
 	{
 		// main game board

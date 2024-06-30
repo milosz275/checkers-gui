@@ -5,6 +5,18 @@
 
 namespace checkers
 {
+	/**
+	 * @brief Class representing king piece
+	 * 
+	 * This class is derived from piece and represents king piece in checkers game
+	 * 
+	 * @see king::king
+	 * 		- constructor
+	 * @see king::~king
+	 * 		- destructor
+	 * @see king::setup_shape
+	 * 		- setups outer outline of the king
+	 */
 	class king : public piece
 	{
 	public:

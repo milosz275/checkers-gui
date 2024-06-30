@@ -7,6 +7,20 @@
 
 namespace checkers
 {
+	/**
+	 * @brief Class representing player
+	 * 
+	 * This class is derived from base_player and represents player in checkers game
+	 * 
+	 * @see player::player
+	 * 		- constructor
+	 * @see player::player
+	 * 		- copy constructor
+	 * @see player::~player
+	 * 		- destructor
+	 * @see player::get_coordinates
+	 * 		- method proxy using game (gui or stream) to get coordinates
+	 */
 	class player : public base_player
 	{
 		// pointer to game get_coordinates function

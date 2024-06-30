@@ -11,6 +11,45 @@
 namespace checkers
 {
 	class gui;
+
+	/**
+	 * @brief Class representing piece
+	 * 
+	 * This class is used to represent piece in checkers game
+	 * 
+	 * @see piece::piece
+	 * 		- constructor
+	 * @see piece::piece
+	 * 		- copy constructor
+	 * @see piece::~piece
+	 * 		- destructor
+	 * @see piece::setup_shape
+	 * 		- setups visual traits of the piece
+	 * @see piece::get_x
+	 * 		- returns x coordinate of the piece
+	 * @see piece::get_y
+	 * 		- returns y coordinate of the piece
+	 * @see piece::set_x
+	 * 		- sets x to x1 and returns it
+	 * @see piece::set_y
+	 * 		- sets y to y1 and returns it
+	 * @see piece::is_alive
+	 * 		- returns if the piece is alive
+	 * @see piece::get_owner
+	 * 		- returns the piece's owner
+	 * @see piece::set_owner
+	 * 		- sets and returns the piece's owner
+	 * @see piece::get_shape
+	 * 		- returns the shape of the piece
+	 * @see piece::operator<<
+	 * 		- lets to print the piece in given stream
+	 * @see piece::get_av_list
+	 * 		- returns the list of all evaluated moves
+	 * @see piece::get_gui
+	 * 		- returns gui of the piece
+	 * @see piece::draw
+	 * 		- draws the piece to the window
+	 */
 	class piece
 	{
 	protected:
