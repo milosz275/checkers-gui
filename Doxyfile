@@ -51,7 +51,7 @@ FULL_SIDEBAR = NO
 HTML_EXTRA_STYLESHEET  = doxygen-awesome-css/doxygen-awesome.css
 HTML_COLORSTYLE        = LIGHT
 
-INPUT                  = ./checkers-game
+INPUT                  = ./checkers-gui
 FILE_PATTERNS          = *.cpp *.h
 RECURSIVE              = YES
 EXCLUDE_PATTERNS       = */build/*
