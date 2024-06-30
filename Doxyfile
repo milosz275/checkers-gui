@@ -52,7 +52,7 @@ HTML_EXTRA_STYLESHEET  = doxygen-awesome-css/doxygen-awesome.css
 HTML_COLORSTYLE        = LIGHT
 
 INPUT                  = ./checkers-game
-FILE_PATTERNS          = *.c *.h
+FILE_PATTERNS          = *.cpp *.h
 RECURSIVE              = YES
 EXCLUDE_PATTERNS       = */build/*
 SKIP_FUNCTION_MACROS   = YES
