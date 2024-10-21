@@ -56,7 +56,6 @@ namespace checkers
 			else if (event.type == sfml::event::Resized)
 			{
 				m_game_pointer->get_game_state()->set_any_changes(true);
-				os << "test" << std::endl;
 			}
 			else if (event.type == sfml::event::MouseButtonPressed && event.mouseButton.button == sfml::mouse::Left || (bool)dynamic_cast<bot*>(m_game_pointer->get_game_state()->get_current_player()) || m_game_pointer->m_console_game)
 			{

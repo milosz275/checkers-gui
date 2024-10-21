@@ -80,6 +80,7 @@ namespace checkers
 			if (!against_bot)
 				m_player_2 = new player(player_sign_2, player_name_2, get_coords);
 		}
+		int bot_search_depth = 1;
 		if (against_bot)
 			m_player_2 = new bot('B', bot_search_depth, m_os);
 
@@ -290,7 +291,7 @@ namespace checkers
 	std::ostream& operator<<(std::ostream& os, const std::vector<std::vector<piece*>>* board)
 	{
 		os << "\t  ";
-		for (char a = 'a'; a < 'a' + checkers::s_size; ++a) // colums as letters
+		for (char a = 'a'; a < 'a' + checkers::s_size; ++a) // columns as letters
 			os << a << "   ";
 		/*for (int i = 0; i < checkers::size; ++i)
 			os << i << "   ";*/
@@ -320,19 +321,9 @@ namespace checkers
 		m_to_delete_list.clear();
 		m_selected_piece = nullptr;
 		m_moving_piece = nullptr;
-		if (m_board)
-		{
-			for_each(m_board->begin(), m_board->end(), [](std::vector<piece*>& row)
-				{
-					for_each(row.begin(), row.end(), [](piece* p)
-						{
-							if (p)
-								delete p;
-						});
-					row.clear();
-				});
-			m_board->clear();
-		}
+		for (auto& row : *m_board)
+			for (piece* p : row) delete p;
+		delete m_board;
 
 		if (m_player_1)
 			delete m_player_1;
@@ -1762,6 +1753,10 @@ namespace checkers
 		// players
 		base_player* player = m_game_state->get_current_player();
 		base_player* opponent = m_game_state->get_next_player();
+
+		if (player == nullptr || opponent == nullptr) {
+            throw std::runtime_error("Player or opponent is null");
+        }
 
 		bool multicapture = !(*dead_list).empty();
 
